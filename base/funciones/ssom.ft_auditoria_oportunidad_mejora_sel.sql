@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION ssom.ft_auditoria_oportunidad_mejora_sel (
 	p_administrador integer,
 	p_id_usuario integer,
