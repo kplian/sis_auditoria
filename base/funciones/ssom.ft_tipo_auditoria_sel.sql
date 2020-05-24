@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_tipo_auditoria_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -96,63 +96,6 @@ BEGIN
 
 		end;
 
-		/*++++++++++++++++++++++++++++++++++++++++++++++++*/
-		/*********************************
-    #TRANSACCION:  'SSOM_TAUX1_SEL'
-    #DESCRIPCION:	Consulta de datos
-    #AUTOR:		max.camacho
-    #FECHA:		17-07-2019 13:23:26
-    ***********************************/
-
-	elsif(p_transaccion='SSOM_TAUX1_SEL')then
-
-		begin
-			--Sentencia de la consulta
-			v_consulta:='select
-                			te.id_tipo_estado,
-                            tp.id_tipo_proceso,
-                            te.codigo,
-                            te.nombre_estado,
-                            te.etapa
-                            from wf.tproceso_macro pm
-                            join wf.ttipo_proceso tp on pm.id_proceso_macro = tp.id_proceso_macro
-                            join wf.ttipo_estado te on tp.id_tipo_proceso = te.id_tipo_proceso
-                            where pm.codigo = ''SAOM'' and tp.estado_reg = ''activo'' and tp.inicio = ''si'' and (te.codigo = ''vob_programado'' or te.codigo = ''vob_planificacion'' or te.codigo = ''vob_informe'') and ';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-
-		/*********************************
-    #TRANSACCION:  'SSOM_TAUX1_CONT'
-    #DESCRIPCION:	Conteo de registros
-    #AUTOR:		max.camacho
-    #FECHA:		17-07-2019 13:23:26
-    ***********************************/
-
-	elsif(p_transaccion='SSOM_TAUX1_CONT')then
-
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(te.id_tipo_estado)
-                            from wf.tproceso_macro pm
-                            join wf.ttipo_proceso tp on pm.id_proceso_macro = tp.id_proceso_macro
-                            join wf.ttipo_estado te on tp.id_tipo_proceso = te.id_tipo_proceso
-                            where pm.codigo = ''SAOM'' and tp.estado_reg = ''activo'' and tp.inicio = ''si'' and (te.codigo = ''vob_programado'' or te.codigo = ''vob_planificacion'' or te.codigo = ''vob_informe'') and';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-		/*++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 	else
 
@@ -170,8 +113,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_tipo_auditoria_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

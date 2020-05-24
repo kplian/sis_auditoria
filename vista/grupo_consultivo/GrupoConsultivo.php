@@ -38,21 +38,21 @@ Phx.vista.GrupoConsultivo=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 emptyText: 'Elija una opción...',
                 store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/GrupoConsultivo/getListEmpresa',
+                    url: '../../sis_parametros/control/Empresa/listarEmpresa',
                     id: 'id_empresa',
                     root: 'datos',
                     sortInfo: {
-                        field: 'empresa',
+                        field: 'nombre',
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_empresa', 'empresa'],
+                    fields: ['id_empresa', 'nombre'],
                     remoteSort: true,
-                    baseParams: {par_filtro: 'empresa'}
+                    baseParams: {par_filtro: 'nombre'}
                 }),
                 valueField: 'id_empresa',
-                displayField: 'empresa',
-                gdisplayField: 'empresa',
+                displayField: 'nombre',
+                gdisplayField: 'nombre',
                 hiddenName: 'id_empresa',
                 forceSelection: true,
                 typeAhead: false,
@@ -62,7 +62,7 @@ Phx.vista.GrupoConsultivo=Ext.extend(Phx.gridInterfaz,{
                 pageSize: 15,
                 queryDelay: 1000,
                 anchor: '80%',
-                gwidth: 150,
+                gwidth: 200,
                 minChars: 2,
                 renderer : function(value, p, record) {
                     return String.format('{0}', record.data['empresa']);
@@ -80,8 +80,7 @@ Phx.vista.GrupoConsultivo=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Grupo Consultivo',
                 allowBlank: false,
                 anchor: '80%',
-                gwidth: 100,
-                maxLength:100
+                gwidth: 200
             },
             type:'TextField',
             filters:{pfiltro:'gct.nombre_gconsultivo',type:'string'},
@@ -95,8 +94,7 @@ Phx.vista.GrupoConsultivo=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Descripcion',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 100,
-                //maxLength:-5
+                gwidth: 200
             },
             type:'TextArea',
             filters:{pfiltro:'gct.descrip_gconsultivo',type:'string'},
@@ -338,18 +336,14 @@ Phx.vista.GrupoConsultivo=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
     onButtonNew: function(){
-
         Phx.vista.GrupoConsultivo.superclass.onButtonNew.call(this);
-        //alert("Valor del RP:",this.Cmp.requiere_programacion.store.data);
         this.getFormGC();
 
     },
     getFormGC: function(){
-        //alert("Valor del RP:",this.Cmp.requiere_programacion.value);
         this.Cmp.requiere_programacion.on('select',function (combo,record,index) {
-            console.log('combo',combo, 'record',record, 'index',index);
             if(record.data.requiere_programacion.originalValue === 0){
                 this.formGrupoConsultivo();
             }
@@ -360,20 +354,15 @@ Phx.vista.GrupoConsultivo=Ext.extend(Phx.gridInterfaz,{
         },this);
     },
     formGrupoConsultivo: function () {
-        //Phx.vista.AuditoriaOportunidadMejora.superclass.onButtonEdit.call(this);
         this.ocultarComponente(this.Cmp.nombre_programacion);
         this.ocultarComponente(this.Cmp.nombre_formulario);
-
         this.mostrarComponente(this.Cmp.id_empresa);
         this.mostrarComponente(this.Cmp.nombre_gconsultivo);
         this.mostrarComponente(this.Cmp.descrip_gconsultivo);
         this.mostrarComponente(this.Cmp.requiere_programacion);
         this.mostrarComponente(this.Cmp.requiere_formulario);
-
     },
     formGCRP: function () {
-        //Phx.vista.AuditoriaOportunidadMejora.superclass.onButtonEdit.call(this);
-
         this.mostrarComponente(this.Cmp.id_empresa);
         this.mostrarComponente(this.Cmp.nombre_gconsultivo);
         this.mostrarComponente(this.Cmp.descrip_gconsultivo);

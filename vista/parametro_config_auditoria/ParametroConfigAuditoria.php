@@ -285,7 +285,7 @@ Phx.vista.ParametroConfigAuditoria=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:false
 	}
 )
 </script>

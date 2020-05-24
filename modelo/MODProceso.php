@@ -111,26 +111,6 @@ class MODProceso extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-    /*************   Inicio definicion mas funciones ******************/
-    function getListUO(){
-        $this->procedimiento='ssom.ft_proceso_sel';
-        $this->transaccion='SSOM_PCSE1_SEL';
-        $this->tipo_procedimiento='SEL';//tipo de transaccion
-
-        //Definicion de la lista del resultado del query
-        $this->captura('id_uo','int4');
-        $this->captura('nombre_unidad','varchar');
-
-        //Ejecuta la instruccion
-        $this->armarConsulta();
-        $this->ejecutarConsulta();
-
-        //Devuelve la respuesta
-        return $this->respuesta;
-        //return "";
-    }
-
-    /*************   Fin definicion mas funciones ******************/
 			
 }
 ?>

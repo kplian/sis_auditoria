@@ -37,8 +37,7 @@ Phx.vista.TipoAuditoria=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Tipo Auditoria',
                 allowBlank: false,
                 anchor: '80%',
-                gwidth: 100,
-                maxLength:100
+                gwidth: 200
             },
             type:'TextField',
             filters:{pfiltro:'tau.tipo_auditoria',type:'string'},
@@ -52,8 +51,7 @@ Phx.vista.TipoAuditoria=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Codigo',
                 allowBlank: false,
                 anchor: '80%',
-                gwidth: 100,
-                maxLength:100
+                gwidth: 100
             },
             type:'TextField',
             filters:{pfiltro:'tau.codigo_tpo_aom',type:'string'},
@@ -67,8 +65,7 @@ Phx.vista.TipoAuditoria=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Descripcion',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
-				//maxLength:-5
+				gwidth: 100
 			},
 				type:'TextArea',
 				filters:{pfiltro:'tau.descrip_auditoria',type:'string'},
@@ -211,7 +208,7 @@ Phx.vista.TipoAuditoria=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
     onButtonNew:function () {
         Phx.vista.TipoAuditoria.superclass.onButtonNew.call(this);
         this.Cmp.codigo_tpo_aom.enable();

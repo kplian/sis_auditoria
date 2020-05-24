@@ -7,14 +7,13 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 
-class ACTParametro extends ACTbase{    
-			
+class ACTParametro extends ACTbase{
 	function listarParametro(){
 		$this->objParam->defecto('ordenacion','id_parametro');
 		$this->objParam->defecto('dir_ordenacion','asc');
 		//************SSSS
-        if($this->objParam->getParametro('id_tipo_parametro') != '') {
-            $this->objParam->addFiltro("prm.id_tipo_parametro = " .$this->objParam->getParametro('id_tipo_parametro'));
+        if($this->objParam->getParametro('tipo_norma') != '') {
+            $this->objParam->addFiltro("tpp.tipo_parametro =  ''" .$this->objParam->getParametro('tipo_norma')."'' ");
         }
         
         if($this->objParam->getParametro('tipo_parametro') != '') {
@@ -62,40 +61,6 @@ class ACTParametro extends ACTbase{
 		$this->res=$this->objFunc->eliminarParametro($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-    function getListParametro(){
-
-        $this->objParam->defecto('ordenacion','id_parametro');
-        $this->objParam->defecto('dir_ordenacion','asc');
-        //************SSS
-       // var_dump($this->objParam->getParametro('x'));
-        /*if($this->objParam->getParametro('x') != '') {
-            $this->objParam->addFiltro("x =''".$this->objParam->getParametro('x')."''");
-        }
-        if($this->objParam->getParametro('parametro_to') == 'OBJETO_AUDITORIA') {
-            $this->objParam->addFiltro("tpp.tipo_parametro =''".$this->objParam->getParametro('parametro_to')."''");
-        }*/
-        //var_dump('Hola parametro',$this->objParam);
-        //************SSS
-        $this->objFunc=$this->create('MODParametro');
-        $this->res=$this->objFunc->getListParametro($this->objParam);
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
-    function getListParametro2(){
-        $this->objParam->defecto('ordenacion','id_parametro');
-        $this->objParam->defecto('dir_ordenacion','asc');
-
-        $this->objFunc=$this->create('MODParametro');
-        $this->res=$this->objFunc->getListParametro2($this->objParam);
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
-    function getListTipoOM(){
-        $this->objParam->defecto('ordenacion','id_parametro');
-        $this->objParam->defecto('dir_ordenacion','asc');
-
-        $this->objFunc=$this->create('MODParametro');
-        $this->res=$this->objFunc->getListTipoOM($this->objParam);
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
 			
 }
 

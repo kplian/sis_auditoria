@@ -21,20 +21,6 @@ class ACTTipoAuditoria extends ACTbase{
 			
 			$this->res=$this->objFunc->listarTipoAuditoria($this->objParam);
 		}
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
-    function filtroTipoAuditoria(){
-        $this->objParam->defecto('ordenacion','id_tipo_auditoria');
-        $this->objParam->defecto('dir_ordenacion','asc');
-
-        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
-            $this->objReporte = new Reporte($this->objParam,$this);
-            $this->res = $this->objReporte->generarReporteListado('MODTipoAuditoria','listarTipoAuditoria');
-        } else{
-            $this->objFunc=$this->create('MODTipoAuditoria');
-
-            $this->res=$this->objFunc->listarTipoAuditoria($this->objParam);
-        }
         if($this->objParam->getParametro('_adicionar')!=''){
 
             $respuesta = $this->res->getDatos();
@@ -48,8 +34,8 @@ class ACTTipoAuditoria extends ACTbase{
             ));
             $this->res->setDatos($respuesta);
         }
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 	function insertarTipoAuditoria(){
 		$this->objFunc=$this->create('MODTipoAuditoria');	
 		if($this->objParam->insertar('id_tipo_auditoria')){
@@ -65,15 +51,6 @@ class ACTTipoAuditoria extends ACTbase{
 		$this->res=$this->objFunc->eliminarTipoAuditoria($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-    function listCodigoEstadoVoBAuditoria(){
-
-        $this->objParam->defecto('ordenacion','id_tipo_auditoria');
-        $this->objParam->defecto('dir_ordenacion','desc');
-        $this->objFunc=$this->create('MODTipoAuditoria');
-
-        $this->res=$this->objFunc->listCodigoEstadoVoBAuditoria($this->objParam);
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
 			
 }
 

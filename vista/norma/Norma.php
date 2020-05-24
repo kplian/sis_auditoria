@@ -18,7 +18,6 @@ Phx.vista.Norma=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Norma.superclass.constructor.call(this,config);
 		this.init();
 		this.load({params:{start:0, limit:this.tam_pag}});
-        console.log('hola');
 	},
 
 	Atributos:[
@@ -50,7 +49,7 @@ Phx.vista.Norma=Ext.extend(Phx.gridInterfaz,{
 					totalProperty: 'total',
 					fields: ['id_parametro', 'valor_parametro', 'id_tipo_parametro'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'prm.id_parametro#prm.valor_parametro',id_tipo_parametro:3}
+					baseParams: {par_filtro: 'prm.id_parametro#prm.valor_parametro',tipo_norma:'TIPO_NORMA'}
 				}),
 				valueField: 'id_parametro',
 				displayField: 'valor_parametro',
@@ -64,10 +63,9 @@ Phx.vista.Norma=Ext.extend(Phx.gridInterfaz,{
 				pageSize: 15,
 				queryDelay: 1000,
 				anchor: '50%',
-				gwidth: 90,
+				gwidth: 200,
 				minChars: 2,
 				renderer : function(value, p, record) {
-					//return String.format('{0}', record.data['valor_parametro']);
 					return String.format('{0}', record.data['desc_tn']);
 				}
 			},
@@ -253,7 +251,6 @@ Phx.vista.Norma=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		//****************************
 		{name:'desc_tn', type: 'string'},
 
 	],
@@ -262,8 +259,7 @@ Phx.vista.Norma=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
-
+	bsave:false,
     tabsouth:[
 			{
 				url:'../../../sis_auditoria/vista/punto_norma/PuntoNorma.php',
@@ -272,7 +268,6 @@ Phx.vista.Norma=Ext.extend(Phx.gridInterfaz,{
 				cls: 'PuntoNorma'
 			}
 	]
-	//**********Hasta aqui
 	}
 )
 </script>

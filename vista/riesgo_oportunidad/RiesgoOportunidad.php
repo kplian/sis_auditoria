@@ -245,20 +245,7 @@ Phx.vista.RiesgoOportunidad=Ext.extend(Phx.gridInterfaz,{
 		direction: 'DESC'
 	},
 	bdel:true,
-	bsave:false/*,
-    onReloadPage:function(m){
-        this.maestro=m;
-        this.store.baseParams = {id_aom: this.maestro.id_aom};
-        this.load({params:{start:0, limit:50}});
-        this.Cmp.id_aom.disable(true);
-        this.Cmp.id_norma.store.baseParams.p_id_parametro = this.maestro.id_tnorma;
-
-    },
-    loadValoresIniciales: function () {
-        Phx.vista.RiesgoOportunidad.superclass.loadValoresIniciales.call(this);
-        this.Cmp.id_aom.setValue(this.maestro.id_aom);
-    },*/
-
+	bsave:false
 	}
 )
 </script>

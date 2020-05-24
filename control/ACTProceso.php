@@ -17,10 +17,7 @@ class ACTProceso extends ACTbase{
 			$this->res = $this->objReporte->generarReporteListado('MODProceso','listarProceso');
 		} else{
 			$this->objFunc=$this->create('MODProceso');
-			
 			$this->res=$this->objFunc->listarProceso($this->objParam);
-			//var_dump($this->res); exit;
-
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
@@ -40,22 +37,6 @@ class ACTProceso extends ACTbase{
 		$this->res=$this->objFunc->eliminarProceso($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-	/*************   inicio definicion mas funciones ******************/
-	function getListUO(){
-        $this->objParam->defecto('ordenacion','id_uo');
-
-        $this->objParam->defecto('dir_ordenacion','asc');
-
-        $this->objFunc=$this->create('MODProceso');
-
-        $this->res=$this->objFunc->getListUO($this->objParam);
-        //var_dump($this->res); exit;
-
-        $this->res->imprimirRespuesta($this->res->generarJson());
-	    //return "";
-    }
-    /*************   fin definicion mas funciones ******************/
-			
 }
 
 ?>

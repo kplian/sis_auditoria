@@ -39,15 +39,6 @@ class ACTGrupoConsultivo extends ACTbase{
 		$this->res=$this->objFunc->eliminarGrupoConsultivo($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-	function getListEmpresa(){
-	    $this->objParam->defecto('ordenacion','id_empresa');
-	    $this->objParam->defecto('dir_ordenacion', 'asc') ;
-
-	    $this->objFunc=$this->create('MODGrupoConsultivo');
-	    $this->res=$this->objFunc->getListEmpresa($this->objParam);
-
-	    $this->res->imprimirRespuesta($this->res->generarJson());
-    }
 			
 }
 

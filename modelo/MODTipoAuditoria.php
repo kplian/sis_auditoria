@@ -99,26 +99,5 @@ class MODTipoAuditoria extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-    function listCodigoEstadoVoBAuditoria(){
-        //Definicion de variables para ejecucion del procedimientp
-        $this->procedimiento='ssom.ft_tipo_auditoria_sel';
-        $this->transaccion='SSOM_TAUX1_SEL';
-        $this->tipo_procedimiento='SEL';//tipo de transaccion
-
-        //Definicion de la lista del resultado del query
-        $this->captura('id_tipo_estado','int4');
-        $this->captura('id_tipo_proceso','int4');
-        $this->captura('codigo','varchar');
-        $this->captura('nombre_estado','varchar');
-        $this->captura('etapa','varchar');
-
-        //Ejecuta la instruccion
-        $this->armarConsulta();
-        $this->ejecutarConsulta();
-
-        //Devuelve la respuesta
-        return $this->respuesta;
-    }
-			
 }
 ?>

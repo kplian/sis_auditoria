@@ -17,7 +17,6 @@ Phx.vista.PuntoNorma=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.PuntoNorma.superclass.constructor.call(this,config);
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag}})
 	},
 			
 	Atributos:[
@@ -223,9 +222,7 @@ Phx.vista.PuntoNorma=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
-	
-	//******añadimos codigo para enlazar con la interfaz fuerte ***SSS
+	bsave:false,
 	onReloadPage: function(m){
 		this.maestro=m;
 		this.store.baseParams={id_norma:this.maestro.id_norma};
@@ -237,7 +234,6 @@ Phx.vista.PuntoNorma=Ext.extend(Phx.gridInterfaz,{
 		this.Cmp.id_norma.setValue(this.maestro.id_norma);
 		
 	},
-	///*****codigo ahora punto norma es padre de preguntas insertamso codigo
 	tabeast:[
 		{
 			url:'../../../sis_auditoria/vista/pregunta/Pregunta.php',
@@ -246,8 +242,6 @@ Phx.vista.PuntoNorma=Ext.extend(Phx.gridInterfaz,{
             cls: 'Pregunta'
 		}
 	]
-	
-	//************
 	}
 )
 </script>

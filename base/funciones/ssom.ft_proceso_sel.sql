@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_proceso_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -60,17 +60,12 @@ BEGIN
 						pcs.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        vf.desc_funcionario1
-                        --vig.vigencia
+                        initcap(vf.desc_funcionario1) as desc_funcionario1
 						from ssom.tproceso pcs
 						inner join segu.tusuario usu1 on usu1.id_usuario = pcs.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = pcs.id_usuario_mod
                         join orga.vfuncionario as vf on pcs.id_responsable=vf.id_funcionario
-                        --join ssom.tvigencia as vig on pcs.id_vigencia=vig.id_vigencia
 				        where  ';
-			--uo.nombre_unidad
-			--join orga.tuo as uo on pcs.id_responsable=uo.id_uo
-			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
@@ -104,56 +99,6 @@ BEGIN
 			return v_consulta;
 
 		end;
-
-		/*++++++++++  Inicio adicion de funciones  ++++++++++++*/
-		/**********************************
-        #TRANSACCION:  'SSOM_PCSE1_SEL'
-        #DESCRIPCION:	Consulta de datos de UO
-        #AUTOR:		max.camacho
-        #FECHA:		15-07-2019 20:16:48
-        ***********************************/
-
-	elsif(p_transaccion='SSOM_PCSE1_SEL')then
-
-		begin
-			--Sentencia de la consulta
-			v_consulta:='select
-                  id_uo,
-                  nombre_unidad
-                  from orga.tuo
-                  where  ';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-		/**********************************
-    #TRANSACCION:  'SSOM_PCSE1_CONT'
-    #DESCRIPCION:	Conteo de registros de UO
-    #AUTOR:		max.camacho
-    #FECHA:		15-07-2019 20:16:48
-    ***********************************/
-	elsif(p_transaccion='SSOM_PCSE1_CONT')then
-
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_uo)
-                      from orga.tuo
-                      where ';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-		/*++++++++++++ Fin adicion de funciones  +++++++++++++*/
-
 	else
 
 		raise exception 'Transaccion inexistente';
@@ -170,8 +115,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_proceso_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

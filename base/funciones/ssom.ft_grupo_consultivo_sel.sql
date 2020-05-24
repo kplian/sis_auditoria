@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_grupo_consultivo_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -102,55 +102,6 @@ BEGIN
 			return v_consulta;
 
 		end;
-		/*+++++++++++++  Inicio  +++++++++++++++*/
-		/*********************************
-    #TRANSACCION:  'SSOM_GCTX1_SEL'
-    #DESCRIPCION:	Lista de Empresa
-    #AUTOR:		max.camacho
-    #FECHA:		22-07-2019 23:01:14
-    ***********************************/
-
-	elsif(p_transaccion='SSOM_GCTX1_SEL')then
-		v_banderaE = pxp.f_get_variable_global('ssom_obtener_lista_empresa');
-		begin
-			--Sentencia de la consulta
-			v_consulta:='select
-                                id_uo as id_empresa,
-                                nombre_unidad as empresa
-                                from orga.tuo
-                                where id_nivel_organizacional in ('||v_banderaE||') and';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-		/*********************************
-    #TRANSACCION:  'SSOM_GCTX1_CONT'
-    #DESCRIPCION:	Conteo de registros
-    #AUTOR:		max.camacho
-    #FECHA:		22-07-2019 23:01:14
-    ***********************************/
-
-	elsif(p_transaccion='SSOM_GCTX1_CONT')then
-		v_banderaE = pxp.f_get_variable_global('ssom_obtener_lista_empresa');
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(uo.id_uo)
-                                from orga.tuo as uo
-                                where id_nivel_organizacional in ('||v_banderaE||') and';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-		/*+++++++++++++++++   Fin   ++++++++++++++++++++*/
 
 	else
 
@@ -168,8 +119,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_grupo_consultivo_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

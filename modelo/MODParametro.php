@@ -85,7 +85,6 @@ class MODParametro extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
 	function eliminarParametro(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_parametro_ime';
@@ -102,63 +101,5 @@ class MODParametro extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-    function getListParametro(){
-        //Definicion de variables para ejecucion del procedimientp
-        $this->procedimiento='ssom.ft_parametro_sel';
-        $this->transaccion='SSOM_PRMX1_SEL';
-        $this->tipo_procedimiento='SEL';//tipo de transaccion
-
-        //Definicion de la lista del resultado del query
-        $this->captura('id_parametro','int4');
-        $this->captura('id_tipo_parametro','int4');
-        $this->captura('valor_parametro','varchar');
-        $this->captura('tipo_parametro','varchar');
-
-        //Ejecuta la instruccion
-        $this->armarConsulta();
-        $this->ejecutarConsulta();
-
-        //Devuelve la respuesta
-        return $this->respuesta;
-    }
-    function getListParametro2(){
-        //Definicion de variables para ejecucion del procedimientp
-        $this->procedimiento='ssom.ft_parametro_sel';
-        $this->transaccion='SSOM_PRMX2_SEL';
-        $this->tipo_procedimiento='SEL';//tipo de transaccion
-
-        //Definicion de la lista del resultado del query
-        $this->captura('id_parametro','int4');
-        $this->captura('id_tipo_parametro','int4');
-        $this->captura('valor_parametro','varchar');
-        $this->captura('tipo_parametro','varchar');
-
-        //Ejecuta la instruccion
-        $this->armarConsulta();
-        $this->ejecutarConsulta();
-
-        //Devuelve la respuesta
-        return $this->respuesta;
-    }
-    function getListTipoOM(){
-        //Definicion de variables para ejecucion del procedimientp
-        $this->procedimiento='ssom.ft_parametro_sel';
-        $this->transaccion='SSOM_PRMX3_SEL';
-        $this->tipo_procedimiento='SEL';//tipo de transaccion
-
-        //Definicion de la lista del resultado del query
-        $this->captura('id_parametro','int4');
-        $this->captura('id_tipo_parametro','int4');
-        $this->captura('valor_parametro','varchar');
-        $this->captura('tipo_parametro','varchar');
-
-        //Ejecuta la instruccion
-        $this->armarConsulta();
-        $this->ejecutarConsulta();
-
-        //Devuelve la respuesta
-        return $this->respuesta;
-    }
-			
 }
 ?>

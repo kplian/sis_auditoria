@@ -112,25 +112,6 @@ class MODGrupoConsultivo extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-    function getListEmpresa(){
-        //Definicion de variables para ejecucion del procedimientp
-        $this->procedimiento='ssom.ft_grupo_consultivo_sel';
-        $this->transaccion='SSOM_GCTX1_SEL';
-        $this->tipo_procedimiento='SEL';//tipo de transaccion
-
-        //Definicion de la lista del resultado del query
-        $this->captura('id_empresa','int4');
-        $this->captura('empresa','varchar');
-
-
-
-        //Ejecuta la instruccion
-        $this->armarConsulta();
-        $this->ejecutarConsulta();
-
-        //Devuelve la respuesta
-        return $this->respuesta;
-    }
 			
 }
 ?>

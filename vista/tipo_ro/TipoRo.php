@@ -199,15 +199,13 @@ Phx.vista.TipoRo=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
     onButtonNew:function () {
         Phx.vista.TipoRo.superclass.onButtonNew.call(this);
-        //this.ocultarComponente(this.Cmp.tipo_ro);
         this.Cmp.tipo_ro.enable();
     },
     onButtonEdit:function () {
         Phx.vista.TipoRo.superclass.onButtonEdit.call(this);
-        //this.ocultarComponente(this.Cmp.tipo_ro);
         this.Cmp.tipo_ro.disable();
     }
 	}

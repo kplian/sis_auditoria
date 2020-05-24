@@ -91,49 +91,6 @@ Phx.vista.Proceso=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
-        /*{
-            config: {
-                name: 'id_responsable',
-                fieldLabel: 'Responsable',
-                allowBlank: false,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/Proceso/getListUO',
-                    id: 'id_ou',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre_unidad',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_uo', 'nombre_unidad'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'UO.nombre_unidad'}
-                }),
-                valueField: 'id_uo',
-                displayField: 'nombre_unidad',
-                gdisplayField: 'nombre_unidad',
-                hiddenName: 'id_responsable',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '100%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['nombre_unidad']);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
-        },*/
         {
             config:{
                 name:'id_responsable',
@@ -147,7 +104,7 @@ Phx.vista.Proceso=Ext.extend(Phx.gridInterfaz,{
                 baseParams: { es_combo_solicitud : 'si' },
                 renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario1']);}
             },
-            type:'ComboRec',//ComboRec
+            type:'ComboRec',
             id_grupo:0,
             filters:{pfiltro:'fun.desc_funcionario1',type:'string'},
             bottom_filter:true,
@@ -316,9 +273,7 @@ Phx.vista.Proceso=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		{name:'desc_funcionario1', type: 'string'},
-		//{name:'nombre_unidad', type: 'string'},
-		//{name:'vigencia', type: 'string'},
+		{name:'desc_funcionario1', type: 'string'}
 
 	],
 	sortInfo:{
@@ -326,19 +281,14 @@ Phx.vista.Proceso=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
     onButtonNew:function(){
-        Phx.vista.Proceso.superclass.onButtonNew.call(this);//habilita el boton y se abre
+        Phx.vista.Proceso.superclass.onButtonNew.call(this);
         this.ocultarComponente(this.Cmp.codigo_proceso);
-        console.log("nuevo");
-       // this.mostrarComponente(this.Cmp.tipo_periodo);
-
         },
     onButtonEdit:function(){
-        Phx.vista.Proceso.superclass.onButtonEdit.call(this);//habilita el boton y se abre
+        Phx.vista.Proceso.superclass.onButtonEdit.call(this);
         this.ocultarComponente(this.Cmp.codigo_proceso);
-        console.log("edit");
-        // this.mostrarComponente(this.Cmp.tipo_periodo);
     }
 	}
 )

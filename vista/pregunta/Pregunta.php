@@ -211,20 +211,15 @@ Phx.vista.Pregunta=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:false,
-	//****************
 	onReloadPage: function(m){
-	this.maestro=m;
-	this.store.baseParams={id_pn:this.maestro.id_pn};
-	this.load({params:{start:0, limit:50}});
-
+        this.maestro=m;
+        this.store.baseParams={id_pn:this.maestro.id_pn};
+        this.load({params:{start:0, limit:50}});
 	},
-	loadValoresIniciales:function()
-	{
+	loadValoresIniciales:function() {
 		Phx.vista.Pregunta.superclass.loadValoresIniciales.call(this);
 		this.Cmp.id_pn.setValue(this.maestro.id_pn);
-
 	}
-	//*******************
 	}
 )
 </script>
