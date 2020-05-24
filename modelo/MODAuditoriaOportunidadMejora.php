@@ -310,40 +310,6 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-    function updateRecomendation(){
-        //Definicion de variables para ejecucion del procedimiento
-        $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_ime';
-        $this->transaccion='SSOM_AOMRC_MOD';
-        $this->tipo_procedimiento='IME';
-
-        //Define los parametros para la funcion
-        $this->setParametro('id_aom','id_aom','int4');
-        $this->setParametro('recomendacion','recomendacion','codigo_html');
-        //$this->setParametro('recomendacion','recomendacion','text');
-        //Ejecuta la instruccion
-        $this->armarConsulta();
-        $this->ejecutarConsulta();
-
-        //Devuelve la respuesta
-        return $this->respuesta;
-    }
-    function updateActaRC(){
-        //Definicion de variables para ejecucion del procedimiento
-        $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_ime';
-        $this->transaccion='SSOM_OMARC_MOD';
-        $this->tipo_procedimiento='IME';
-
-        //Define los parametros para la funcion
-        $this->setParametro('id_aom','id_aom','int4');
-        $this->setParametro('acta','acta','codigo_html');
-        //$this->setParametro('recomendacion','recomendacion','text');
-        //Ejecuta la instruccion
-        $this->armarConsulta();
-        $this->ejecutarConsulta();
-
-        //Devuelve la respuesta
-        return $this->respuesta;
-    }
     function siguienteEstado(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento = 'ssom.ft_auditoria_oportunidad_mejora_ime';
@@ -412,39 +378,6 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-    function verificarPlanificacion(){
-        //Definicion de variables para ejecucion del procedimientp
-        $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_ime';
-        $this->transaccion='SSOM_ANEXT_MOD';
-        $this->tipo_procedimiento='IME';//tipo de transaccion
-        $this->setCount(false);
-
-        $this->setParametro('p_id_aom','p_id_aom','int4');
-        $this->setParametro('p_id_funcionario','p_id_funcionario','int4');
-        $this->setParametro('p_lugar','p_lugar','varchar');
-        $this->setParametro('p_id_tnorma','p_id_tnorma','varchar');
-        $this->setParametro('p_id_tobjeto','p_id_tobjeto','varchar');
-        $this->setParametro('p_fecha_eje_inicio','p_fecha_eje_inicio','date');
-        $this->setParametro('p_fecha_eje_fin','p_fecha_eje_fin','date');
-
-        //$this->setParametro('p_unidad','p_unidad','varchar');
-        //$this->setParametro('p_codigo_aom','p_codigo_aom','varchar');
-        //var_dump($this->objParam);exit;
-
-        //Definicion de la lista del resultado del query
-        //$this->captura('id_tipo_estado','int4');
-        /*$this->captura('id_tipo_proceso','int4');
-        $this->captura('codigo','varchar');
-        $this->captura('nombre_estado','varchar');
-        $this->captura('estado_reg','varchar');*/
-
-        //Ejecuta la instruccion
-        $this->armarConsulta();
-        $this->ejecutarConsulta();
-        //var_dump($this->respuesta);exit;
-        //Devuelve la respuesta
-        return $this->respuesta;
-    }
     function verificarInforme(){
         //Definicion de variables para ejecucion del procedimientp
         $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_ime';
@@ -459,17 +392,6 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         $this->setParametro('p_id_tobjeto','p_id_tobjeto','varchar');
         $this->setParametro('p_fecha_eje_inicio','p_fecha_eje_inicio','date');
         $this->setParametro('p_fecha_eje_fin','p_fecha_eje_fin','date');
-
-        //$this->setParametro('p_unidad','p_unidad','varchar');
-        //$this->setParametro('p_codigo_aom','p_codigo_aom','varchar');
-        //var_dump($this->objParam);exit;
-
-        //Definicion de la lista del resultado del query
-        //$this->captura('id_tipo_estado','int4');
-        /*$this->captura('id_tipo_proceso','int4');
-        $this->captura('codigo','varchar');
-        $this->captura('nombre_estado','varchar');
-        $this->captura('estado_reg','varchar');*/
 
         //Ejecuta la instruccion
         $this->armarConsulta();

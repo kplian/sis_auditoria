@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_auditoria_oportunidad_mejora_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -62,95 +62,72 @@ BEGIN
 	***********************************/
 
 	if(p_transaccion='SSOM_AOM_SEL')then
-
 		begin
-
-			--Sentencia de la consulta
-			v_consulta:='select
-						aom.id_aom,
-						aom.id_proceso_wf,
-						aom.nro_tramite_wf,
-						aom.resumen,
-						aom.id_funcionario,
-						aom.fecha_prog_inicio,
-						aom.recomendacion,
-						aom.id_uo,
-						aom.id_gconsultivo,
-						aom.fecha_prev_inicio,
-						aom.fecha_prev_fin,
-						aom.fecha_prog_fin,
-						aom.descrip_aom2,
-						aom.nombre_aom1,
-						aom.documento,
-						aom.estado_reg,
-						aom.estado_wf,
-                        aom.id_tobjeto,
-                        --vpto.valor_parametro_to as objeto_auditoria,
-						--(CASE WHEN aom.id_tobjeto is null THEN null ELSE (select valor_parametro from ssom.tparametro where id_parametro=aom.id_tobjeto::integer) END) id_tobjeto,
-						aom.id_estado_wf,
-						--(CASE WHEN aom.id_tnorma is null THEN null ELSE (select valor_parametro from ssom.tparametro where id_parametro=aom.id_tnorma::integer) END) id_tnorma,
-                        --vptn.valor_parametro_tn as ctrl_norma_auditoria,
-                        aom.id_tnorma,
-						aom.fecha_eje_inicio,
-						aom.codigo_aom,
-						aom.id_tipo_auditoria,
-						aom.descrip_aom1,
-						aom.lugar,
-						aom.id_tipo_om,
-                        aom.formulario_ingreso,
-                        aom.estado_form_ingreso,
-						aom.fecha_eje_fin,
-						aom.nombre_aom2,
-						aom.id_usuario_ai,
-						aom.fecha_reg,
-						aom.usuario_ai,
-						aom.id_usuario_reg,
-						aom.id_usuario_mod,
-						aom.fecha_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-                        tau.tipo_auditoria,
-                        uo.nombre_unidad,
-                        gct.nombre_gconsultivo,
-                        vfc.desc_funcionario1,
-                        vfc.desc_funcionario2,
-                        vpto.valor_parametro_to as desc_tipo_objeto,--objeto_auditoria,
-                        vptn.valor_parametro_tn as desc_tipo_norma,--tipo_ctrl_auditoria,
-                        vptn.codigo_parametro,
-                        vptom.valor_parametro_tom as desc_tipo_om,
-                        tew.nombre_estado,
-                        tau.codigo_tpo_aom,
-                        gct.requiere_programacion,
-                        gct.requiere_formulario,
-                        (select count(*) from unnest(pw.id_tipo_estado_wfs) elemento where elemento = ew.id_tipo_estado)::integer as contador_estados
-						from ssom.tauditoria_oportunidad_mejora aom
-						inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = aom.id_usuario_mod
-                        left join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
-                        left join orga.tuo as uo on aom.id_uo=uo.id_uo
-                        left join ssom.tgrupo_consultivo as gct on aom.id_gconsultivo = gct.id_gconsultivo
-                        left join orga.vfuncionario_cargo vfc on aom.id_funcionario = vfc.id_funcionario
-                        left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
-                        left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
-                        left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-                        --left join ssom.vestado_wf_aom ewfa on aom.id_estado_wf = ewfa.id_estado_wf
-                        --left join ssom.vestado_wf_aom ewfa on aom.id_aom = ewfa.id_aom
-                        left join wf.tproceso_wf pw on pw.id_proceso_wf = aom.id_proceso_wf
-                        left join wf.testado_wf ew on ew.id_estado_wf = aom.id_estado_wf
-                        left join wf.ttipo_estado tew on tew.id_tipo_estado = ew.id_tipo_estado
-				        where  ';
+		--Sentencia de la consulta
+	    v_consulta:='select	aom.id_aom,
+                            aom.id_proceso_wf,
+                            aom.nro_tramite_wf,
+                            aom.id_funcionario,
+                            aom.id_uo,
+                            aom.id_gconsultivo,
+                            aom.id_tobjeto,
+                            aom.id_estado_wf,
+                            aom.id_tnorma,
+                            aom.id_tipo_om,
+                            aom.id_tipo_auditoria,
+                            aom.fecha_prog_inicio,
+                            aom.fecha_prog_fin,
+                            aom.fecha_prev_inicio,
+                            aom.fecha_prev_fin,
+                            aom.recomendacion,
+                            aom.codigo_aom,
+                            aom.nombre_aom1,
+                            aom.descrip_aom1,
+                            aom.estado_reg,
+                            aom.estado_wf,
+                            te.nombre_estado,----
+                            aom.fecha_eje_inicio,
+                            aom.fecha_eje_fin,
+                            aom.lugar,
+                            aom.formulario_ingreso,
+                            aom.estado_form_ingreso,
+                            aom.id_usuario_ai,
+                            aom.fecha_reg,
+                            aom.usuario_ai,
+                            aom.id_usuario_reg,
+                            aom.id_usuario_mod,
+                            aom.fecha_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            initcap(uni.nombre_unidad)::varchar as nombre_unidad,
+                            initcap(vfc.desc_funcionario2) as desc_funcionario2,
+                            gct.nombre_gconsultivo,
+                            vpto.valor_parametro_to as desc_tipo_objeto,
+                            vptn.valor_parametro_tn as desc_tipo_norma,
+                            vptn.codigo_parametro,
+                            vptom.valor_parametro_tom as desc_tipo_om,
+                            initcap(tau.tipo_auditoria) as tipo_auditoria,
+							tau.codigo_tpo_aom,
+                            gct.requiere_programacion,
+                            gct.requiere_formulario
+                            from ssom.tauditoria_oportunidad_mejora aom
+                            inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
+                            inner join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
+                            inner join orga.tuo uni on uni.id_uo = aom.id_uo
+                            inner join wf.testado_wf es on es.id_estado_wf = aom.id_estado_wf
+        					inner join wf.ttipo_estado te on te.id_tipo_estado = es.id_tipo_estado
+                            left join segu.tusuario usu2 on usu2.id_usuario = aom.id_usuario_mod
+                            left join orga.vfuncionario vfc on aom.id_funcionario = vfc.id_funcionario
+                            left join ssom.tgrupo_consultivo as gct on aom.id_gconsultivo = gct.id_gconsultivo
+                            left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
+                            left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
+                            left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
+                            where ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||'group by aom.id_aom,usu1.cuenta,usu2.cuenta,tau.tipo_auditoria
-            						,uo.nombre_unidad,gct.nombre_gconsultivo,vfc.desc_funcionario1,vfc.desc_funcionario2
-                                    ,vpto.valor_parametro_to,vptn.valor_parametro_tn,vptn.codigo_parametro,vptom.valor_parametro_tom
-                                    ,tew.nombre_estado,tau.codigo_tpo_aom,gct.requiere_programacion
-                                    ,gct.requiere_formulario,aom.id_proceso_wf, ew.id_tipo_estado
-                                    , pw.id_tipo_estado_wfs order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			--v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			RAISE NOTICE 'v_consulta %',v_consulta;
-			--Devuelve la respuesta
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
 			return v_consulta;
 
 		end;
@@ -167,39 +144,52 @@ BEGIN
 		begin
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(aom.id_aom)
-					    from ssom.tauditoria_oportunidad_mejora aom
-					    inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = aom.id_usuario_mod
-                        left join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
-                        left join orga.tuo as uo on aom.id_uo=uo.id_uo
-                        left join ssom.tgrupo_consultivo as gct on aom.id_gconsultivo = gct.id_gconsultivo
-                        left join orga.vfuncionario_cargo vfc on aom.id_funcionario = vfc.id_funcionario
-                        left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
-                        left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
-                        left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-                        --left join ssom.vestado_wf_aom ewfa on aom.id_estado_wf = ewfa.id_estado_wf
-                        --left join ssom.vestado_wf_aom ewfa on aom.id_aom = ewfa.id_aom
-                        left join wf.tproceso_wf pw on pw.id_proceso_wf = aom.id_proceso_wf
-                        left join wf.testado_wf ew on ew.id_estado_wf = aom.id_estado_wf
-                        left join wf.ttipo_estado tew on tew.id_tipo_estado = ew.id_tipo_estado
-					    where ';
+					        from ssom.tauditoria_oportunidad_mejora aom
+					   	    join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
+                            inner join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
+                            inner join orga.tuo uni on uni.id_uo = aom.id_uo
+                            inner join wf.testado_wf es on es.id_estado_wf = aom.id_estado_wf
+        					inner join wf.ttipo_estado te on te.id_tipo_estado = es.id_tipo_estado
+                            left join segu.tusuario usu2 on usu2.id_usuario = aom.id_usuario_mod
+                            left join orga.vfuncionario vfc on aom.id_funcionario = vfc.id_funcionario
+                            left join ssom.tgrupo_consultivo as gct on aom.id_gconsultivo = gct.id_gconsultivo
+                            left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
+                            left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
+                            left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
+					        where ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||'group by aom.id_aom,usu1.cuenta,usu2.cuenta,tau.tipo_auditoria
-            						,uo.nombre_unidad,gct.nombre_gconsultivo,vfc.desc_funcionario1,vfc.desc_funcionario2
-                                    ,vpto.valor_parametro_to,vptn.valor_parametro_tn,vptn.codigo_parametro,vptom.valor_parametro_tom
-                                    ,tew.nombre_estado,tau.codigo_tpo_aom,gct.requiere_programacion
-                                    ,gct.requiere_formulario,aom.id_proceso_wf, ew.id_tipo_estado
-                                    , pw.id_tipo_estado_wfs order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
 
-		/*+++++++++++++  Inicio  +++++++++++++++*/
-		/*********************************
+	/*********************************
+    #TRANSACCION:  'SSOM_RESU_SEL'
+    #DESCRIPCION:	Resumen
+    #AUTOR:		MMV
+    #FECHA:
+    ***********************************/
+    elsif(p_transaccion='SSOM_RESU_SEL')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select  som.id_aom,
+                               som.fecha_prev_inicio,
+                               som.fecha_prev_fin,
+                               som.nombre_aom1,
+                               som.descrip_aom1,
+                               som.nro_tramite_wf,
+                               fun.desc_funcionario1
+                        from ssom.tauditoria_oportunidad_mejora som
+                        inner join ssom.tequipo_responsable equ on equ.id_aom = som.id_aom
+                        inner join orga.vfuncionario fun on fun.id_funcionario = equ.id_funcionario
+                        where som.id_aom = '||v_parametros.id_aom;
+          --Devuelve la respuesta
+          return v_consulta;
+    end;
+
+	/*********************************
     #TRANSACCION:  'SSOM_AOMX1_SEL'
     #DESCRIPCION:	Consult area list
     #AUTOR:		max.camacho
@@ -228,7 +218,7 @@ BEGIN
 
 		end;
 
-		/*********************************
+    /*********************************
     #TRANSACCION:  'SSOM_AOMX1_CONT'
     #DESCRIPCION:	Count area list
     #AUTOR:		max.camacho
@@ -251,7 +241,7 @@ BEGIN
 
 		end;
 
-		/*********************************
+	/*********************************
     #TRANSACCION:  'SSOM_AOMX2_SEL'
     #DESCRIPCION:	Consult lista funcionario activos
     #AUTOR:		max.camacho
@@ -339,208 +329,94 @@ BEGIN
 
 		end;
 
-		/*********************************
+	/*********************************
     #TRANSACCION:  'SSOM_ADPTO_SEL'
     #DESCRIPCION:	Consult lista funcionario activos
-    #AUTOR:		max.camacho
-    #FECHA:		17-07-2019 17:41:55
+    #AUTOR:
+    #FECHA:
     ***********************************/
-
 	elsif(p_transaccion='SSOM_ADPTO_SEL')then
-
 		begin
-			--Sentencia de la consulta
-			--raise EXCEPTION '-----> %',v_parametros.p_codigo_parametro;
-			v_codigo_parametro = v_parametros.p_codigo_parametro;
-			v_id_uo_i = v_parametros.p_id_uo_i;
-			--raise exception 'hola id_uo_i %',v_id_uo_i;
-			if ( v_codigo_parametro = 'MEQ' ) then
+		if(v_parametros.codigo = 'MEQ') then
 
-				v_codigo_dpto = pxp.f_get_variable_global('ssom_parametro_codigo_dpto');
+        v_consulta:='select fu.id_funcionario,
+                            fu.desc_funcionario1
+                    from param.tdepto de
+                    inner join param.tdepto_usuario du on du.id_depto = de.id_depto
+                    inner join segu.vusuario uo on uo.id_usuario = du.id_usuario
+                    inner join orga.vfuncionario_persona  fu on fu.id_persona = uo.id_persona
+                    where de.codigo = ''SAOM_CENTRAL'' and ';
 
-				select
-					id_depto
-					into
-						v_id_depto
-				from param.tdepto
-				where codigo = ''||v_codigo_dpto||'' and estado_reg = 'activo';
+        end if;
 
-				--raise exception 'deptoooooooooo %', v_id_depto;
-				v_consulta:='select
-                                vfcx.id_persona,
-                                vfcx.id_funcionario,
-                                vfcx.desc_funcionario1||'' ''||''(''||(case when (depusu.cargo=''administrador'') then ''Responsable'' when (depusu.cargo=''responsable'') then ''Interno'' else ''En entrenamiento'' end)||'')'' desc_funcionario1,
-                                vfcx.desc_funcionario2||'' ''||''(''||(case when (depusu.cargo=''administrador'') then ''Responsable'' when (depusu.cargo=''responsable'') then ''Interno'' else ''En entrenamiento'' end)||'')'' desc_funcionario2,
-                                vfcx.nombre_cargo,
-                                vfcx.descripcion_cargo,
-                                vfcx.cargo_codigo,
-                                vfcx.id_uo,
-                                vfcx.nombre_unidad
-                                from param.tdepto_usuario depusu
-                                inner join segu.tusuario usu1 on usu1.id_usuario = depusu.id_usuario_reg
-                                left join segu.tusuario usu2 on usu2.id_usuario = depusu.id_usuario_mod
-                                inner join segu.tusuario usudep on usudep.id_usuario=depusu.id_usuario
-                                inner join segu.vpersona person on person.id_persona=usudep.id_persona
-                                inner join orga.vfuncionario_cargo_xtra vfcx on vfcx.id_persona = person.id_persona
-                                where depusu.id_depto = '||v_id_depto||' and (vfcx.fecha_finalizacion is null or vfcx.fecha_finalizacion >= now()) and';
+        if (v_parametros.codigo = 'ETI' or v_parametros.codigo = 'RESP' ) then
 
-			end if;
-			if (v_codigo_parametro = 'ETI' or v_codigo_parametro = 'RESP' ) then
-
-				--v_codigo_dpto = v_parametros.p_id_uo_i;
-
-				v_consulta:= 'SELECT
-                                      vfcx.id_persona
-                                      ,vfcx.id_funcionario
-                                      ,vfcx.desc_funcionario1
-                                      ,vfcx.desc_funcionario2
-                                      ,vfcx.nombre_cargo
-                                      ,vfcx.descripcion_cargo
-                                      ,vfcx.cargo_codigo
-                                      ,vfcx.id_uo
-                                      ,vfcx.nombre_unidad
-                                  from orga.vfuncionario_cargo_xtra vfcx
-                                  where vfcx.id_funcionario not in (
-
-                                  select
-                                      --ss.id_persona
-                                      ss.id_funcionario
-                                      /*,ss.desc_funcionario1
-                                      ,ss.desc_funcionario2
-                                      ,ss.nombre_cargo
-                                      ,ss.descripcion_cargo
-                                      ,ss.cargo_codigo
-                                      ,ss.id_uo
-                                      ,ss.nombre_unidad*/
-                                  from (WITH RECURSIVE uo_mas_subordinados(id_uo_hijo,id_uo_padre) AS (
-                                                     SELECT
-                                                        euo.id_uo_hijo,--id
-                                                        id_uo_padre---padre
-                                                     FROM orga.testructura_uo euo
-                                                     WHERE euo.id_uo_hijo = '||v_id_uo_i||' and euo.estado_reg = ''activo''
-                                                     UNION
-                                                        SELECT
-                                                           e.id_uo_hijo,
-                                                           e.id_uo_padre
-                                                        FROM
-                                                           orga.testructura_uo e
-                                                        INNER JOIN uo_mas_subordinados s ON s.id_uo_hijo = e.id_uo_padre and e.estado_reg = ''activo''
-                                                  )
-                                                  SELECT
-                                                    suo.id_uo_hijo
-                                                    ,suo.id_uo_padre
-                                                    ,vfc.id_persona
-                                                    ,vfc.id_funcionario
-                                                    ,vfc.desc_funcionario1
-                                                    ,vfc.desc_funcionario2
-                                                    ,vfc.nombre_cargo
-                                                    ,vfc.descripcion_cargo
-                                                    ,vfc.cargo_codigo
-                                                    ,vfc.id_uo
-                                                    ,vfc.nombre_unidad
-                                                  FROM uo_mas_subordinados suo
-                                                  inner join orga.vfuncionario_cargo_xtra vfc on suo.id_uo_hijo = vfc.id_uo
-                                                  where (vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date)) ss) and (vfcx.fecha_finalizacion is null or vfcx.fecha_finalizacion >= now()::date) and ';
-
-			end if;
-
-			--v_codigo_dpto = pxp.f_get_variable_global('ssom_parametro_codigo_dpto');
-
+        		v_consulta:= 'with recursive uo_mas_subordinados(id_uo_hijo,id_uo_padre) as (
+                                                     select euo.id_uo_hijo,--id
+                                                           id_uo_padre---padre
+                                                     from orga.testructura_uo euo
+                                                     where euo.id_uo_hijo = '||v_parametros.id_uo||' and euo.estado_reg = ''activo''
+                                                     union
+                                                     select e.id_uo_hijo,
+                                                            e.id_uo_padre
+                                                     from orga.testructura_uo e
+                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
+                                                     and e.estado_reg = ''activo''
+                                                  )select fun.id_funcionario,
+                                                          fun.desc_funcionario1
+                                                   from uo_mas_subordinados suo
+                                                   inner join orga.vfuncionario_cargo fun on fun.id_uo = suo.id_uo_hijo
+                                                   where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                                                   and ';
+		end if;
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			--raise exception 'deptoooooooooo %', v_consulta;
-			--Devuelve la respuesta
-			RAISE NOTICE 'v_consulta %',v_consulta ;
+			raise notice '%',v_consulta;
 			return v_consulta;
 
 		end;
-		/*********************************
+	/*********************************
     #TRANSACCION:  'SSOM_ADPTO_CONT'
     #DESCRIPCION:	Count funcionarios
     #AUTOR:		max.camacho
     #FECHA:		17-07-2019 17:41:55
     ***********************************/
-
 	elsif(p_transaccion='SSOM_ADPTO_CONT')then
-		v_codigo_dpto = pxp.f_get_variable_global('ssom_parametro_codigo_dpto');
 		begin
-			--Sentencia de la consulta de conteo de registros
+		--Sentencia de la consulta de conteo de registros
 
-			v_codigo_parametro = v_parametros.p_codigo_parametro;
-			v_id_uo_i = v_parametros.p_id_uo_i;
-
-			select id_depto
-						 into v_id_depto
-			from param.tdepto
-			where codigo = ''||v_codigo_dpto||'' and estado_reg = 'activo';
-
-			if (v_codigo_parametro = 'MEQ') then
-				v_codigo_dpto = pxp.f_get_variable_global('ssom_parametro_codigo_dpto');
-
-				v_consulta:='select count (vfcx.id_funcionario)
-                                from param.tdepto_usuario depusu
-                                inner join segu.tusuario usu1 on usu1.id_usuario = depusu.id_usuario_reg
-                                left join segu.tusuario usu2 on usu2.id_usuario = depusu.id_usuario_mod
-                                inner join segu.tusuario usudep on usudep.id_usuario=depusu.id_usuario
-                                inner join segu.vpersona person on person.id_persona=usudep.id_persona
-                                inner join orga.vfuncionario_cargo_xtra vfcx on vfcx.id_persona = person.id_persona
-                                where depusu.id_depto = '||v_id_depto||' and (vfcx.fecha_finalizacion is null or vfcx.fecha_finalizacion >= now()) and';
-
+			if (v_parametros.codigo = 'MEQ') then
+				v_consulta:='select count(fu.id_funcionario)
+                            from param.tdepto de
+                            inner join param.tdepto_usuario du on du.id_depto = de.id_depto
+                            inner join segu.vusuario uo on uo.id_usuario = du.id_usuario
+                            inner join orga.vfuncionario_persona  fu on fu.id_persona = uo.id_persona
+                            where de.codigo = ''SAOM_CENTRAL'' and';
 			end if;
 
-			if (v_codigo_parametro = 'ETI' or v_codigo_parametro = 'RESP') then
-
-				v_consulta:= 'select count(vfcx.id_funcionario)
-
-                                  from orga.vfuncionario_cargo_xtra vfcx
-                                  where vfcx.id_funcionario not in (
-
-                                  select
-                                      --ss.id_persona
-                                      ss.id_funcionario
-                                      /*,ss.desc_funcionario1
-                                      ,ss.desc_funcionario2
-                                      ,ss.nombre_cargo
-                                      ,ss.descripcion_cargo
-                                      ,ss.cargo_codigo
-                                      ,ss.id_uo
-                                      ,ss.nombre_unidad*/
-                                  from (WITH RECURSIVE uo_mas_subordinados(id_uo_hijo,id_uo_padre) AS (
-                                                     SELECT
-                                                        euo.id_uo_hijo,--id
-                                                        id_uo_padre---padre
-                                                     FROM orga.testructura_uo euo
-                                                     WHERE euo.id_uo_hijo = '||v_id_uo_i||' and euo.estado_reg = ''activo''
-                                                     UNION
-                                                        SELECT
-                                                           e.id_uo_hijo,
-                                                           e.id_uo_padre
-                                                        FROM
-                                                           orga.testructura_uo e
-                                                        INNER JOIN uo_mas_subordinados s ON s.id_uo_hijo = e.id_uo_padre and e.estado_reg = ''activo''
-                                                  )
-                                                  SELECT
-                                                    suo.id_uo_hijo
-                                                    ,suo.id_uo_padre
-                                                    ,vfc.id_persona
-                                                    ,vfc.id_funcionario
-                                                    ,vfc.desc_funcionario1
-                                                    ,vfc.desc_funcionario2
-                                                    ,vfc.nombre_cargo
-                                                    ,vfc.descripcion_cargo
-                                                    ,vfc.cargo_codigo
-                                                    ,vfc.id_uo
-                                                    ,vfc.nombre_unidad
-                                                  FROM uo_mas_subordinados suo
-                                                  inner join orga.vfuncionario_cargo_xtra vfc on suo.id_uo_hijo = vfc.id_uo
-                                                  where (vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date)) ss) and (vfcx.fecha_finalizacion is null or vfcx.fecha_finalizacion >= now()::date) and ';
+			if (v_parametros.codigo = 'ETI' or v_parametros.codigo = 'RESP') then
+				v_consulta:= 'with recursive uo_mas_subordinados(id_uo_hijo,id_uo_padre) as (
+                                                     select euo.id_uo_hijo,--id
+                                                           id_uo_padre---padre
+                                                     from orga.testructura_uo euo
+                                                     where euo.id_uo_hijo = '||v_parametros.id_uo||' and euo.estado_reg = ''activo''
+                                                     union
+                                                     select e.id_uo_hijo,
+                                                            e.id_uo_padre
+                                                     from orga.testructura_uo e
+                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
+                                                     and e.estado_reg = ''activo''
+                                                  )select count (fun.id_funcionario)
+                                                   from uo_mas_subordinados suo
+                                                   inner join orga.vfuncionario_cargo fun on fun.id_uo = suo.id_uo_hijo
+                                                   where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                                                   and';
 			end if;
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -926,8 +802,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_auditoria_oportunidad_mejora_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

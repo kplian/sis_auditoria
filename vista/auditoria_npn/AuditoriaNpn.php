@@ -324,8 +324,6 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
         this.maestro = m;
         this.store.baseParams = {id_aom: this.maestro.id_aom};
         this.load({params:{start:0, limit:50}});
-        this.Cmp.id_norma.store.baseParams.p_id_parametro = this.maestro.id_tnorma;
-
     },
     loadValoresIniciales: function () {
        Phx.vista.AuditoriaNpn.superclass.loadValoresIniciales.call(this);
@@ -333,8 +331,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
     },
     onButtonNew :function () {
         Phx.vista.AuditoriaNpn.superclass.onButtonNew.call(this);
-        console.log(this.maestro.codigo_parametro);
-        this.Cmp.id_norma.store.baseParams.query = this.maestro.desc_prioridad;
+        this.Cmp.id_norma.store.baseParams.p_id_parametro = this.maestro.id_tnorma;
         this.Cmp.id_norma.store.load({params:{p_codigo_parametro:this.maestro.codigo_parametro,start:0,limit:this.tam_pag},
             callback : function (r) {
                 if (r.length > 0 ) {
@@ -344,8 +341,8 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
             }, scope : this
         });
         this.Cmp.id_norma.on('select', function(combo, record, index){
-            this.Cmp.id_norma.store.baseParams.p_codigo_parametro = this.maestro.codigo_parametro;
             this.Cmp.id_pn.store.baseParams ={par_filtro: 'nor.sigla_norma#nor.nombre_norma',id_norma: record.data.id_norma};
+            this.Cmp.id_pn.modificado = true;
         },this);
     },
     preparaMenu:function(n){

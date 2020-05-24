@@ -75,8 +75,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
                     fields: ['id_parametro', 'tipo_parametro', 'valor_parametro','codigo_parametro'],
                     remoteSort: true,
                     baseParams: { par_filtro: 'prm.id_parametro',
-                                  tipo_parametro:'TIPO_PARTICIPACION'/*,
-                                  codigo_parametro:"''ETE'',''RESP'',''OTHERS'',''INV''"*/}
+                                  tipo_parametro:'TIPO_PARTICIPACION'
                 }),
                 valueField: 'id_parametro',
                 displayField: 'valor_parametro',

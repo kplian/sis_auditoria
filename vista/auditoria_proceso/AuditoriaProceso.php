@@ -70,7 +70,7 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
                 gdisplayField: 'proceso',
                 hiddenName: 'id_proceso',
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p>{proceso}</p>' +
-                '<p><b>Responsable: </b>{desc_funcionario1}<br><b>vigencia: </b>{vigencia}</p></div></tpl>',
+                '<p><b>Responsable: </b>{desc_funcionario1}</div></tpl>',
                 forceSelection: true,
                 typeAhead: false,
                 triggerAction: 'all',

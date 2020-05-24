@@ -151,22 +151,6 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function insertRecomendation(){
-        $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
-        $this->res=$this->objFunc->updateRecomendation($this->objParam);
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
-    function insertActaRC(){
-        $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
-        $this->res=$this->objFunc->updateActaRC($this->objParam);
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
-    function verificarPlanificacion(){
-        $this->objParam->addParametro('p_id_funcionario',$_SESSION["ss_id_funcionario"]);
-        $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
-        $this->res=$this->objFunc->verificarPlanificacion($this->objParam);
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
     function verificarInforme(){
         $this->objParam->addParametro('p_id_funcionario',$_SESSION["ss_id_funcionario"]);
         $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
