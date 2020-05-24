@@ -8,7 +8,7 @@ CREATE OR REPLACE FUNCTION ssom.f_get_funcionarios_x_uoi (
   p_start integer = 0,
   p_filtro varchar = '0=0'::character varying
 )
-RETURNS SETOF record AS
+  RETURNS SETOF record AS
 $body$
   /**************************************************************************
    SISTEMA

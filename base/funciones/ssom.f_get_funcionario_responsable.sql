@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION ssom.f_get_funcionario_responsable (
   p_id_usuario integer,
   p_id_estado integer,
@@ -10,7 +8,7 @@ CREATE OR REPLACE FUNCTION ssom.f_get_funcionario_responsable (
   p_start integer = 0,
   p_filtro varchar = '0=0'::character varying
 )
-RETURNS SETOF record AS
+  RETURNS SETOF record AS
 $body$
   /**************************************************************************
    SISTEMA: Sistema de Seguimiento de Oportunidades de Mejoras

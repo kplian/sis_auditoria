@@ -34,17 +34,10 @@ header("content-type: text/javascript; charset=UTF-8");
 				bandera : this.maestro.bandera,
 				id_uo_adicional : this.maestro.id_uo_adicional,
 				nro_tramite : this.maestro.nro_tramite_wf
-				//id_responsable : this.maestro.id_responsable, //aumentado
-				//desc_funcionario1 : this.maestro.desc_funcionario1, //aumentado
-				//nombre_aom1 : this.maestro.nombre_aom1 //aumentado
             };
 			this.initButtons=[this.cmbTipoAuditoria, this.cmbAuditorias];
 			Phx.vista.NoConformidadAdmin.superclass.constructor.call(this,config);
-            //this.load({params:{start:0, limit:this.tam_pag,id_aom:this.obj.id_aom}});
-
-            //llamamos a la creacion del formulario responsable de NC
-             this.crearFormResponsableNC();
-            
+            this.crearFormResponsableNC();
             //insertamos los combos
             this.cmbTipoAuditoria.on('select', function(combo, record, index){
                 console.log(record.data);
@@ -676,9 +669,7 @@ c
 			pageSize:50,
 			queryDelay:500,
 			listWidth:'280',
-			width:300,
-			tpl:'<tpl for="."><div class="x-combo-list-item"><p><font color="#006400"><b>{tipo_auditoria}</b></font></p>' +
-			'<p><font color="#006400"><b>{id_aom}</b></font></p><p><b>{id_uo}</b></p></div></tpl>',
+			width:300
 		}),
 
 //*****************************
@@ -698,8 +689,6 @@ c
 					},
 					totalProperty: 'total',
 					fields: ['id_aom','nombre_aom1','id_uo','nombre_unidad','' ],
-					//fields: ['id_aom','nombre_aom2','gerencia_uo'],
-					// turn on remote sorting
 					remoteSort: true,
 					baseParams:{par_filtro:'nombre_aom1'}
 				}),
@@ -711,9 +700,7 @@ c
 			pageSize:50,
 			queryDelay:500,
 			listWidth:'280',
-			width:300,
-			tpl:'<tpl for="."><div class="x-combo-list-item"><p><font color="#006400"><b>{nombre_aom1}</b></font></p>' +
-			'<p><font color="#006400"><b>{id_aom}</b></font></p><p><b>{id_uo}</b></p></div></tpl>',
+			width:300
 		}),
 		/*agregarArgsExtraSubmit: function() {
 					this.argumentExtraSubmit.funcionario = this.Cmp.id_funcionario.getRawValue();

@@ -21,7 +21,7 @@ Phx.vista.AccionRo=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.AccionRo.superclass.constructor.call(this,config);
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag}})
+		this.load({params:{start:0, limit:this.tam_pag}})
 	},
 			
 	Atributos:[
@@ -254,7 +254,7 @@ Phx.vista.AccionRo=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:true/*,
     onReloadPage:function(m){
         this.maestro=m;
         console.log("ggggggddddddddddxxx",this.maestro);
@@ -270,7 +270,7 @@ Phx.vista.AccionRo=Ext.extend(Phx.gridInterfaz,{
         this.Cmp.id_aom_ro.setValue(this.maestro.id_aom_ro);
         Phx.vista.AccionRo.superclass.loadValoresIniciales.call(this);
 
-    },
+    },*/
 	}
 )
 </script>

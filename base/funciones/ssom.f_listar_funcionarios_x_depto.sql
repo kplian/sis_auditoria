@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION ssom.f_listar_funcionarios_x_depto (
   p_filtro varchar = '0=0'::character varying,
   p_id_depto integer = 0
 )
-RETURNS SETOF record AS
+  RETURNS SETOF record AS
 $body$
   /**************************************************************************
    SISTEMA: Sistema de Seguimiento de Oportunidades de Mejoras

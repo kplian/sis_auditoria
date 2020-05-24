@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION ssom.f_set_siguiente_estado (
   p_id_usuario_ai integer,
   p_usuario_ai integer
 )
-RETURNS void AS
+  RETURNS void AS
 $body$
 DECLARE
   /**************************************************************************

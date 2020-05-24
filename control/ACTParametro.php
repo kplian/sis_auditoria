@@ -18,7 +18,6 @@ class ACTParametro extends ACTbase{
         }
         
         if($this->objParam->getParametro('tipo_parametro') != '') {
-            //var_dump("Hola Valor de codigo parametro-->".$this->objParam->getParametro('codigo_parametro'));exit;
             if($this->objParam->getParametro('codigo_parametro') != ''){
                 $this->objParam->addFiltro("tpp.tipo_parametro = ''" .$this->objParam->getParametro('tipo_parametro')."'' and prm.codigo_parametro not in (".$this->objParam->getParametro('codigo_parametro').")");
             }

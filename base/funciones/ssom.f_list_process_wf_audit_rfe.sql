@@ -4,19 +4,19 @@ CREATE OR REPLACE FUNCTION ssom.f_list_process_wf_audit_rfe (
   p_estado varchar,
   p_gestion integer
 )
-RETURNS TABLE (
-                fill_id_proceso_wf integer,
-                fill_fecha_reg date,
-                fill_estado_reg varchar,
-                fill_id_estado_wf integer,
-                fill_id_estado_anterior integer,
-                fill_id_tipo_estado integer,
-                fill_id_funcionario integer,
-                fill_id_depto integer,
-                fill_obs varchar,
-                fill_codigo varchar,
-                fill_nombre_estado varchar
-              ) AS
+  RETURNS TABLE (
+                  fill_id_proceso_wf integer,
+                  fill_fecha_reg date,
+                  fill_estado_reg varchar,
+                  fill_id_estado_wf integer,
+                  fill_id_estado_anterior integer,
+                  fill_id_tipo_estado integer,
+                  fill_id_funcionario integer,
+                  fill_id_depto integer,
+                  fill_obs varchar,
+                  fill_codigo varchar,
+                  fill_nombre_estado varchar
+                ) AS
 $body$
 DECLARE
   /**************************************************************************

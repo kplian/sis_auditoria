@@ -294,6 +294,18 @@ CREATE TABLE ssom.taccion_ro (
 ) INHERITS (pxp.tbase)
 
   WITH (oids = false);
+
+CREATE TABLE ssom.tparametro_config_auditoria (
+  id_param_config_aom SERIAL,
+  param_gestion INTEGER NOT NULL,
+  param_fecha_a DATE NOT NULL,
+  param_fecha_b DATE NOT NULL,
+  param_prefijo VARCHAR(20) NOT NULL,
+  param_serie VARCHAR(20),
+  CONSTRAINT tparametro_config_auditoria_pkey PRIMARY KEY(id_param_config_aom)
+) INHERITS (pxp.tbase)
+
+  WITH (oids = false);
 /*fin de nuevos requerimientos*/
 /***********************************F-SCP-MCCH-SSOM-0-26/12/2019*****************************************/
 

@@ -1,9 +1,9 @@
 <?php
 /**
 *@package pXP
-*@file gen-AuditoriaOportunidadMejora.php
-*@author  (max.camacho)
-*@date 17-07-2019 17:41:55
+*@file AuditoriaOportunidadMejora.php
+*@author MMV
+*@date 21/04/2020
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
 
@@ -14,41 +14,93 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
-    	//llama al constructor de la clase padre
 		Phx.vista.AuditoriaOportunidadMejora.superclass.constructor.call(this,config);
         this.init();
-		this.load({params:{start:0, limit:this.tam_pag}});
-        //this.iniciarEventos();
-        //console.log("Verificador de generador de serie wwwww:",this.generarSerieAOM("R100000"));
-
-        //this.store.baseParams.oportunidad = {oportunidad1: this.oportunidad};
-        this.addButton('btnPlanificarAudit', {
-            text : 'Planificar Auditoria',
-            iconCls : 'bballot',
-            disabled : false,
-            handler : this.onBtnPlanificarAudit,
-            tooltip : '<b>Perfil de Planificacion de Auditorias</b>'
+        this.setColumnHeader('fecha_prog_inicio',String.format('<div style="background-color: {0};"> {1}</div>','#81f98f', 'Fecha Inicio'));
+        this.setColumnHeader('fecha_prog_fin',String.format('<div style="background-color: {0};"> {1}</div>','#f9d755', 'Fecha Fin'));
+        this.finCons = true;
+		this.addButton('ant_estado', {
+            argument: {estado: 'anterior'},
+            text:'Anterior',
+            grupo:[3],
+            iconCls: 'batras',
+            disabled:true,
+            handler:this.antEstado,
+            tooltip: '<b>Pasar al Anterior Estado</b>'
         });
-        this.addButton('btnInformeOM', {
-            text : 'Informe de OM',
-            iconCls : 'bballot',
-            disabled : false,
-            handler : this.onBtnInformeOM,
-            tooltip : '<b>Perfil de Informe de Oportunidades de Mejora</b>'
+        this.addButton('sig_estado',{
+            text:'Siguiente',
+            grupo:[0],
+            iconCls: 'badelante',
+            disabled: true,
+            handler: this.sigEstado,
+            tooltip: '<b>Pasar al Siguiente Estado</b>'
         });
-        this.addButton('btnHelpAOM', {
-            text : 'Help',
-            iconCls : 'bballot',
-            disabled : false,
-            handler : this.onBtnHelpAOM,
-            tooltip : '<b>Perfil de Ayuda de Proceso de Registro, Planificacion de AOM</b>'
+        this.addBotonesGantt();
+        this.addButton('btnChequeoDocumentosWf',
+            {	text: 'Documentos',
+                grupo:[0],
+                iconCls: 'bchecklist',
+                disabled: true,
+                handler: this.loadCheckDocumentosRecWf,
+                tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.'
+            }
+        );
+        this.addButton('btnObs',{//#11
+            text :'Obs Wf',
+            grupo:[1,2],
+            iconCls : 'bchecklist',
+            disabled: true,
+            handler : this.onOpenObs,
+            tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
         });
-
 	},
-			
+    addBotonesGantt: function() {
+        this.menuAdqGantt = new Ext.Toolbar.SplitButton({
+            id: 'b-diagrama_gantt-' + this.idContenedor,
+            text: 'Gantt',
+            disabled: true,
+            grupo:[0,1,2,3,4],
+            iconCls : 'bgantt',
+            handler:this.diagramGanttDinamico,
+            scope: this,
+            menu:{
+                items: [{
+                    id:'b-gantti-' + this.idContenedor,
+                    text: 'Gantt Imagen',
+                    tooltip: '<b>Muestra un reporte gantt en formato de imagen</b>',
+                    handler:this.diagramGantt,
+                    scope: this
+                }, {
+                    id:'b-ganttd-' + this.idContenedor,
+                    text: 'Gantt Dinámico',
+                    tooltip: '<b>Muestra el reporte gantt facil de entender</b>',
+                    handler:this.diagramGanttDinamico,
+                    scope: this
+                }
+                ]}
+        });
+        this.tbar.add(this.menuAdqGantt);
+        this.load({params:{start:0, limit:this.tam_pag}});
+    },
+    diagramGantt : function (){
+        var data=this.sm.getSelected().data.id_proceso_wf;
+        Phx.CP.loadingShow();
+        Ext.Ajax.request({
+            url: '../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+            params: { 'id_proceso_wf': data },
+            success: this.successExport,
+            failure: this.conexionFailure,
+            timeout: this.timeout,
+            scope: this
+        });
+    },
+    diagramGanttDinamico : function(){
+        var data=this.sm.getSelected().data.id_proceso_wf;
+        window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)
+    },
 	Atributos:[
 		{
-			//configuracion del componente
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
@@ -58,209 +110,94 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
 			form:true 
 		},
         {
-			//configuracion del componente
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
-					name: 'estado_wf'
+					name: 'id_proceso_wf'
+			},
+			type:'Field',
+			form:true
+		},
+        {
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_estado_wf'
 			},
 			type:'Field',
 			form:true
 		},
         {
             config:{
-                name: 'documento',
-                fieldLabel: 'Documento',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 60,
-                maxLength:150,
-                renderer: function (value, p, record) {
-                    var result;
-                    console.log('Tipo Auditoria:',record.data['id_tipo_auditoria'])
-                    if (record.data['id_tipo_auditoria'] == 1 || record.data['id_tipo_auditoria']== 2 ) {
-                        result = String.format('{0}', "<div style='text-align:center'><img src = '../../../lib/imagenes/icono_dibu/dibu_checklist.png' align='center' width='35' height='35' title=''/></div>");
-                    }
-                    return result;
-                }
+                labelSeparator:'',
+                inputType:'hidden',
+                name: 'requiere_programacion'
             },
-            type:'TextField',
-            filters:{pfiltro:'aom.documento',type:'string'},
-            //id_grupo:1,
-            id_grupo:0,
-            grid:true,
+            type:'Field',
             form:true
         },
         {
             config:{
-                name: 'codigo_aom',
-                fieldLabel: 'Codigo AOM',
+                labelSeparator:'',
+                inputType:'hidden',
+                name: 'requiere_formulario'
+            },
+            type:'Field',
+            form:true
+        },
+        {
+            config:{
+                name: 'estado_wf',
+                fieldLabel: 'Estado',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
                 maxLength:50
             },
             type:'TextField',
+            id_grupo:0,
+            grid:false,
+            form:false
+        },
+        {
+            config:{
+                name: 'codigo_tpo_aom',
+                fieldLabel: 'Auditoria',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 60
+            },
+            type:'TextField',
             filters:{pfiltro:'aom.codigo_aom',type:'string'},
-            //id_grupo:1,
             id_grupo:0,
             grid:true,
-            form:true
+            form:false
         },
         {
             config:{
                 name: 'nro_tramite_wf',
-                fieldLabel: 'Nro. Tramite',
+                fieldLabel: 'Codigo',
                 allowBlank: true,
                 anchor: '60%',
-                gwidth: 150,
-                maxLength:100
+                gwidth: 200,
+                renderer: function(value,p,record){
+                        var color = '#B7950B';
+                        if(record.data['codigo_tpo_aom'] === 'OM'){
+                            color = '#A04000';
+                        }
+                    return '<tpl for="."><div class="gridmultiline">' +
+                        '<p><b>'+record.data['nro_tramite_wf']+'</b></p>'+
+                        '<p><b>Estado: </b><font color="blue">'+record.data['nombre_estado']+'</font></p>'+
+                        '<p><b><font color="'+color+'">'+record.data['tipo_auditoria']+'</font></b></p>'+
+                        '</div></tpl>';
+                }
             },
             type:'TextField',
             filters:{pfiltro:'aom.nro_tramite_wf',type:'string'},
             id_grupo:0,
             grid:true,
-            form:true
-        },
-        /*{
-            config:{
-                name: 'estado_wf',
-                fieldLabel: 'Estado',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 130,
-                maxLength:100,
-                renderer: function (value, p, record) {
-                    var result = '';
-                    if(record.data.estado_wf=='programado'){
-                        //result='<b><font color="burlywood">';
-                        result='<b><font color="darkgray">';
-                    }
-                    else if (record.data.estado_wf=='vob_programado'){
-                        //result='<b><font color="brown">';
-                        //result='<b><font color="burlywood">';
-                        result='<b><font color="red">';
-                    }
-                    else if (record.data.estado_wf=='planificacion'){
-                        result='<b><font color="green">';
-                    }
-                    else if (record.data.estado_wf=='vob_planificacion'){
-                        result='<b><font color="red">';
-                    }
-                    else if (record.data.estado_wf=='informe'){
-                        result='<b><font color="green">';
-                    }
-                    else if (record.data.estado_wf=='vob_informe'){
-                        result='<b><font color="red">';
-                    }
-                    result = result + value+'</font></b>';
-                    return String.format('{0}', result);
-
-                }
-            },
-            type:'TextField',
-            filters:{pfiltro:'aom.estado_wf',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-
-        },*/
-        {
-            config:{
-                name: 'nombre_estado',
-                fieldLabel: 'Estado',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 130,
-                maxLength:100,
-                renderer: function (value, p, record) {
-                    console.log("lista de record->",record);
-                    var result = '';
-                    if(record.data.estado_wf=='programado'){
-                        var result_aux_prog = '';
-                        if(record.data.contador_estados >= 1){
-                            //var result_aux='<b><font color="burlywood">';
-                            result_aux_prog = '<b><font color="red">';
-                        }
-                        else{
-                            result_aux_prog = '<b><font color="#D8D8D8">';
-                        }
-                        //result='<b><font color="#D8D8D8">';
-                        result=result_aux_prog;
-                    }
-                    else if (record.data.estado_wf=='vob_programado'){
-                        //result='<b><font color="brown">';
-                        result='<b><font color="red">';
-                    }
-                    else if (record.data.estado_wf =='prog_aprob'){
-                        //result='<b><font color="brown">';
-                        result='<b><font color="green">';
-                    }
-                    else if (record.data.estado_wf =='observado'){
-                        //result='<b><font color="brown">';
-                        result='<b><font color="black">';
-                    }
-                    else if (record.data.estado_wf=='planificacion'){
-                        var result_aux_plan = '';
-                        if(record.data.contador_estados > 1){
-                            result_aux_plan = '<b><font color="red">';
-                        }
-                        else{
-                            result_aux_plan = '<b><font color="#006400">';
-                        }
-                        //result='<b><font color="#006400">';
-                        result = result_aux_plan;
-                    }
-                    else if (record.data.estado_wf=='vob_planificacion'){
-                        result='<b><font color="red">';
-                    }
-                    else if (record.data.estado_wf=='plani_aprob'){
-                        result='<b><font color="green">';
-                    }
-                    else if (record.data.estado_wf=='plan_observado'){
-                        result='<b><font color="black">';
-                    }
-                    else if (record.data.estado_wf=='ejecutada'){
-                        result='<b><font color="#006400">';
-                    }
-                    else if (record.data.estado_wf=='informe'){
-                        var result_aux_inf = '';
-                        if(record.data.contador_estados > 1){
-                            result_aux_inf = '<b><font color="red">';
-                        }
-                        else{
-                            result_aux_inf = '<b><font color="#006400">';
-                        }
-                        //result='<b><font color="#006400">';
-                        result = result_aux_inf;
-                    }
-                    else if (record.data.estado_wf=='vob_informe'){
-                        result='<b><font color="red">';
-                    }
-                    else if (record.data.estado_wf=='acept_resp_area'){
-                        result='<b><font color="green">';
-                    }
-                    else if (record.data.estado_wf=='informe_observado'){
-                        result='<b><font color="black">';
-                    }
-                    console.log(record.data.contador_estados);
-                    result = result + value+' - ('+record.data.contador_estados+')'+'</font></b>';
-                    //console.log("wwww->",value);
-
-                    //renderer : function(value, p, record) {
-                        return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>', result);
-                    //}
-
-                    //return String.format('{0}', result);
-                    //return String.format('<div title="Número de revisiones: {1}"><b><font color="red">{0}-({1})</font></b></div>', value, record.data.contador_estados);
-                }
-            },
-            type:'TextField',
-            filters:{pfiltro:'aom.nombre_estado',type:'string'},
-            id_grupo:0,
-            grid:true,
-            form:true
-
+            form:false,
+            bottom_filter:true
         },
         {
             config: {
@@ -294,119 +231,174 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
                 pageSize: 15,
                 queryDelay: 1000,
                 anchor: '50%',
-                gwidth: 100,
+                gwidth: 270,
                 minChars: 2,
-                /*listeners: {
-                    'afterrender': function(id_param_config_aom){
-                    },
-                    'expand':function (id_param_config_aom) {
-                        this.store.reload();
-                    }
-                },*/
                 renderer : function(value, p, record) {
-                    var tipo = record.data['codigo_tpo_aom'];
-                    return String.format('{0}',"<div style='text-align:center;'>"+tipo+"</div>");
+                    return '<tpl for="."><div class="gridmultiline">' +
+                        '<p>'+record.data['codigo_tpo_aom']+'</p></div></tpl>';
                 }
             },
             type: 'ComboBox',
             id_grupo: 0,
             filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            //valorInicial: 'AUDITORIA INTERNA',
-            grid: true,
+            grid: false,
             form: true
         },
         {
-            config: {
-                name: 'id_tipo_om',
-                fieldLabel: 'Tipo OM',
-                //title: 't_id_tipo_om',
+            config:{
+                name: 'nombre_aom1',
+                fieldLabel: 'Nombre',
                 allowBlank: false,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/Parametro/listarParametro',
-                    id: 'id_parametro',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'valor_parametro',
-                        direction: 'DESC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'prm.id_tipo_parametro',tipo_parametro:'TIPO_OPORTUNIDAD_MEJORA'}
-                }),
-                valueField: 'id_parametro',
-                displayField: 'valor_parametro',
-                gdisplayField: 'desc_tipo_om',
-                hiddenName: 'id_tipo_om',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '60%',
-                gwidth: 120,
-                minChars: 2,
+                anchor: '80%',
+                emptyText: 'Intruzca titulo...',
+                gwidth: 210,
+                maxLength:300,
                 renderer : function(value, p, record) {
-                    return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>', record.data['desc_tipo_om']);
-                    //return String.format('{0}', record.data['desc_tipo_om']);
+                    if (record.data['desc_funcionario2'] == '' ){
+                        return '<tpl for="."><div class="gridmultiline">' +
+                            '<p> <b>'+record.data['nombre_aom1']+'</b></p></div></tpl>';
+                    }else{
+                        return '<tpl for="."><div class="gridmultiline">' +
+                            '<p><b>'+record.data['nombre_aom1']+'</b></p>' +
+                            '<p><b>Resp.: </b> <font color="#117A65">'+record.data['desc_funcionario2']+'</font></p></div></tpl>';
+                    }
                 }
             },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
+            type:'TextField',
+            filters:{pfiltro:'aom.nombre_aom1',type:'string'},
+            id_grupo:0,
+            grid:true,
+            form:true
         },
         {
             config: {
                 name: 'id_uo',
-                fieldLabel: 'Area/UO',
-                allowBlank: false,
-                resizable:true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListUO',
-                    id: 'id_uo',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre_unidad',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_uo', 'nombre_unidad','codigo','nivel_organizacional'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'nombre_unidad'}
-                }),
-                valueField: 'id_uo',
-                displayField: 'nombre_unidad',
-                gdisplayField: 'nombre_unidad',
-                hiddenName: 'id_uo',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '75%',
-                gwidth: 150,
-                minChars: 2,
+                baseParams: {
+                    estado_reg: 'activo'
+                },
+                origen:'UO',
+                allowBlank:true,
+                fieldLabel:'Area',
+                gdisplayField:'nombre_unidad', //mapea al store del grid
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre_unidad}</p> </div></tpl>',
+                width : 300,
+                gwidth: 250,
                 renderer : function(value, p, record) {
-                    var v_uo = record.data['nombre_unidad'];
-                    //return String.format('{0}', "<div style='font-size:12px;'>"+v_uo+"</div>");
-                    return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>', record.data['nombre_unidad']);
+                    return String.format('{0}', record.data['nombre_unidad']);
                 }
             },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            //valorInicial: 0,
-            grid: true,
-            form: true
+            type:'ComboRec',
+            id_grupo:1,
+            filters:{
+                pfiltro:'desc_uo',
+                type:'string'
+            },
+            grid:false,
+            form:true
         },
+        {
+            config:{
+                name: 'descrip_aom1',
+                fieldLabel: 'Descripcion',
+                allowBlank: true,
+                resizable:true,
+                anchor: '80%',
+                gwidth: 350,
+                renderer : function(value, p, record) {
+                    return String.format('<div class="gridmultiline" style="text-align: justify;">{0}</div>', record.data['descrip_aom1']);
+                }
+            },
+            type:'TextArea',
+            filters:{pfiltro:'aom.descrip_aom1',type:'string'},
+            id_grupo:0,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'fecha_prog_inicio',
+                fieldLabel: 'Fecha Inicio',
+                allowBlank: false,
+                emptyText: 'Fecha Inicio...',
+                anchor: '40%',
+                gwidth: 80,
+                format: 'd/m/Y',
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'aom.fecha_prog_inicio',type:'date'},
+            id_grupo:0,
+            valorInicial: (new Date().getDate()),
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'fecha_prog_fin',
+                fieldLabel: 'Fecha Fin',
+                allowBlank: false,
+                emptyText: 'Fecha Fin...',
+                anchor: '40%',
+                gwidth: 80,
+                format: 'd/m/Y',
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'aom.fecha_prog_fin',type:'date'},
+            id_grupo:0,
+            valorInicial: (new Date().getDate()),
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name:'id_funcionario',
+                origen:'FUNCIONARIOCAR',
+                fieldLabel:'Responsable',
+                gdisplayField:'desc_funcionario2', //mapea al store del grid
+                valueField:'id_funcionario',
+                width:300,
+                gwidth:250,
+                renderer:function(value, p, record) {
+                    return String.format('{0}', record.data['desc_funcionario2']);
+                }
+            },
+            type:'ComboRec',
+            id_grupo:2,
+            grid:false,
+            form:true
+        },
+        {
+            config:{
+                name: 'lugar',
+                fieldLabel: 'Lugar',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 200
+            },
+            type:'TextField',
+            filters:{pfiltro:'aom.lugar',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'recomendacion',
+                fieldLabel: 'Recomendacion',
+                allowBlank: true,
+                anchor: '80%',
+                height: 200,
+                gwidth: 200
+            },
+            type:'TextArea',
+            filters:{pfiltro:'aom.recomendacion',type:'string'},
+            rows:50,
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+
         {
             config: {
                 name: 'id_gconsultivo',
@@ -438,10 +430,53 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
                 pageSize: 15,
                 queryDelay: 1000,
                 anchor: '60%',
-                gwidth: 150,
+                gwidth: 200,
                 minChars: 2,
                 renderer : function(value, p, record) {
                     return String.format('{0}', record.data['nombre_gconsultivo']);
+                }
+            },
+            type: 'ComboBox',
+            id_grupo: 0,
+            filters: {pfiltro: 'movtip.nombre',type: 'string'},
+            grid: false,
+            form: true
+        },
+        {
+            config: {
+                name: 'id_tipo_om',
+                fieldLabel: 'Tipo OM',
+                allowBlank: false,
+                emptyText: 'Elija una opción...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_auditoria/control/Parametro/listarParametro',
+                    id: 'id_parametro',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'valor_parametro',
+                        direction: 'DESC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'prm.id_tipo_parametro',tipo_parametro:'TIPO_OPORTUNIDAD_MEJORA'}
+                }),
+                valueField: 'id_parametro',
+                displayField: 'valor_parametro',
+                gdisplayField: 'desc_tipo_om',
+                hiddenName: 'id_tipo_om',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,
+                anchor: '60%',
+                gwidth: 200,
+                minChars: 2,
+                renderer : function(value, p, record) {
+                    return String.format('<div class="gridmultiline">{0}</div>', record.data['desc_tipo_om']);
                 }
             },
             type: 'ComboBox',
@@ -451,213 +486,6 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
             form: true
         },
         {
-            //configuracion del componente
-            config:{
-                labelSeparator:'',
-                inputType:'hidden',
-                name: 'requiere_programacion'
-            },
-            type:'Field',
-            form:true
-        },
-        {
-            //configuracion del componente
-            config:{
-                labelSeparator:'',
-                inputType:'hidden',
-                name: 'requiere_formulario'
-            },
-            type:'Field',
-            form:true
-        },
-        {
-            config:{
-                name: 'nombre_aom1',
-                fieldLabel: 'Titulo',
-                allowBlank: false,
-                anchor: '80%',
-                emptyText: 'Intruzca titulo...',
-                gwidth: 200,
-                maxLength:300,
-                /*renderer: function(value, p, record){
-                    var aux='<b><font color="green">';
-                    aux = aux +value+'</font></b>';
-                    return String.format('{0}', aux);
-                }*/
-                renderer : function(value, p, record) {
-                    return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>', record.data['nombre_aom1']);
-                }
-
-            },
-            type:'TextField',
-            filters:{pfiltro:'aom.nombre_aom1',type:'string'},
-            //id_grupo:1,
-            id_grupo:0,
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'descrip_aom1',
-                fieldLabel: 'Descripcion',
-                allowBlank: true,
-                resizable:true,
-                anchor: '80%',
-                gwidth: 200,
-                //maxLength:-5
-                renderer : function(value, p, record) {
-                    return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>', record.data['descrip_aom1']);
-                }
-            },
-            type:'TextArea',
-            filters:{pfiltro:'aom.descrip_aom1',type:'string'},
-            //id_grupo:1,
-            id_grupo:0,
-            grid:true,
-            form:true
-        },
-        {
-            config: {
-                //name: 'id_responsable',
-                name: 'id_funcionario',
-                fieldLabel: 'Responsable',
-                allowBlank: false,
-                resizable: true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListFuncionario',
-                    id: 'id_funcionario',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'desc_funcionario1',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    //fields: ['id_no_funcionario','id_responsable', 'id_uo','desc_funcionario1'],
-                    fields: ['id_funcionario','desc_funcionario1','desc_funcionario2'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'vfc.desc_funcionario1'}
-                }),
-                valueField: 'id_funcionario',
-                displayField: 'desc_funcionario2',
-                gdisplayField: 'desc_funcionario1',
-                hiddenName: 'id_funcionario',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '50%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    var _desc_funcionario = '';
-                    if(record.data.id_funcionario == null){
-                        _desc_funcionario = '(No aplica)';
-                    }
-                    else{
-                        _desc_funcionario = record.data['desc_funcionario2'];
-                        console.log("hhhhhhhhhhhhhhhhhhhhhhh",_desc_funcionario);
-                        console.log("hhhhhhhhhhhhhhhhhhhhhhh",record.data['desc_funcionario2'])
-                    }
-                    //return String.format('{0}', _desc_funcionario);
-                    return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>', _desc_funcionario);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'vfc.desc_funcionario1',type: 'string'},
-            grid: true,
-            form: true
-        },
-        {
-            config:{
-                name: 'fecha_prog_inicio',
-                fieldLabel: 'Fecha Inicio',
-                allowBlank: false,
-                //minValue : (new Date()).clearTime(),
-                emptyText: 'Fecha Inicio...',
-                anchor: '40%',
-                gwidth: 100,
-                format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-            },
-            type:'DateField',
-            filters:{pfiltro:'aom.fecha_prog_inicio',type:'date'},
-            //id_grupo:1,
-            id_grupo:0,
-            valorInicial: (new Date().getDate()),
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'fecha_prog_fin',
-                fieldLabel: 'Fecha Fin',
-                allowBlank: false,
-                //minValue : (new Date()).clearTime(),
-                emptyText: 'Fecha Fin...',
-                anchor: '40%',
-                gwidth: 100,
-                format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-            },
-            type:'DateField',
-            filters:{pfiltro:'aom.fecha_prog_fin',type:'date'},
-            //id_grupo:1,
-            id_grupo:0,
-            valorInicial: (new Date().getDate()),
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'nombre_aom2',
-                fieldLabel: 'Titulo',
-                allowBlank: false,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:300
-            },
-            type:'TextField',
-            filters:{pfiltro:'aom.nombre_aom2',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'lugar',
-                fieldLabel: 'Lugar',
-                allowBlank: false,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:300
-            },
-            type:'TextField',
-            filters:{pfiltro:'aom.lugar',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'descrip_aom2',
-                fieldLabel: 'Descripcion',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                //maxLength:-5
-            },
-            type:'TextArea',
-            filters:{pfiltro:'aom.descrip_aom2',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
-        {
             config: {
                 name: 'id_tnorma',
                 fieldLabel: 'Tipo Norma',
@@ -665,7 +493,6 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
                 resizable:true,
                 emptyText: 'Elija una opción...',
                 store: new Ext.data.JsonStore({
-                    //url: '../../sis_auditoria/control/Parametro/getListParametro',
                     url: '../../sis_auditoria/control/Parametro/listarParametro',
                     id: 'id_parametro',
                     root: 'datos',
@@ -690,10 +517,10 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
                 pageSize: 15,
                 queryDelay: 1000,
                 anchor: '60%',
-                gwidth: 150,
+                gwidth: 200,
                 minChars: 2,
                 renderer : function(value, p, record) {
-                   return String.format('{0}', record.data['desc_tipo_norma']);
+                    return String.format('{0}', record.data['desc_tipo_norma']);
                 }
             },
             type: 'ComboBox',
@@ -710,7 +537,6 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
                 resizable:true,
                 emptyText: 'Elija una opción...',
                 store: new Ext.data.JsonStore({
-                    //url: '../../sis_auditoria/control/Parametro/getListParametro2',
                     url: '../../sis_auditoria/control/Parametro/listarParametro',
                     id: 'id_parametro',
                     root: 'datos',
@@ -735,7 +561,7 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
                 pageSize: 15,
                 queryDelay: 1000,
                 anchor: '60%',
-                gwidth: 150,
+                gwidth: 200,
                 minChars: 2,
                 renderer : function(value, p, record) {
                     return String.format('{0}', record.data['desc_tipo_objeto']);
@@ -745,49 +571,13 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
             id_grupo: 1,
             filters: {pfiltro: 'movtip.nombre',type: 'string'},
             grid: true,
-            form: true
-        },
-        {
-            config:{
-                name: 'resumen',
-                fieldLabel: 'Resumen',
-                allowBlank: false,
-                resizable: true,
-                anchor: '80%',
-                height: 200,
-                gwidth: 100,
-                //maxLength:-5
-            },
-            //type:'HtmlEditor',
-            type:'HtmlEditor',
-            filters:{pfiltro:'aom.resumen',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'recomendacion',
-                fieldLabel: 'Recomendacion',
-                allowBlank: true,
-                anchor: '80%',
-                height: 200,
-                gwidth: 100,
-                //maxLength:-5
-            },
-            type:'HtmlEditor',
-            //type:'HtmlEditor',
-            filters:{pfiltro:'aom.recomendacion',type:'string'},
-            rows:50,
-            id_grupo:1,
-            grid:true,
-            form:true
+            form:  true
         },
         {
             config:{
                 name: 'fecha_prev_inicio',
                 fieldLabel: 'Fecha PV-Inicio',
-                allowBlank: false,
+                allowBlank: true,
                 anchor: '40%',
                 gwidth: 100,
                 format: 'd/m/Y',
@@ -798,13 +588,13 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             valorInicial: (new Date().getDate()),
             grid:true,
-            form:true
+            form:false
         },
         {
             config:{
                 name: 'fecha_prev_fin',
                 fieldLabel: 'Fecha PV-Fin',
-                allowBlank: false,
+                allowBlank: true,
                 anchor: '40%',
                 gwidth: 100,
                 format: 'd/m/Y',
@@ -815,7 +605,7 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             valorInicial: (new Date().getDate()),
             grid:true,
-            form:true
+            form:false
         },
         {
             config:{
@@ -831,7 +621,7 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'aom.fecha_eje_inicio',type:'date'},
             id_grupo:1,
             grid:true,
-            form:true
+            form:false
         },
         {
             config:{
@@ -847,41 +637,7 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'aom.fecha_eje_fin',type:'date'},
             id_grupo:1,
             grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'formulario_ingreso',
-                fieldLabel: 'Formulario',
-                allowBlank: true,
-                anchor: '80%',
-                height: 200,
-                gwidth: 100,
-                //maxLength:-5
-            },
-            type:'TextArea',
-            filters:{pfiltro:'aom.formulario_ingreso',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'estado_form_ingreso',
-                fieldLabel: 'Estado Formulario',
-                inputType:'hidden',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:4
-                //store:[{1:'si'},{2:'no'}]
-            },
-            type:'NumberField',
-            filters:{pfiltro:'aom.estado_form_ingreso',type:'numeric'},
-            valorInicial:0,
-            id_grupo:1,
-            grid:true,
-            form:true
+            form:false
         },
 		{
 			config:{
@@ -898,96 +654,10 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:false
 		},
-        {
-            config: {
-                name: 'id_proceso_wf',
-                fieldLabel: 'id_proceso_wf',
-                allowBlank: true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_/control/Clase/Metodo',
-                    id: 'id_',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_', 'nombre', 'codigo'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-                }),
-                valueField: 'id_',
-                displayField: 'nombre',
-                gdisplayField: 'desc_',
-                hiddenName: 'id_proceso_wf',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '100%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['desc_']);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
-        },
-        {
-            config: {
-                name: 'id_estado_wf',
-                fieldLabel: 'id_estado_wf',
-                allowBlank: true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_/control/Clase/Metodo',
-                    id: 'id_',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_', 'nombre', 'codigo'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-                }),
-                valueField: 'id_',
-                displayField: 'nombre',
-                gdisplayField: 'desc_',
-                hiddenName: 'id_estado_wf',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '100%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['desc_']);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
-        },
 		{
 			config:{
 				name: 'id_usuario_ai',
-				fieldLabel: '',
+				fieldLabel: 'jjj',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -1077,36 +747,6 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
-    /*Grupos : [{
-        layout : 'column',
-        items : [{
-            xtype : 'fieldset',
-            //layout : 'form',
-            border : true,
-            title : 'Datos de Programacion',
-            bodyStyle : 'padding:0 10px 0;',
-            columnWidth : '500px',
-            items : [],
-            id_grupo : 0,
-            collapsible : true
-        },]
-    },*/
-    /*{
-        layout : 'column',
-        items : [{
-            xtype : 'fieldset',
-            layout : 'form',
-            border : true,
-            title : 'Datos de Planificacion',
-            bodyStyle : 'padding:0 10px 0;',
-            columnWidth : '1000px',
-            items : [],
-            id_grupo : 1,
-            collapsible : true
-        },]
-    }
-
-    ],*/
 	tam_pag:50,	
 	title:'Auditoria - Oportunidad Mejora',
     id:'AOM',
@@ -1118,7 +758,6 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_aom', type: 'numeric'},
 		{name:'id_proceso_wf', type: 'numeric'},
 		{name:'nro_tramite_wf', type: 'string'},
-		{name:'resumen', type: 'string'},
 		{name:'id_funcionario', type: 'numeric'},
 		{name:'fecha_prog_inicio', type: 'date',dateFormat:'Y-m-d'},
 		{name:'recomendacion', type: 'string'},
@@ -1127,9 +766,7 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_prev_inicio', type: 'date',dateFormat:'Y-m-d'},
 		{name:'fecha_prev_fin', type: 'date',dateFormat:'Y-m-d'},
 		{name:'fecha_prog_fin', type: 'date',dateFormat:'Y-m-d'},
-		{name:'descrip_aom2', type: 'string'},
 		{name:'nombre_aom1', type: 'string'},
-		{name:'documento', type: 'string'},
 		{name:'estado_reg', type: 'string'},
 		{name:'estado_wf', type: 'string'},
 		{name:'id_tobjeto', type: 'string'},
@@ -1141,12 +778,9 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
 		{name:'descrip_aom1', type: 'string'},
 		{name:'lugar', type: 'string'},
 		{name:'id_tipo_om', type: 'numeric'},
-
         {name:'formulario_ingreso', type: 'string'},
         {name:'estado_form_ingreso', type: 'numeric'},
-
 		{name:'fecha_eje_fin', type: 'date',dateFormat:'Y-m-d'},
-		{name:'nombre_aom2', type: 'string'},
 		{name:'id_usuario_ai', type: 'numeric'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usuario_ai', type: 'string'},
@@ -1158,82 +792,151 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
 		{name:'tipo_auditoria', type: 'string'},
 		{name:'nombre_unidad', type: 'string'},
 		{name:'nombre_gconsultivo', type: 'string'},
-		{name:'desc_funcionario1', type: 'text'},
-		{name:'desc_funcionario2', type: 'text'},
+		{name:'desc_funcionario2', type: 'string'},
         {name:'desc_tipo_objeto', type: 'string'},
 		{name:'desc_tipo_norma', type: 'string'},
 		{name:'codigo_parametro', type: 'string'},
 		{name:'desc_tipo_om', type: 'string'},
-		{name:'nombre_estado', type: 'string'},
 		{name:'codigo_tpo_aom', type: 'string'},
 		{name:'requiere_programacion', type: 'string'},
 		{name:'requiere_formulario', type: 'string'},
 		{name:'contador_estados', type: 'numeric'},
-
+        {name:'nombre_estado', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_aom',
 		direction: 'DESC'
 	},
 	bdel:true,
-	bsave:true,
-    onBtnInformeOM: function () {
-        //this.ocultarComponente(this.Cmp.formulario_impuesto);
-        var rec = '';
-        Phx.CP.loadWindows('../../../sis_auditoria/vista/auditoria_oportunidad_mejora/InformeOM.php', 'Perfil de Informe de Oportunidades de Mejora', {
-            modal : true,
-            width : '99%',
-            height : '98%',
-        }, rec, this.idContenedor, 'InformeOM');
+	bsave:false,
+    iniciarEvento:function () {
+        this.ocultarComponente(this.Cmp.id_tipo_om);
+        this.ocultarComponente(this.Cmp.lugar);
+        this.ocultarComponente(this.Cmp.id_tnorma);
+        this.ocultarComponente(this.Cmp.id_tobjeto);
+        this.ocultarComponente(this.Cmp.id_gconsultivo);
     },
+    sigEstado:function(){
+        var rec = this.sm.getSelected();
+        this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+            'Estado de Wf',
+            {
+                modal: true,
+                width: 700,
+                height: 450
+            },
+            {
+                data: {
+                    id_estado_wf: rec.data.id_estado_wf,
+                    id_proceso_wf: rec.data.id_proceso_wf
+                }
+            }, this.idContenedor, 'FormEstadoWf',
+            {
+                config: [{
+                    event: 'beforesave',
+                    delegate: this.onSaveWizard
+                }],
+                scope: this
+            }
+        );
+    },
+    onSaveWizard:function(wizard,resp){
+        Ext.Ajax.request({
+            url:'../../sis_auditoria/control/AuditoriaOportunidadMejora/siguienteEstado',
+            params:{
+                id_proceso_wf_act:  resp.id_proceso_wf_act,
+                id_estado_wf_act:   resp.id_estado_wf_act,
+                id_tipo_estado:     resp.id_tipo_estado,
+                id_funcionario_wf:  resp.id_funcionario_wf,
+                id_depto_wf:        resp.id_depto_wf,
+                obs:                resp.obs,
+                json_procesos:      Ext.util.JSON.encode(resp.procesos)
+            },
+            success:this.successWizard,
+            failure: this.conexionFailure,
+            argument:{wizard:wizard},
+            timeout:this.timeout,
+            scope:this
+        });
 
-    // ================ Agrega botones =================
-    onBtnPlanificarAudit: function () {
-        var rec = '';
-        //var rec = this.sm.getSelected();
-        console.log('valor del rec->:',this.sm.getSelected())
-        Phx.CP.loadWindows('../../../sis_auditoria/vista/auditoria_oportunidad_mejora/PlanificacionAOM.php', 'Perfil de Planificacion de Auditoria', {
-            modal : true,
-            width : '99%',
-            height : '98%',
-        }, rec, this.idContenedor, 'PlanificacionAOM');
-
     },
-    onBtnInformeRegistroNC: function () {
-        var rec = '';
-        //var rec = this.sm.getSelected();
-        console.log('valor del rec->:',this.sm.getSelected())
-        Phx.CP.loadWindows('../../../sis_auditoria/vista/auditoria_oportunidad_mejora/InformeAuditoria.php', 'Perfil de Informe y Resitro de No Conformidad', {
-            modal : true,
-            width : '99%',
-            height : '98%',
-        }, rec, this.idContenedor, 'InformeAuditoria');
+    successWizard:function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy();
+        this.reload();
     },
-    onBtnHelpAOM: function () {
-            var rec = '';
-            //var rec = this.sm.getSelected();
-            console.log('valor del rec->:',this.sm.getSelected())
-            Phx.CP.loadWindows('../../../sis_auditoria/vista/auditoria_oportunidad_mejora/InformeAuditoria.php', 'Perfil de Informe y Resitro de No Conformidad', {
-                modal : true,
-                width : '99%',
-                height : '98%',
-            }, rec, this.idContenedor, 'InformeAuditoria');
+    loadCheckDocumentosRecWf:function() {
+        var rec=this.sm.getSelected();
+        rec.data.nombreVista = this.nombreVista;
+        Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+            'Chequear documento del WF',
+            {
+                width:'90%',
+                height:500
+            },
+            rec.data,
+            this.idContenedor,
+            'DocumentoWf'
+        )
     },
-    preparaMenu:function(n){
-        //console.log('valor n de preparaMenu:',n);
-        var data = this.getSelectedData();
-        Phx.vista.AuditoriaOportunidadMejora.superclass.preparaMenu.call(this);
-        this.getBoton('btnPlanificarAudit').enable();
-        this.getBoton('btnInformeOM').enable();
+    onOpenObs:function() {
+        var rec=this.sm.getSelected();
+        var data = {
+            id_proceso_wf: rec.data.id_proceso_wf,
+            id_estado_wf: rec.data.id_estado_wf,
+            num_tramite: rec.data.nro_tramite_wf
+        };
+        Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
+            'Observaciones del WF',
+            {
+                width:'80%',
+                height:'70%'
+            },
+            data,
+            this.idContenedor,
+            'Obs'
+        )
     },
-    liberaMenu:function(n){
-        //var data = this.getSelectedData();
-        //console.log('valor n de liberaMenu:',n);
-        Phx.vista.AuditoriaOportunidadMejora.superclass.liberaMenu.call(this);
-        this.getBoton('btnPlanificarAudit').enable();
-        this.getBoton('btnInformeOM').disable();
+    antEstado:function(res){
+        var rec=this.sm.getSelected();
+        Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/AntFormEstadoWf.php',
+            'Estado de Wf',
+            {
+                modal:true,
+                width:450,
+                height:250
+            }, { data:rec.data, estado_destino: res.argument.estado}, this.idContenedor,'AntFormEstadoWf',
+            {
+                config:[{
+                    event:'beforesave',
+                    delegate: this.onAntEstado,
+                }
+                ],
+                scope:this
+            })
     },
-
+    onAntEstado: function(wizard,resp){
+        Phx.CP.loadingShow();
+        Ext.Ajax.request({
+            url:'../../sis_auditoria/control/AuditoriaOportunidadMejora/anteriorEstado',
+            params:{
+                id_proceso_wf: resp.id_proceso_wf,
+                id_estado_wf:  resp.id_estado_wf,
+                obs: resp.obs,
+                estado_destino: resp.estado_destino
+            },
+            argument:{wizard:wizard},
+            success:this.successEstadoSinc,
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });
+    },
+    successEstadoSinc:function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+    }
 }
 )
 </script>

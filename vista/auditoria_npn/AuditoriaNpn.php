@@ -17,16 +17,13 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.AuditoriaNpn.superclass.constructor.call(this,config);
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag}})
         var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
-        //console.log("data oadre",dataPadre);
         if(dataPadre){
             this.onEnablePanel(this, dataPadre);
         }
         else {
             this.bloquearMenus();
         }
-        //this.nodoVista();
 	},
 			
 	Atributos:[
@@ -136,9 +133,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
                 }),
                 tpl:'<tpl for=".">'+
                     '<div class="x-combo-list-item" >'+
-                        '<div class=""><p> Punto: <b>{nro_pn}</b></p></div>'+
-                        '<div><p>Nombre: <b>{nombre_pn}</b></p></div>'+
-                        '<div><p>Descripcion: <b>{descrip_pn}</b></p></div>'+
+                        '<div class=""><p> Punto: <b>{codigo_pn}</b></p> <p>Nombre: <b>{nombre_pn}</b></p></div>'+
                     '</div></tpl>',
                 valueField: 'id_pn',
                 displayField: 'nombre_pn',
@@ -317,65 +312,29 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
 		field: 'id_anpn',
 		direction: 'ASC'
 	},
-	bdel:true,
-	bsave:true,
-    east:{
-        url:'../../../sis_auditoria/vista/auditoria_npnpg/AuditoriaNpnpg.php',
-        title:'Pregunta(s)',
-        height:'40%',
-        width: '50%',
-        cls:'AuditoriaNpnpg'
-    },
-    onReloadPage:function(m){
-        /*this.maestro=m;
-        this.store.baseParams = {id_anorma: this.maestro.id_anorma};
-        console.log('maestro',this.maestro);
-        //Ext.apply(this.Cmp.id_centro_costo.store.baseParams,{id_gestion: this.maestro.id_gestion});
-        this.load({params:{start:0, limit:50}});
-        // Envio de parametro para hacer consulta en Punto de Norma
-        this.Cmp.id_anorma.disable(true);
-        this.Cmp.id_pn.store.baseParams.id_norma = this.maestro.id_norma;*/
-
-        this.maestro=m;
-        this.store.baseParams = {id_aom: this.maestro.id_aom};
-        //Ext.apply(this.Cmp.id_centro_costo.store.baseParams,{id_gestion: this.maestro.id_gestion});
-        this.load({params:{start:0, limit:50}});
-        this.Cmp.id_aom.disable(true);
-        //console.log("masesto---->",this.maestro);
-        this.Cmp.id_norma.store.baseParams.p_id_parametro = this.maestro.id_tnorma;
-        //this.Cmp.codigo_parametro.store.baseParams.codigo_parametro = this.maestro.codigo_parametro;
-
-        /*bloquearMenus:function(){
-            this.grid.getBottomToolbar().disable();
-            this.tbar.disable();
-            //this.bloquearOrdenamientoGrid();
-
-        },*/
-    },
-    loadValoresIniciales: function () {
-        //this.Cmp.id_anorma.setValue(this.maestro.id_anorma);
-
-        Phx.vista.AuditoriaNpn.superclass.loadValoresIniciales.call(this);
-        this.Cmp.id_aom.setValue(this.maestro.id_aom);
-
-        //this.Cmp.codigo_parametro.setValue(this.maestro.codigo_parametro);
-        console.log("codigo parametro:",this.maestro.codigo_parametro);
-    },
-    /*success: function(resp){
-        Phx.CP.loadingHide();
-        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-    },*/
     tipoStore: 'GroupingStore',//GroupingStore o JsonStore #
     remoteGroup: true,
     groupField: 'sigla_norma',
     viewGrid: new Ext.grid.GroupingView({
         forceFit: false
     }),
-    onButtonNew :function () {
-        var data = this.getSelectedData();
-        Phx.vista.AuditoriaNpn.superclass.onButtonNew.call(this);
+	bdel:true,
+	bsave:false,
+    onReloadPage:function(m){
+        this.maestro = m;
+        this.store.baseParams = {id_aom: this.maestro.id_aom};
+        this.load({params:{start:0, limit:50}});
+        this.Cmp.id_norma.store.baseParams.p_id_parametro = this.maestro.id_tnorma;
 
-        //this.Cmp.id_norma.store.baseParams.query = this.maestro.desc_prioridad;
+    },
+    loadValoresIniciales: function () {
+       Phx.vista.AuditoriaNpn.superclass.loadValoresIniciales.call(this);
+       this.Cmp.id_aom.setValue(this.maestro.id_aom);
+    },
+    onButtonNew :function () {
+        Phx.vista.AuditoriaNpn.superclass.onButtonNew.call(this);
+        console.log(this.maestro.codigo_parametro);
+        this.Cmp.id_norma.store.baseParams.query = this.maestro.desc_prioridad;
         this.Cmp.id_norma.store.load({params:{p_codigo_parametro:this.maestro.codigo_parametro,start:0,limit:this.tam_pag},
             callback : function (r) {
                 if (r.length > 0 ) {
@@ -384,76 +343,48 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
                 }
             }, scope : this
         });
-
-        //*** Filtro para seleccionar solo los punto de norma de la norma seleccionada***
         this.Cmp.id_norma.on('select', function(combo, record, index){
             this.Cmp.id_norma.store.baseParams.p_codigo_parametro = this.maestro.codigo_parametro;
             this.Cmp.id_pn.store.baseParams ={par_filtro: 'nor.sigla_norma#nor.nombre_norma',id_norma: record.data.id_norma};
-            console.log('this.maestro.id_tnorma',record.data.id_norma);
         },this);
     },
-    /*nodoVista:function () {
+    preparaMenu:function(n){
+        var tb =this.tbar;
+        Phx.vista.AuditoriaNpn.superclass.preparaMenu.call(this,n);
 
-        var tb = Phx.vista.AuditoriaNpn.superclass.preparaMenu.call(this);
-        var data = this.getSelectedData();
-
-        if(this.maestro.estado_wf == 'vob_planificacion'){
-            tb.items.get('b-new-' + this.idContenedor).disable();
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-            tb.items.get('b-save-' + this.idContenedor).disable();
+        if (this.maestro.estado_wf ==='programada') {
+            this.getBoton('new').disable();
+            this.getBoton('edit').disable();
+            this.getBoton('del').disable();
+        }else{
+            this.getBoton('new').enable();
+            this.getBoton('edit').enable();
+            this.getBoton('del').enable();
         }
-    },*/
-    preparaMenu: function(n){
 
-        var tb = Phx.vista.AuditoriaNpn.superclass.preparaMenu.call(this);
-        var data = this.getSelectedData();
-
-        if(this.maestro.estado_wf == 'plani_aprob' || this.maestro.estado_wf == 'vob_planificacion'){
-            tb.items.get('b-new-' + this.idContenedor).disable();
-            //tb.items.get('b-new-' + this.idContenedor).hide();
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-            tb.items.get('b-save-' + this.idContenedor).disable();
-        }
-        else{
-            tb.items.get('b-edit-' + this.idContenedor).enable();
-            tb.items.get('b-del-' + this.idContenedor).enable();
-        }
-        return tb;
+        return tb
     },
-    liberaMenu: function(n){
-
-        var tb = Phx.vista.AuditoriaNpn.superclass.preparaMenu.call(this);
-        var data = this.getSelectedData();
-
-        if(this.maestro.estado_wf == 'plani_aprob' || this.maestro.estado_wf == 'vob_planificacion'){
-            tb.items.get('b-new-' + this.idContenedor).disable();
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-            tb.items.get('b-save-' + this.idContenedor).disable();
+    liberaMenu:function(){
+        var tb = Phx.vista.AuditoriaNpn.superclass.liberaMenu.call(this);
+        if(tb){
+            if (this.maestro.estado_wf ==='programada'){
+                this.getBoton('new').disable();
+                this.getBoton('edit').disable();
+                this.getBoton('del').disable();
+            }else{
+                this.getBoton('new').enable();
+                this.getBoton('edit').enable();
+                this.getBoton('del').enable();
+            }
         }
-        else{
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-        }
-        return tb;
+        return tb
     },
-    /*onButtonNew :function () {
-        Phx.vista.AuditoriaNpn.superclass.onButtonNew.call(this);
-        this.Cmp.id_norma.setValue(this.maestro.id_n);
-        /// filtros combo
-        this.Cmp.id_norma.on('select', function(combo, record, index){
-            this.Cmp.id_pn.store.baseParams ={par_filtro: 'pnorm.nombre_pn#pnorm.codigo_pn',id_norma : record.data.id_norma};
-            this.Cmp.id_pn.reset();
-            this.store.removeAll();
-            this.Cmp.id_pn.modificado = true;
-        },this);
-        this.Cmp.id_pn.on('select', function(combo, record, index){
-            this.Cmp.nombre_pn.reset();
-            this.Cmp.nombre_pn.setValue(record.data.nombre_pn);
-        },this);
-    },*/
+    south:{
+        url:'../../../sis_auditoria/vista/auditoria_npnpg/AuditoriaNpnpg.php',
+        title:'Pregunta(s)',
+        height:'40%',
+        cls:'AuditoriaNpnpg'
+    }
 	}
 )
 </script>

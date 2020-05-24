@@ -21,7 +21,6 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.Cronograma.superclass.constructor.call(this,config);
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag}})
         var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
         if(dataPadre){
             this.onEnablePanel(this, dataPadre);
@@ -52,49 +51,6 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
             type:'Field',
             form:true
         },
-        /*{
-            config: {
-                name: 'id_aom',
-                fieldLabel: 'id_aom',
-                allowBlank: false,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_/control/Clase/Metodo',
-                    id: 'id_',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_', 'nombre', 'codigo'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-                }),
-                valueField: 'id_',
-                displayField: 'nombre',
-                gdisplayField: 'desc_',
-                hiddenName: 'id_aom',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '80%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['desc_']);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
-        },*/
         {
             config: {
                 name: 'id_actividad',
@@ -204,21 +160,6 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        /*{
-            config:{
-                name: 'hora_ini_activ',
-                fieldLabel: 'hora_ini_activ',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:8
-            },
-            type:'TextField',
-            filters:{pfiltro:'cronog.hora_ini_activ',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },*/
         {
             config:{
                 name: 'hora_fin_activ',
@@ -238,21 +179,6 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        /*{
-            config:{
-                name: 'hora_fin_activ',
-                fieldLabel: 'hora_fin_activ',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:8
-            },
-            type:'TextField',
-            filters:{pfiltro:'cronog.hora_fin_activ',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },*/
 		{
 			config:{
 				name: 'obs_actividad',
@@ -411,123 +337,53 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
-    east:{
+	bsave:false,
+    south:{
         url:'../../../sis_auditoria/vista/cronograma_equipo_responsable/CronogramaEquipoResponsable.php',
         title:'Participantes en la Actividad',
-        //height:'50%',
-        width: '40%',
+        height:'40%',
         cls:'CronogramaEquipoResponsable'
     },
-    //arrayDefaultColumHidden:['nueva_actividad'],
     onReloadPage:function(m){
         this.maestro=m;
         this.store.baseParams = {id_aom: this.maestro.id_aom};
-        //Ext.apply(this.Cmp.id_centro_costo.store.baseParams,{id_gestion: this.maestro.id_gestion});
         this.load({params:{start:0, limit:50}});
-        this.Cmp.id_aom.disable(true);
     },
     loadValoresIniciales: function () {
-        //this.Cmp.id_aom.setValue(this.maestro.id_aom);
-        //Phx.vista.AuditoriaNorma.superclass.loadValoresIniciales.call(this);
         Phx.vista.Cronograma.superclass.loadValoresIniciales.call(this);
         this.Cmp.id_aom.setValue(this.maestro.id_aom);
     },
-    preparaMenu: function(n){
+    preparaMenu:function(n){
+        var tb =this.tbar;
+        Phx.vista.Cronograma.superclass.preparaMenu.call(this,n);
 
-        var tb = Phx.vista.Cronograma.superclass.preparaMenu.call(this);
-        var data = this.getSelectedData();
-
-        if(this.maestro.estado_wf == 'plani_aprob' || this.maestro.estado_wf == 'vob_planificacion'){
-            tb.items.get('b-new-' + this.idContenedor).disable();
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-            tb.items.get('b-save-' + this.idContenedor).disable();
+        if (this.maestro.estado_wf ==='programada') {
+            this.getBoton('new').disable();
+            this.getBoton('edit').disable();
+            this.getBoton('del').disable();
+        }else{
+            this.getBoton('new').enable();
+            this.getBoton('edit').enable();
+            this.getBoton('del').enable();
         }
-        else{
-            tb.items.get('b-edit-' + this.idContenedor).enable();
-            tb.items.get('b-del-' + this.idContenedor).enable();
 
-        }
-        return tb;
+        return tb
     },
-    liberaMenu: function(n){
-
-        var tb = Phx.vista.Cronograma.superclass.preparaMenu.call(this);
-        var data = this.getSelectedData();
-
-        if(this.maestro.estado_wf == 'plani_aprob' || this.maestro.estado_wf == 'vob_planificacion'){
-            tb.items.get('b-new-' + this.idContenedor).disable();
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-            tb.items.get('b-save-' + this.idContenedor).disable();
-        }
-        else{
-            //tb.items.get('b-new-' + this.idContenedor).disable();
-            //tb.items.get('b-save-' + this.idContenedor).disable();
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-        }
-        return tb;
-    },
-    onButtonNew: function () {
-        var data = this.getSelectedData();
-        this.formCronoggrama();
-        Phx.vista.Cronograma.superclass.onButtonNew.call(this);
-
-        this.Cmp.id_actividad.on('select',function (combo,record,index) {
-            console.log('combitoooooo',record);
-            if(record.data.codigo_actividad != 'OTHER_ACTIVITY'){
-                this.formCronoggrama();
+    liberaMenu:function(){
+        var tb = Phx.vista.Cronograma.superclass.liberaMenu.call(this);
+        if(tb){
+            if (this.maestro.estado_wf ==='programada'){
+                this.getBoton('new').disable();
+                this.getBoton('edit').disable();
+                this.getBoton('del').disable();
+            }else{
+                this.getBoton('new').enable();
+                this.getBoton('edit').enable();
+                this.getBoton('del').enable();
             }
-            else{
-                this.formCronogNewActivity();
-            }
-        },this);
-
-    },
-    onButtonEdit: function () {
-	    var data = this.getSelectedData();
-        Phx.vista.Cronograma.superclass.onButtonEdit.call(this);
-        if(data.nueva_actividad != ''){
-            this.formCronogNewActivity();
-            this.Cmp.id_actividad.disable();
         }
-        else{
-            this.formCronoggrama();
-        }
-        /*this.Cmp.id_actividad.on('select',function (combo,record,index) {
-            console.log('combitoooooo',record);
-            if(data.nueva_actividad == ''){
-                this.formCronoggrama();
-            }
-            else{
-                this.formCronogNewActivity();
-            }
-        },this);*/
-        
-    },
-    formCronoggrama:function () {
-        this.mostrarComponente(this.Cmp.id_actividad);
-        this.mostrarComponente(this.Cmp.fecha_ini_activ);
-        this.mostrarComponente(this.Cmp.fecha_fin_activ);
-        this.mostrarComponente(this.Cmp.hora_ini_activ);
-        this.mostrarComponente(this.Cmp.hora_fin_activ);
-        this.mostrarComponente(this.Cmp.obs_actividad);
-
-        this.ocultarComponente(this.Cmp.nueva_actividad);
-    },
-    formCronogNewActivity:function () {
-        this.mostrarComponente(this.Cmp.id_actividad);
-        this.mostrarComponente(this.Cmp.fecha_ini_activ);
-        this.mostrarComponente(this.Cmp.fecha_fin_activ);
-        this.mostrarComponente(this.Cmp.hora_ini_activ);
-        this.mostrarComponente(this.Cmp.hora_fin_activ);
-        this.mostrarComponente(this.Cmp.obs_actividad);
-
-        this.mostrarComponente(this.Cmp.nueva_actividad);
+        return tb
     }
-
 	}
 )
 </script>

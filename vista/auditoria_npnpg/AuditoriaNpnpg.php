@@ -17,15 +17,6 @@ Phx.vista.AuditoriaNpnpg=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.AuditoriaNpnpg.superclass.constructor.call(this,config);
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag}})
-        //this.bloquearMenu();
-        /*var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
-        if(dataPadre){
-            this.onEnablePanel(this, dataPadre);
-        }
-        else {
-            this.bloquearMenus();
-        }*/
 	},
 			
 	Atributos:[
@@ -49,49 +40,6 @@ Phx.vista.AuditoriaNpnpg=Ext.extend(Phx.gridInterfaz,{
             type:'Field',
             form:true
         },
-        /*{
-            config: {
-                name: 'id_anpn',
-                fieldLabel: '#Punto Norma',
-                allowBlank: false,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNorma',
-                    id: 'id_anpn',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'id_pn',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_anpn', 'nombre_pn'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-                }),
-                valueField: 'id_pn',
-                displayField: 'id_pn',
-                gdisplayField: 'id_pn',
-                hiddenName: 'id_anpn',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '100%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('# {0}', record.data['id_pn']);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
-        },*/
         {
             config: {
                 name: 'id_pregunta',
@@ -304,10 +252,9 @@ Phx.vista.AuditoriaNpnpg=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
     onReloadPage:function (m) {
         this.maestro=m;
-        console.log('Maestrito:',this.maestro);
         this.store.baseParams={id_anpn:this.maestro.id_anpn};
         this.load({params:{start:0, limit:50}});
         this.Cmp.id_anpn.disable(true);
@@ -316,23 +263,7 @@ Phx.vista.AuditoriaNpnpg=Ext.extend(Phx.gridInterfaz,{
     loadValoresIniciales: function () {
         this.Cmp.id_anpn.setValue(this.maestro.id_anpn);
         Phx.vista.AuditoriaNpnpg.superclass.loadValoresIniciales.call(this);
-    },
-    /*onButtonNew :function () {
-        Phx.vista.AuditoriaNpnpg.superclass.onButtonNew.call(this);
-        this.Cmp.id_anpn.setValue(this.maestro.id_anpn);
-        /// filtros combo
-        this.Cmp.id_pn.on('select', function(combo, record, index){
-            this.Cmp.id_anpn.store.baseParams ={par_filtro: 'pnorm.nombre_pn#pnorm.codigo_pn',id_pn : record.data.id_pn};
-            this.Cmp.id_anpn.reset();
-            this.store.removeAll();
-            this.Cmp.id_anpn.modificado = true;
-        },this);
-        this.Cmp.id_anpn.on('select', function(combo, record, index){
-            this.Cmp.nombre_pn.reset();
-            this.Cmp.nombre_pn.setValue(record.data.nombre_pn);
-        },this);
-    },*/
-
+    }
 	}
 )
 </script>

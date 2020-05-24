@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION ssom.f_list_funcionarios_responsables (
   p_id_aom integer,
   p_estado varchar
 )
-RETURNS varchar AS
+  RETURNS varchar AS
 $body$
   /**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora

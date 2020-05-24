@@ -14,10 +14,8 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
-    	//llama al constructor de la clase padre
 		Phx.vista.PnormaNoconformidad.superclass.constructor.call(this,config);
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag}})
 	},
 			
 	Atributos:[
@@ -265,22 +263,7 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
-    //***********SSS
-    /*onReloadPage:function (m)
-    {
-	    this.maestro=m;
-	    this.store.baseParams={id_nc:this.maestro.id_nc};
-	    this.load({params:{start:0, limit:50}})
-    },
-    loadValoresIniciales:function ()
-    {
-        Phx.vista.PnormaNoconformidad.superclass.loadValoresIniciales.call(this);
-        //console.log(this.maestro);
-        this.Cmp.id_nc.setValue(this.maestro.id_nc);
-    },
-	*/
-	//
+	bsave:false,
     onButtonNew :function () {
         Phx.vista.PnormaNoconformidad.superclass.onButtonNew.call(this);
         this.Cmp.id_nc.setValue(this.maestro.id_nc);

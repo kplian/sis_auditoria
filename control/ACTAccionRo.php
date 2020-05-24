@@ -15,7 +15,6 @@ class ACTAccionRo extends ACTbase{
 			
 	function listarAccionRo(){
 		$this->objParam->defecto('ordenacion','id_accion_ro');
-
 		$this->objParam->defecto('dir_ordenacion','asc');
 
         if($this->objParam->getParametro('id_aom_ro')!=''){

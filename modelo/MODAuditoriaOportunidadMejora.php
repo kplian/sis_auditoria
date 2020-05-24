@@ -17,40 +17,34 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 		$this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_sel';
 		$this->transaccion='SSOM_AOM_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-        //$this->setParametro('bandera','bandera','varchar');
-		//Definicion de la lista del resultado del query
+
 		$this->captura('id_aom','int4');
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('nro_tramite_wf','varchar');
-		$this->captura('resumen','text');
 		$this->captura('id_funcionario','int4');
-		$this->captura('fecha_prog_inicio','date');
-		$this->captura('recomendacion','text');
-		$this->captura('id_uo','int4');
-		$this->captura('id_gconsultivo','int4');
-		$this->captura('fecha_prev_inicio','date');
-		$this->captura('fecha_prev_fin','date');
-		$this->captura('fecha_prog_fin','date');
-		$this->captura('descrip_aom2','text');
-		$this->captura('nombre_aom1','varchar');
-		$this->captura('documento','varchar');
-		$this->captura('estado_reg','varchar');
+        $this->captura('id_uo','int4');
+        $this->captura('id_gconsultivo','int4');
+        $this->captura('id_tobjeto','varchar');
+        $this->captura('id_estado_wf','int4');
+        $this->captura('id_tnorma','varchar');  // corregir
+        $this->captura('id_tipo_om','int4');
+        $this->captura('id_tipo_auditoria','int4');
+        $this->captura('fecha_prog_inicio','date');
+        $this->captura('fecha_prog_fin','date');
+        $this->captura('fecha_prev_inicio','date');
+        $this->captura('fecha_prev_fin','date');
+        $this->captura('recomendacion','text');
+        $this->captura('codigo_aom','varchar');
+        $this->captura('nombre_aom1','varchar');
+        $this->captura('descrip_aom1','text');
+        $this->captura('estado_reg','varchar');
 		$this->captura('estado_wf','varchar');
-		$this->captura('id_tobjeto','varchar');
-		$this->captura('id_estado_wf','int4');
-		$this->captura('id_tnorma','varchar');
-		$this->captura('fecha_eje_inicio','date');
-		$this->captura('codigo_aom','varchar');
-		$this->captura('id_tipo_auditoria','int4');
-		$this->captura('descrip_aom1','text');
-		$this->captura('lugar','varchar');
-		$this->captura('id_tipo_om','int4');
-
+		$this->captura('nombre_estado','varchar');
+        $this->captura('fecha_eje_inicio','date');
+        $this->captura('fecha_eje_fin','date');
+        $this->captura('lugar','varchar');
         $this->captura('formulario_ingreso','text');
         $this->captura('estado_form_ingreso','int4');
-
-		$this->captura('fecha_eje_fin','date');
-		$this->captura('nombre_aom2','varchar');
 		$this->captura('id_usuario_ai','int4');
 		$this->captura('fecha_reg','timestamp');
 		$this->captura('usuario_ai','varchar');
@@ -59,20 +53,17 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-		$this->captura('tipo_auditoria','varchar');
 		$this->captura('nombre_unidad','varchar');
-		$this->captura('nombre_gconsultivo','varchar');
-		$this->captura('desc_funcionario1','text');
-		$this->captura('desc_funcionario2','text');
+        $this->captura('desc_funcionario2','text');
+        $this->captura('nombre_gconsultivo','varchar');
         $this->captura('desc_tipo_objeto','varchar');
 		$this->captura('desc_tipo_norma','varchar');
 		$this->captura('codigo_parametro','varchar');
 		$this->captura('desc_tipo_om','varchar');
-		$this->captura('nombre_estado','varchar');
+        $this->captura('tipo_auditoria','text');
 		$this->captura('codigo_tpo_aom','varchar');
 		$this->captura('requiere_programacion','varchar');
 		$this->captura('requiere_formulario','varchar');
-		$this->captura('contador_estados','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -198,6 +189,30 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+    function reporteResumen(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_sel';
+        $this->transaccion='SSOM_RESU_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this->setCount(false);
+
+        $this->setParametro('id_aom','id_aom','int4');
+        //Definicion de la lista del resultado del query
+        $this->captura('id_aom','int4');
+        $this->captura('fecha_prev_inicio','date');
+        $this->captura('fecha_prev_fin','date');
+        $this->captura('nombre_aom1','varchar');
+        $this->captura('descrip_aom1','text');
+        $this->captura('nro_tramite_wf','varchar');
+        $this->captura('desc_funcionario1','text');
+
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        // var_dump($this->respuesta);exit;
+        return $this->respuesta;
+    }
+
+
 
 	/****************  Inicio ***********************/
 	function getListUO(){
@@ -243,43 +258,18 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         return $this->respuesta;
         //return "";
     }
+
     function getListAuditores(){
         $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_sel';
         $this->transaccion='SSOM_ADPTO_SEL';
         $this->tipo_procedimiento='SEL';//tipo de transaccion
 
-
-        $this->setParametro('p_codigo_parametro','p_codigo_parametro','varchar');
-        $this->setParametro('p_id_uo_i','p_id_uo_i','int4');
-
+        $this->setParametro('codigo','codigo','varchar');
+        $this->setParametro('id_uo','id_uo','int4');
         //Definicion de la lista del resultado del query
-        $this->captura('id_persona','int4');
+
         $this->captura('id_funcionario','int4');
         $this->captura('desc_funcionario1','text');
-        $this->captura('desc_funcionario2','text');
-        $this->captura('nombre_cargo','varchar');
-        $this->captura('descripcion_cargo','varchar');
-        $this->captura('cargo_codigo','varchar');
-        $this->captura('id_uo','int4');
-        $this->captura('nombre_unidad','varchar');
-
-        /*$this->captura('cargo','varchar');
-        $this->captura('sw_alerta','varchar');
-        $this->captura('id_persona','int4');
-        $this->captura('ap_materno','varchar');
-        $this->captura('ap_paterno','varchar');
-        $this->captura('nombre_completo1','text');
-        $this->captura('id_usuario','int4');
-        $this->captura('id_funcionario','int4');
-        $this->captura('nombre_cargo','varchar');
-        $this->captura('descripcion_cargo','varchar');
-        $this->captura('cargo_codigo','varchar');
-        $this->captura('desc_funcionario1','text');
-        $this->captura('desc_funcionario2','text');
-        $this->captura('id_uo','int4');
-        $this->captura('nombre_unidad','varchar');*/
-
-
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -287,6 +277,7 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+
     function getLastAuditRecord(){
         $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_sel';
         $this->transaccion='SSOM_AOMX3_SEL';
@@ -311,8 +302,7 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 
         //Define los parametros para la funcion
         $this->setParametro('id_aom','id_aom','int4');
-        $this->setParametro('resumen','resumen','codigo_html');
-        //$this->setParametro('recomendacion','recomendacion','text');
+        $this->setParametro('recomendacion','recomendacion','text');
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -360,8 +350,6 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         $this->transaccion = 'SSOM_WFNEXT_INS';
         $this->tipo_procedimiento = 'IME';
 
-        //Define los parametros para la funcion
-        $this->setParametro('id_aom','id_aom','int4');
         $this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
         $this->setParametro('id_estado_wf_act','id_estado_wf_act','int4');
         $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
@@ -370,9 +358,6 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         $this->setParametro('id_depto_wf','id_depto_wf','int4');
         $this->setParametro('obs','obs','text');
         $this->setParametro('json_procesos','json_procesos','text');
-
-        //$this->setParametro('id_depto_lb','id_depto_lb','int4');
-        //$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -386,7 +371,6 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         $this->transaccion='SSOM_WFBACK_IME';
         $this->tipo_procedimiento='IME';
         //Define los parametros para la funcion
-        $this->setParametro('id_aom','id_aom','int4');
         $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
         $this->setParametro('id_estado_wf','id_estado_wf','int4');
         $this->setParametro('obs','obs','varchar');

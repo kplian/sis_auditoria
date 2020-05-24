@@ -14,11 +14,8 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
-    	//llama al constructor de la clase padre
 		Phx.vista.AuditoriaProceso.superclass.constructor.call(this,config);
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag}})
-        //this.bloquearMenu();
         var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
         if(dataPadre){
             this.onEnablePanel(this, dataPadre);
@@ -26,7 +23,6 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
         else {
             this.bloquearMenus();
         }
-        //this.validarProcesoSeleccionado();
 	},
 			
 	Atributos:[
@@ -50,50 +46,6 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
             type:'Field',
             form:true
         },
-        /*{
-            config: {
-                name: 'id_aom',
-                fieldLabel: '#Auditoria',
-                allowBlank: false,
-                emptyText: 'Elija una opción...',
-                //disabled: true,
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarAuditoriaOportunidadMejora',
-                    id: 'id_aom',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre_aom',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_aom', 'nombre_aom1'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-                }),
-                valueField: 'id_aom',
-                displayField: 'nombre_aom1',
-                gdisplayField: 'nombre_aom1',
-                hiddenName: 'id_aom',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '100%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['nombre_aom1']);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
-        },*/
         {
             config: {
                 name: 'id_proceso',
@@ -109,7 +61,7 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_proceso', 'proceso'],
+                    fields: ['id_proceso', 'proceso','desc_funcionario1','vigencia'],
                     remoteSort: true,
                     baseParams: {par_filtro: 'pcs.proceso'}
                 }),
@@ -117,6 +69,8 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
                 displayField: 'proceso',
                 gdisplayField: 'proceso',
                 hiddenName: 'id_proceso',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{proceso}</p>' +
+                '<p><b>Responsable: </b>{desc_funcionario1}<br><b>vigencia: </b>{vigencia}</p></div></tpl>',
                 forceSelection: true,
                 typeAhead: false,
                 triggerAction: 'all',
@@ -125,10 +79,14 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
                 pageSize: 15,
                 queryDelay: 1000,
                 anchor: '100%',
-                gwidth: 150,
+                gwidth: 200,
                 minChars: 2,
                 renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['proceso']);
+                    // return String.format('{0}', record.data['proceso']);
+                    return '<tpl for="."><div class="gridmultiline">' +
+                        '<p>'+record.data['proceso']+'</p>' +
+                        '<p><b>Resp.: </b> <font color="#922B21">'+record.data['desc_funcionario']+'</font></p></div></tpl>';
+
                 }
             },
             type: 'ComboBox',
@@ -140,7 +98,7 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'ap_valoracion',
-                fieldLabel: 'ap_valoracion',
+                fieldLabel: 'Valoracion',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
@@ -155,7 +113,7 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'obs_pcs',
-                fieldLabel: 'obs_pcs',
+                fieldLabel: 'Obs',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
@@ -296,7 +254,7 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		{name:'nombre_aom1', type: 'string'},
+		{name:'desc_funcionario', type: 'string'},
 		{name:'proceso', type: 'string'},
 
 	],
@@ -305,98 +263,39 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
     onReloadPage:function(m){
         this.maestro=m;
         this.store.baseParams = {id_aom: this.maestro.id_aom};
-        //Ext.apply(this.Cmp.id_centro_costo.store.baseParams,{id_gestion: this.maestro.id_gestion});
         this.load({params:{start:0, limit:50}})
-        // Para Ocultar un campo del formulario
-        //this.ocultarComponente(this.Cmp.id_aom);
-        // Para poner un campo no editable
-        this.Cmp.id_aom.disable(true);
     },
     loadValoresIniciales: function () {
         Phx.vista.AuditoriaProceso.superclass.loadValoresIniciales.call(this);
         this.Cmp.id_aom.setValue(this.maestro.id_aom);
     },
-    preparaMenu: function(n){
-
-        var tb = Phx.vista.AuditoriaProceso.superclass.preparaMenu.call(this);
-        var data = this.getSelectedData();
-
-        if(this.maestro.estado_wf == 'plani_aprob' || this.maestro.estado_wf == 'vob_planificacion'){
-            tb.items.get('b-new-' + this.idContenedor).disable();
-            //tb.items.get('b-new-' + this.idContenedor).hide();
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-            tb.items.get('b-save-' + this.idContenedor).disable();
-        }
-        else{
-            tb.items.get('b-edit-' + this.idContenedor).enable();
-            tb.items.get('b-del-' + this.idContenedor).enable();
-        }
-        return tb;
+    preparaMenu:function(n){
+        var tb =this.tbar;
+        Phx.vista.AuditoriaProceso.superclass.preparaMenu.call(this,n);
+        this.getBoton('new').enable();
+        this.getBoton('edit').enable();
+        this.getBoton('del').enable();
+        return tb
     },
-    liberaMenu: function(n){
-
-        var tb = Phx.vista.AuditoriaProceso.superclass.preparaMenu.call(this);
-        var data = this.getSelectedData();
-
-        if(this.maestro.estado_wf == 'plani_aprob' || this.maestro.estado_wf == 'vob_planificacion'){
-            tb.items.get('b-new-' + this.idContenedor).disable();
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-            tb.items.get('b-save-' + this.idContenedor).disable();
+    liberaMenu:function(){
+        var tb = Phx.vista.AuditoriaProceso.superclass.liberaMenu.call(this);
+        if(tb){
+            if (this.maestro.estado_wf ==='programada'){
+                this.getBoton('new').disable();
+                this.getBoton('edit').disable();
+                this.getBoton('del').disable();
+            }else{
+                this.getBoton('new').enable();
+                this.getBoton('edit').enable();
+                this.getBoton('del').enable();
+            }
         }
-        else{
-            tb.items.get('b-edit-' + this.idContenedor).disable();
-            tb.items.get('b-del-' + this.idContenedor).disable();
-        }
-        return tb;
-    },
-    /*onButtonEdit:function(){
-        Phx.vista.AuditoriaProceso.superclass.onButtonEdit.call(this);
-        this.eventAuditoria();
-    },
-    eventAuditoria: function () {
-        // Para Ocultar un campo del formulario
-        //this.ocultarComponente(this.Cmp.id_aom);
-        // Para poner un campo no editable
-        this.Cmp.id_aom.disable(true);
-    }*/
-    /*validarProcesoSeleccionado: function () {
-
-        var data = this.getSelectedData();
-
-        this.Cmp.id_proceso.on('select',function (combo,record,index) {
-            //alert("Estas en parametros....");
-            console.log('combo',combo, 'record',record, 'index',index);
-            console.log('valor id_proceso',record.data.id_proceso);
-            console.log('valor id_aom',this.maestro.id_aom);
-            var codigo_parametro = '';
-            Ext.Ajax.request({
-                url:'../../sis_auditoria/control/AuditoriaProceso/esSelectaProceso',
-                params:{start:0, limit:50, p_id_aom: this.maestro.id_aom, p_id_proceso: record.data.id_proceso},
-                dataType:"JSON",
-                success:function (resp) {
-                    var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                    console.log("valor de respuesta:",reg);
-                    if(reg.datos.length>0){
-                        //alert("Ya existe un Responsable, no es permitido tener mas...!!!");
-                        Ext.Msg.alert("status","Ya existe es proceso, no es permitido tener mas...!!!");
-
-                        this.Cmp.id_proceso.setValue(null);
-                    }
-                },
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });
-
-
-        },this);
-    }*/
+        return tb
+    }
 	}
 )
 </script>

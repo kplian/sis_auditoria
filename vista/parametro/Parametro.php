@@ -242,7 +242,7 @@ Phx.vista.Parametro=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
     onButtonNew:function () {
         Phx.vista.Parametro.superclass.onButtonNew.call(this);
         this.mostrarComponente(this.Cmp.codigo_parametro);

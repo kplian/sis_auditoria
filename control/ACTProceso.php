@@ -11,7 +11,6 @@ class ACTProceso extends ACTbase{
 			
 	function listarProceso(){
 		$this->objParam->defecto('ordenacion','id_proceso');
-
 		$this->objParam->defecto('dir_ordenacion','asc');
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);

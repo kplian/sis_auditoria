@@ -14,16 +14,9 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 	nombreVista: 'base',
 	constructor:function(config){
 		this.maestro=config.maestro;
-    	//llama al constructor de la clase padre
-		///***************HABER SI FUNCIONA********SSS
-		Phx.vista.NoConformidad.superclass.constructor.call(this,config);
+    	Phx.vista.NoConformidad.superclass.constructor.call(this,config);
 		this.store.baseParams = {tipo_interfaz: this.nombreVista};
 		this.init();
-		// console.log(this.sm.getSelected());
-
-		//this.load({params:{start:0, limit:50}});
-        //this.load({params:{start:0, limit:this.tam_pag}});
-		//aqui habia 2 botones
     },
 
 	Atributos:[
@@ -640,8 +633,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
-
+	bsave:false
 	}
 )
 </script>

@@ -195,7 +195,7 @@ Phx.vista.TipoParametro=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
     onButtonNew:function () {
         Phx.vista.TipoParametro.superclass.onButtonNew.call(this);
         this.Cmp.tipo_parametro.enable();

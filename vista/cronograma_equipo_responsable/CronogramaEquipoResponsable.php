@@ -18,10 +18,8 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
-    	//llama al constructor de la clase padre
 		Phx.vista.CronogramaEquipoResponsable.superclass.constructor.call(this,config);
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag}})
 	},
 			
 	Atributos:[
@@ -45,49 +43,6 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
             type:'Field',
             form:true
         },
-        /*{
-            config: {
-                name: 'id_cronograma',
-                fieldLabel: 'id_cronograma',
-                allowBlank: false,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_/control/Clase/Metodo',
-                    id: 'id_',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_', 'nombre', 'codigo'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-                }),
-                valueField: 'id_',
-                displayField: 'nombre',
-                gdisplayField: 'desc_',
-                hiddenName: 'id_cronograma',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '100%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['desc_']);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
-        },*/
         {
             config: {
                 name: 'id_equipo_responsable',
@@ -99,7 +54,6 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
                 emptyText: 'Elija una opción...',
                 store: new Ext.data.JsonStore({
                     url: '../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
-                    //url: '../../sis_auditoria/control/EquipoResponsable/listarEquipoRespCronog',
                     id: 'id_equipo_responsable',
                     root: 'datos',
                     sortInfo: {
@@ -296,34 +250,24 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-        {name:'desc_funcionario1', type: 'string'},
-		
+        {name:'desc_funcionario1', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_cronog_eq_resp',
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
     onReloadPage:function(m){
         this.maestro=m;
         this.store.baseParams = {id_cronograma: this.maestro.id_cronograma};
-        //Ext.apply(this.Cmp.id_centro_costo.store.baseParams,{id_gestion: this.maestro.id_gestion});
         this.load({params:{start:0, limit:50}});
-        this.Cmp.id_cronograma.disable(true);
     },
     loadValoresIniciales: function () {
-        //this.Cmp.id_aom.setValue(this.maestro.id_aom);
-        //Phx.vista.AuditoriaNorma.superclass.loadValoresIniciales.call(this);
         Phx.vista.CronogramaEquipoResponsable.superclass.loadValoresIniciales.call(this);
         this.Cmp.id_cronograma.setValue(this.maestro.id_cronograma);
-
     },
     onButtonNew:function(){
-        var data = this.getSelectedData();
-        console.log('data',data);
-        console.log('maestro',this.maestro);
-        //console.log('maestro[ id_aom->',this.maestro.id_aom +', id cronograma->'+this.maestro.id_cronograma+']');
         this.Cmp.id_equipo_responsable.enableMultiSelect = true;
         this.Cmp.id_equipo_responsable.type = 'AwesomeCombo';
         this.ocultarComponente(this.Cmp.v_participacion);
@@ -339,18 +283,15 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
                 }
             }
         }, this);
-        //this.inicarEvento();
         this.Cmp.id_equipo_responsable.store.baseParams ={par_filtro:'vfc.desc_funcionario1',p_id_aom: this.maestro.id_aom,p_id_cronograma:this.maestro.id_cronograma};
         this.Cmp.id_equipo_responsable.lastQuery = null;
     },
     onButtonEdit:function(){
         var data = this.getSelectedData();
-        console.log('data',data);
         this.Cmp.id_equipo_responsable.enableMultiSelect = false;
         this.Cmp.id_equipo_responsable.type = 'ComboBox';
         this.ocultarComponente(this.Cmp.v_participacion);
         Phx.vista.CronogramaEquipoResponsable.superclass.onButtonEdit.call(this);
-
         this.Cmp.id_equipo_responsable.on('select', function(c, r, i){
             var aux=this.store.data.length;
             for (i=0;i<aux;i++){
@@ -362,21 +303,12 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
                 }
             }
         }, this);
-
-        //this.inicarEvento();
         this.Cmp.id_equipo_responsable.store.baseParams ={par_filtro:'vfc.desc_funcionario1',pe_id_aom: this.maestro.id_aom,pe_id_cronograma:this.maestro.id_cronograma,pe_id_equipo_responsable:this.getSelectedData().id_equipo_responsable};
         this.Cmp.id_equipo_responsable.lastQuery = null;
-
     },
     inicarEvento:function () {
-        // console.log(this.maestro.id_aom);
-
         this.Cmp.id_equipo_responsable.store.baseParams ={par_filtro:'vfc.desc_funcionario1',p_id_aom: this.maestro.id_aom,p_id_cronograma:this.maestro.id_cronograma};
         this.Cmp.id_equipo_responsable.lastQuery = null;
-
-
-        //this.getBoton('new').disable();
-        //this.getBoton('save').disable();
     }
 
 	}
