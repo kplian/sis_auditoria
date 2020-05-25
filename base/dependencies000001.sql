@@ -323,53 +323,6 @@ ALTER TABLE ssom.taccion_ro
 
 /***********************************F-DEP-MCCH-SSOM-0-26/12/2019*****************************************/
 
-/***********************************I-DEP-SAZP-SSOM-1-27/12/2019****************************************/
-
-ALTER TABLE prueba.tno_conformidad
-  ADD CONSTRAINT tno_conformidad_fk FOREIGN KEY (id_aom)
-    REFERENCES prueba.tauditoria_oportunidad_mejora(id_aom)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
-
-ALTER TABLE prueba.taccion_propuesta
-  ADD CONSTRAINT taccion_propuesta_fk FOREIGN KEY (id_nc)
-    REFERENCES prueba.tno_conformidad(id_nc)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
-
-ALTER TABLE prueba.tpnorma_noconformidad
-  ADD CONSTRAINT tpnorma_noconformidad_fk FOREIGN KEY (id_nc)
-    REFERENCES prueba.tno_conformidad(id_nc)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
-
-ALTER TABLE prueba.tresp_acciones_prop
-  ADD CONSTRAINT tresp_acciones_prop_fk FOREIGN KEY (id_ap)
-    REFERENCES prueba.taccion_propuesta(id_ap)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
-
-ALTER TABLE prueba.tresp_sist_integrados
-  ADD CONSTRAINT tresp_sist_integrados_fk FOREIGN KEY (id_si)
-    REFERENCES prueba.tsistema_integrado(id_si)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
-
-ALTER TABLE prueba.tsi_noconformidad
-  ADD CONSTRAINT tsi_noconformidad_fk FOREIGN KEY (id_nc)
-    REFERENCES prueba.tno_conformidad(id_nc)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
-
-
-/***********************************F-DEP-SAZP-SSOM-1-27/12/2019****************************************/
-
 /***********************************I-DEP-MCCH-SSOM-2-30/12/2019*****************************************/
 
 --------------- SQL ---------------
