@@ -571,15 +571,7 @@ select pxp.f_insert_testructura_gui ('TRO', 'ROP');
 ----------------------------------------------------
 -- Dependencias de configuracion de Estados Worflow
 ----------------------------------------------------
-
-select wf.f_import_ttipo_documento_estado ('insert','prueba','SAUDIT','vob_programado','SAUDIT','crear','superior','');
-select wf.f_import_ttipo_documento_estado ('insert','EVI','ACPRO','implementada','ACPRO','crear','superior','');
-select wf.f_import_ttipo_documento_estado ('insert','EVI','ACPRO','vbimplementada_responsable','ACPRO','exigir','superior','');
-select wf.f_import_ttipo_documento_estado ('insert','EVIS','ACPRO','implementada','ACPRO','insertar','superior','');
-select wf.f_import_ttipo_documento_estado ('insert','EVIS','ACPRO','implementada','ACPRO','eliminar','superior','');
-select wf.f_import_ttipo_documento_estado ('insert','EVIAP','NOCON','vbnoconformidad','NOCON','crear','superior','');
-select wf.f_import_ttipo_documento_estado ('insert','EVIAP','NOCON','propuesta','NOCON','eliminar','superior','');
-select wf.f_import_ttipo_documento_estado ('insert','EVIAP','NOCON','propuesta','NOCON','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','IN','AUDSE','vbplanificacion','AUDSE','crear','superior','');
 
 /***********************************F-DEP-MCCH-SSOM-3-31/12/2019*****************************************/
 
