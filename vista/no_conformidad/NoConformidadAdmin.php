@@ -37,8 +37,9 @@ header("content-type: text/javascript; charset=UTF-8");
             };
 			this.initButtons=[this.cmbTipoAuditoria, this.cmbAuditorias];
 			Phx.vista.NoConformidadAdmin.superclass.constructor.call(this,config);
+
             this.crearFormResponsableNC();
-            //insertamos los combos
+
             this.cmbTipoAuditoria.on('select', function(combo, record, index){
                 console.log(record.data);
 			    this.cmbTipoAuditoria = record.data.id_tipo_auditoria;
@@ -48,7 +49,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.cmbAuditorias.store.baseParams = Ext.apply(this.cmbAuditorias.store.baseParams, {v_tipo_auditoria_nc: record.data.id_tipo_auditoria});
                 this.cmbAuditorias.modificado = true;
 			},this);
-			//para iniciar el combo...
+
             this.cmbAuditorias.on('select', function(combo, record, index){
 					this.capturaFiltros();
 					this.Cmp.id_uo.setValue(record.data.uo);
@@ -60,7 +61,6 @@ header("content-type: text/javascript; charset=UTF-8");
 					
             },this);
 
-			//insertamos y habilitamos el boton atras
 			this.addButton('atras',{argument: { estado: 'anterior'},
 				text:'Anterior',
 				iconCls: 'batras',
@@ -68,30 +68,17 @@ header("content-type: text/javascript; charset=UTF-8");
 				handler:this.onButtonAtras,
 				tooltip: '<b>Pasar al anterior Estado</b>'});
 			
-			//insertamos y habilitamos el boton siguiente
 			this.addButton('siguiente',
 				{	text:'Siguiente',
 					iconCls: 'badelante',
 					disabled:false,
-					handler:this.onButtonSigGrupo,   //creamos esta funcion para disparar el evento al presionar siguiente
-					tooltip: '<b>Siguiente</b><p>Pasar al siguiente estado</p>'
+					handler:this.onButtonSiguiente,   //creamos esta funcion para disparar el evento al presionar siguiente
+					tooltip: '<b>Siguiente</b><p>Pasar al siguiente Estado</p>'
 				}
 			);
 			
 			//insertamos y habilitamos el boton Gantt
 			this.addBotonesGantt();
-			/*
-            this.addButton('acciones',
-				{	text: 'Acciones',
-					iconCls: 'bdocuments',
-					disabled: false,
-					handler: this.onButtonAcciones,
-					tooltip: '<b>Asigna acciones para resolver la No conformidades...</b>',
-					scope:this
-				}
-			);
-			*/
-			//insertamos y habilitamos el boton de documentos			
 			this.addButton('btnChequeoDocumentosWf',
 				{	text: 'Documentos',
 					iconCls: 'bchecklist',
@@ -102,8 +89,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			);		
 			
 			//insertamos y habilitamos el boton de observaciones						
-			this.addButton('btnObs',
-				{
+			this.addButton('btnObs', {
 					text :'Obs Wf',
 					iconCls : 'bchecklist',
 					disabled: true,
@@ -209,9 +195,8 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 		//Boton Siguiente
         onButtonSiguiente : function() {
-            var rec = this.sm.getSelected();  // aqui se almacena los datos del registro selecionado
-            console.log(rec);
-            this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php', // llama al formulario de wf
+            var rec = this.sm.getSelected();
+            this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
                 'Estado de Wf',
                 {
                     modal: true,
@@ -220,8 +205,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 {
                     data: {
-                        id_estado_wf: rec.data.id_estado_wf, 	// parametros para obtener los estados de tu macro proceso y tipo proceso
-                        id_proceso_wf: rec.data.id_proceso_wf	// parametros para obtener los estados de tu macro proceso y tipo proceso
+                        id_estado_wf: rec.data.id_estado_wf,
+                        id_proceso_wf: rec.data.id_proceso_wf
                     }
                 }, this.idContenedor, 'FormEstadoWf',
                 {
@@ -235,10 +220,8 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         onSaveWizard:function(wizard,resp){
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText)); // Respuesta del procedimiento
-            Phx.CP.loadingShow(); // inica el reolad
             Ext.Ajax.request({
-                url:'../../sis_auditoria/control/NoConformidad/siguienteEstado', // llamada al controlador del metodo para cambiar el estado
+                url:'../../sis_auditoria/control/NoConformidad/siguienteEstado',
                 params:{
                     id_proceso_wf_act:  resp.id_proceso_wf_act,
                     id_estado_wf_act:   resp.id_estado_wf_act,
@@ -248,21 +231,21 @@ header("content-type: text/javascript; charset=UTF-8");
                     obs:                resp.obs,
                     json_procesos:      Ext.util.JSON.encode(resp.procesos)
                 },
-                success:this.successWizard,
+                success:this.successEstadoSinc,
                 failure: this.conexionFailure,
                 argument:{wizard:wizard},
                 timeout:this.timeout,
                 scope:this
             });
         },
-        successWizard:function(resp){
+        successWizardS:function(resp){
+            console.log(1)
             Phx.CP.loadingHide();
             resp.argument.wizard.panel.destroy();
             this.reload();
         },
-		//Boton Atras
+
 		onButtonAtras : function(res){
-			//console.log("entra atras");
 			var rec=this.sm.getSelected();
 			Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/AntFormEstadoWf.php',
 				'Estado de Wf',
@@ -302,55 +285,19 @@ header("content-type: text/javascript; charset=UTF-8");
 			resp.argument.wizard.panel.destroy();
 			this.reload();
 		},
-
-		//codigo necesario para añadir mas de un panel hijo en este caso tenemos 2
-		/*onEnablePanel: function(idPanel, data) {
-          console.log(data);
-          var myPanel;
-            if (typeof idPanel === 'object') {
-                myPanel = idPanel
-            } else {
-                myPanel = Phx.CP.getPagina(idPanel);
-            }
-            if (idPanel && myPanel) {
-                //Accede al panel derecho
-
-                myPanelEast = Phx.CP.getPagina(idPanel+'-east');
-                //console.log(myPanelEast);
-                //Carga los datos de ambos paneles
-                 myPanel.onReloadPage(data); // izquierda
-                 myPanelEast.onReloadPage(data); // derecha
-            }
-
-            delete myPanel;
-            delete myPanelEast;
-
-         },*/
         loadValoresIniciales: function () {
-			
 			this.Cmp.id_aom.setValue(this.cmbAuditorias.getValue());
-
             Phx.vista.NoConformidadAdmin.superclass.loadValoresIniciales.call(this);
              this.Cmp.id_aom.setValue(this.obj.id_aom);
              this.Cmp.id_uo.setValue(this.obj.id_uo);
              this.Cmp.id_uo.setRawValue(this.obj.nombre_unidad);
-			 //***
-			 //this.Cmp.id_funcionario.setValue(this.obj.id_responsable);
-			 //this.Cmp.id_funcionario.setRawValue(this.obj.desc_funcionario1);
-			 
+
 
         },
         onButtonNew:function(){
-
             Phx.vista.NoConformidadAdmin.superclass.onButtonNew.call(this);
             this.Cmp.id_uo.setValue(this.obj.id_uo);
             this.Cmp.id_uo.setRawValue(this.obj.nombre_unidad);
-			//***
-			//this.Cmp.id_funcionario.setValue(this.obj.id_responsable);
-			//this.Cmp.id_funcionario.setRawValue(this.obj.desc_funcionario1);
-			
-           // console.log(this.obj);
-
         },
 
         capturaFiltros:function(combo, record, index){
@@ -534,7 +481,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 valueField : 'id_funcionario',
                 displayField : 'desc_funcionario',
                 forceSelection: true,
-                allowBlank : false,
                 anchor: '100%',
                 resizable : true,
                 enableMultiSelect: false
@@ -601,44 +547,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			}else{
 					alert("Error no se no se registro el funcionario")
 			}
-				
-c			
 		},
-    
-        //*********************************************************
-        //********************************fin formulario
 
-        //fin del formulario de responsable
-		//vamos a nular los codigos
-		//adicionamos los combos para seleccionar la auditoria 
-		//de esta manera se despliegan sus no conformidades
-		/*
-		cmbTipoAuditoria: new Ext.form.ComboBox({
-			name:'tipoauditoria',
-			fieldLabel:'Tipo de Auditoria',
-			allowBlank: false,
-			emptyText:'Tipo de Auditoria...',
-			store: new Ext.data.ArrayStore({
-				fields: ['variable', 'valor'],
-				data :  [   ['1','Auditoria Interna'],
-							['2','Oportunidad de Mejora']
-				]
-			}),
-			valueField: 'variable',
-			displayField: 'valor',
-			mode: 'local',
-			forceSelection:true,
-			typeAhead: true,
-			triggerAction: 'all',
-			lazyRender: true,
-			queryDelay: 1000,
-			width: 150,
-			minChars: 2 ,
-			//enableMultiSelect: true
-		}),
-		*/
-//******************************
-//*****************************
 	    cmbTipoAuditoria: new Ext.form.ComboBox({
 			name:'tipoauditoria',
 			fieldLabel: 'Tipo de Auditoria',
@@ -671,9 +581,7 @@ c
 			listWidth:'280',
 			width:300
 		}),
-
-//*****************************
-	    cmbAuditorias: new Ext.form.ComboBox({
+    cmbAuditorias: new Ext.form.ComboBox({
 			fieldLabel: 'Auditoria u Oportunidad de mejora',
 			allowBlank: false,
 			emptyText:'Auditoria u Oportunidad de mejora...',
@@ -702,9 +610,6 @@ c
 			listWidth:'280',
 			width:300
 		}),
-		/*agregarArgsExtraSubmit: function() {
-					this.argumentExtraSubmit.funcionario = this.Cmp.id_funcionario.getRawValue();
-		}		*/
     };
 	
 </script>

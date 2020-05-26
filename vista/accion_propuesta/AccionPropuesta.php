@@ -13,16 +13,11 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
-        //this.idContenedor = config.idContenedor; //comentado ahorita
-        //this.maestro = config;
 		this.maestro = config.maestro; //comentado ahorita
        
     	//llama al constructor de la clase padre
 		Phx.vista.AccionPropuesta.superclass.constructor.call(this,config);
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag , id_nc: this.maestro.id_nc}}) //comentado ahorita
-		
-		//insertamos y habilitamos el boton atras
 		this.addButton('atras',{argument: { estado: 'anterior'},
 			text:'Anterior',
 			iconCls: 'batras',
@@ -569,13 +564,9 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:false,
-	//fwidth: '45%',
-	//fheigth: '55%',
-	//para su padre
 	onReloadPage:function(m){
 		
 		this.maestro = m;
-		//console.log('detalle padre',this.maestro);
 		console.log('padre',this.maestro);
 		this.store.baseParams={id_nc:this.maestro.id_nc};
 		this.load({params:{start:0, limit:50}})
@@ -585,8 +576,6 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.AccionPropuesta.superclass.loadValoresIniciales.call(this);
         this.Cmp.id_nc.setValue(this.maestro.id_nc);
 		this.Cmp.nro_tramite_padre.setValue(this.maestro.nro_tramite);
-		
-		
     },
 	//para su hijo
 	tabeast:[
@@ -598,8 +587,6 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 			cls: 'RespAccionesProp' 
 		}
 	],	
-
-
 
 	//los botones se preparan al inicar la vista
 	preparaMenu:function(n){
@@ -680,7 +667,6 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 				id_depto_wf:        resp.id_depto_wf,
 				obs:                resp.obs,
 				json_procesos:      Ext.util.JSON.encode(resp.procesos),
-				//id_uo_padre: 		this.maestro.id_uo //aumentado
 			},
 			success:this.successWizard,
 			failure: this.conexionFailure,
@@ -736,32 +722,7 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 		resp.argument.wizard.panel.destroy();
 		this.reload();
 	},
-	//codigo necesario para añadir mas de un panel hijo en este caso tenemos 2
-	/* onEnablePanel: function(idPanel, data) {
-	  console.log(data);
-	  var myPanel;
-		if (typeof idPanel === 'object') {
-			myPanel = idPanel
-		} else {
-			myPanel = Phx.CP.getPagina(idPanel);
-		}
-		if (idPanel && myPanel) {
-			//Accede al panel derecho
 
-			myPanelEast = Phx.CP.getPagina(idPanel+'-east');
-			//console.log(myPanelEast);
-			//Carga los datos de ambos paneles
-			 myPanel.onReloadPage(data); // izquierda
-			 myPanelEast.onReloadPage(data); // derecha
-
-		}
-
-		delete myPanel;
-		delete myPanelEast;
-
-	},*/
-	
-	//implementamos el Gantt
 	diagramGanttDinamico : function(){
 	var data=this.sm.getSelected().data.id_proceso_wf;
 	window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)
@@ -839,16 +800,11 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 			data,
 			this.idContenedor,
 			'Obs');
-	},			
-
-	bsave:false,
+	},
 	onButtonNew:function(){
 			Phx.vista.AccionPropuesta.superclass.onButtonNew.call(this);
-			console.log(this.maestro.funcionario_uo);
 			this.Cmp.id_funcionario.setValue(this.maestro.id_funcionario);
 			this.Cmp.id_funcionario.setRawValue(this.maestro.funcionario_uo);
-			
-			
 	}
 	
 }

@@ -267,7 +267,6 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
     onButtonNew :function () {
         Phx.vista.PnormaNoconformidad.superclass.onButtonNew.call(this);
         this.Cmp.id_nc.setValue(this.maestro.id_nc);
-        //*** Filtro para seleccionar solo los punto de norma de la norma seleccionada***SSS
         this.Cmp.id_norma.on('select', function(combo, record, index){
             this.Cmp.id_pn.store.baseParams ={	par_filtro: 'ptonor.nombre_pn#ptonor.codigo_pn',
 											    id_norma : record.data.id_norma,
@@ -275,15 +274,9 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
 												fill : 'si'
 											};
             this.Cmp.id_pn.reset();
-          //  this.store.removeAll();
             this.Cmp.id_pn.modificado = true;
         },this);
-        this.Cmp.id_pn.on('select', function(combo, record, index){
-            //this.Cmp.nombre_pn.reset();
-            // this.Cmp.nombre_pn.setValue(record.data.nombre_pn);
-        },this);
-    },
-
+    }
     }
 )
 </script>
