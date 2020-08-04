@@ -45,11 +45,15 @@ class ACTDestinatario extends ACTbase{
 	}
 						
 	function eliminarDestinatario(){
-			$this->objFunc=$this->create('MODDestinatario');	
+	    $this->objFunc=$this->create('MODDestinatario');
 		$this->res=$this->objFunc->eliminarDestinatario($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-			
+    function checkDestinatario(){
+        $this->objFunc=$this->create('MODDestinatario');
+        $this->res=$this->objFunc->checkDestinatario($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

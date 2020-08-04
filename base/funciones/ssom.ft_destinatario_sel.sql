@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_destinatario_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -17,7 +17,7 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				10-09-2019 23:09:14								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tdestinatario'
-   #
+   #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
    ***************************************************************************/
 
 DECLARE
@@ -61,13 +61,14 @@ BEGIN
 						usu2.cuenta as usr_mod,
                         para.valor_parametro,
                         para.codigo_parametro,
-                        vfc.desc_funcionario1
+                        vfc.desc_funcionario1,
+                        dest.incluir_informe
 						from ssom.tdestinatario dest
 						inner join segu.tusuario usu1 on usu1.id_usuario = dest.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = dest.id_usuario_mod
                         join ssom.tauditoria_oportunidad_mejora aom on dest.id_aom = aom.id_aom
-                        join ssom.tparametro para on dest.id_parametro = para.id_parametro
-                        left join orga.vfuncionario_cargo vfc on dest.id_funcionario = vfc.id_funcionario
+                        left join ssom.tparametro para on dest.id_parametro = para.id_parametro
+                        inner join orga.vfuncionario vfc on dest.id_funcionario = vfc.id_funcionario
 				        where ';
 
 			--Definicion de la respuesta
@@ -95,8 +96,8 @@ BEGIN
 					    inner join segu.tusuario usu1 on usu1.id_usuario = dest.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = dest.id_usuario_mod
                         join ssom.tauditoria_oportunidad_mejora aom on dest.id_aom = aom.id_aom
-                        join ssom.tparametro para on dest.id_parametro = para.id_parametro
-                        join orga.vfuncionario_cargo vfc on dest.id_funcionario = vfc.id_funcionario
+                        left join ssom.tparametro para on dest.id_parametro = para.id_parametro
+                        inner join orga.vfuncionario vfc on dest.id_funcionario = vfc.id_funcionario
 					    where ';
 
 			--Definicion de la respuesta
@@ -123,8 +124,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_destinatario_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
