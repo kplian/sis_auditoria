@@ -10,15 +10,15 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
-
+Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
+     dblclickEdit: true,
 	constructor:function(config){
-		this.maestro=config.maestro;
+        this.idContenedor = config.idContenedor;
+        this.maestro = config.maestro;
 		Phx.vista.AuditoriaOportunidadMejora.superclass.constructor.call(this,config);
         this.init();
-        this.setColumnHeader('fecha_prog_inicio',String.format('<div style="background-color: {0};"> {1}</div>','#81f98f', 'Fecha Inicio'));
-        this.setColumnHeader('fecha_prog_fin',String.format('<div style="background-color: {0};"> {1}</div>','#f9d755', 'Fecha Fin'));
         this.finCons = true;
+        this.filtroVentana();
 		this.addButton('ant_estado', {
             argument: {estado: 'anterior'},
             text:'Anterior',
@@ -28,31 +28,22 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
             handler:this.antEstado,
             tooltip: '<b>Pasar al Anterior Estado</b>'
         });
-        this.addButton('sig_estado',{
-            text:'Siguiente',
-            grupo:[0],
-            iconCls: 'badelante',
-            disabled: true,
-            handler: this.sigEstado,
-            tooltip: '<b>Pasar al Siguiente Estado</b>'
-        });
         this.addBotonesGantt();
         this.addButton('btnChequeoDocumentosWf',
             {	text: 'Documentos',
-                grupo:[0],
+                grupo:[0,1],
                 iconCls: 'bchecklist',
                 disabled: true,
                 handler: this.loadCheckDocumentosRecWf,
                 tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.'
-            }
-        );
-        this.addButton('btnObs',{//#11
-            text :'Obs Wf',
-            grupo:[1,2],
-            iconCls : 'bchecklist',
+            });
+        this.addButton('sig_estado',{
+            text:'Aprobar',
+            grupo:[0],
+            iconCls: 'bok',
             disabled: true,
-            handler : this.onOpenObs,
-            tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
+            handler: this.sigEstado,
+            tooltip: '<b>Pasar al Siguiente Estado</b>'
         });
 	},
     addBotonesGantt: function() {
@@ -100,654 +91,656 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
         window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)
     },
 	Atributos:[
-		{
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_aom'
-			},
-			type:'Field',
-			form:true 
-		},
-        {
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_proceso_wf'
-			},
-			type:'Field',
-			form:true
-		},
-        {
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_estado_wf'
-			},
-			type:'Field',
-			form:true
-		},
-        {
-            config:{
-                labelSeparator:'',
-                inputType:'hidden',
-                name: 'requiere_programacion'
-            },
-            type:'Field',
-            form:true
-        },
-        {
-            config:{
-                labelSeparator:'',
-                inputType:'hidden',
-                name: 'requiere_formulario'
-            },
-            type:'Field',
-            form:true
-        },
-        {
-            config:{
-                name: 'estado_wf',
-                fieldLabel: 'Estado',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:50
-            },
-            type:'TextField',
-            id_grupo:0,
-            grid:false,
-            form:false
-        },
-        {
-            config:{
-                name: 'codigo_tpo_aom',
-                fieldLabel: 'Auditoria',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 60
-            },
-            type:'TextField',
-            filters:{pfiltro:'aom.codigo_aom',type:'string'},
-            id_grupo:0,
-            grid:true,
-            form:false
-        },
-        {
-            config:{
-                name: 'nro_tramite_wf',
-                fieldLabel: 'Codigo',
-                allowBlank: true,
-                anchor: '60%',
-                gwidth: 200,
-                renderer: function(value,p,record){
-                        var color = '#B7950B';
-                        if(record.data['codigo_tpo_aom'] === 'OM'){
-                            color = '#A04000';
-                        }
-                    return '<tpl for="."><div class="gridmultiline">' +
-                        '<p><b>'+record.data['nro_tramite_wf']+'</b></p>'+
-                        '<p><b>Estado: </b><font color="blue">'+record.data['nombre_estado']+'</font></p>'+
-                        '<p><b><font color="'+color+'">'+record.data['tipo_auditoria']+'</font></b></p>'+
-                        '</div></tpl>';
-                }
-            },
-            type:'TextField',
-            filters:{pfiltro:'aom.nro_tramite_wf',type:'string'},
-            id_grupo:0,
-            grid:true,
-            form:false,
-            bottom_filter:true
-        },
-        {
-            config: {
-                name: 'id_tipo_auditoria',
-                fieldLabel: 'Tipo Auditoria',
-                allowBlank: false,
-                resizable:true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/TipoAuditoria/listarTipoAuditoria',
-                    id: 'id_tipo_auditoria',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'tipo_auditoria',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_tipo_auditoria', 'tipo_auditoria','codigo_tpo_aom'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'tau.tipo_auditoria'}
-                }),
-                valueField: 'id_tipo_auditoria',
-                displayField: 'tipo_auditoria',
-                gdisplayField: 'tipo_auditoria',
-                hiddenName: 'id_tipo_auditoria',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '50%',
-                gwidth: 270,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return '<tpl for="."><div class="gridmultiline">' +
-                        '<p>'+record.data['codigo_tpo_aom']+'</p></div></tpl>';
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: false,
-            form: true
-        },
-        {
-            config:{
-                name: 'nombre_aom1',
-                fieldLabel: 'Nombre',
-                allowBlank: false,
-                anchor: '80%',
-                emptyText: 'Intruzca titulo...',
-                gwidth: 210,
-                maxLength:300,
-                renderer : function(value, p, record) {
-                    if (record.data['desc_funcionario2'] == '' ){
-                        return '<tpl for="."><div class="gridmultiline">' +
-                            '<p> <b>'+record.data['nombre_aom1']+'</b></p></div></tpl>';
-                    }else{
-                        return '<tpl for="."><div class="gridmultiline">' +
-                            '<p><b>'+record.data['nombre_aom1']+'</b></p>' +
-                            '<p><b>Resp.: </b> <font color="#117A65">'+record.data['desc_funcionario2']+'</font></p></div></tpl>';
+    		{
+    			config:{
+    					labelSeparator:'',
+    					inputType:'hidden',
+    					name: 'id_aom'
+    			},
+    			type:'Field',
+    			form:true
+    		},
+            {
+    			config:{
+    					labelSeparator:'',
+    					inputType:'hidden',
+    					name: 'id_proceso_wf'
+    			},
+    			type:'Field',
+    			form:true
+    		},
+            {
+    			config:{
+    					labelSeparator:'',
+    					inputType:'hidden',
+    					name: 'id_estado_wf'
+    			},
+    			type:'Field',
+    			form:true
+    		},
+            {
+    			config:{
+    					labelSeparator:'',
+    					inputType:'hidden',
+    					name: 'id_tipo_auditoria'
+    			},
+    			type:'Field',
+    			form:true
+    		},
+            {
+                config:{
+                    name: 'codigo_tpo_aom',
+                    fieldLabel: 'Tipo',
+                    allowBlank: true,
+                    anchor: '50%',
+                    gwidth: 40,
+                    renderer: function(value,p,record){
+                        var color = '#575F90';
+                        return '<font color="'+color+'">'+record.data['codigo_tpo_aom']+'</font>';
                     }
-                }
-            },
-            type:'TextField',
-            filters:{pfiltro:'aom.nombre_aom1',type:'string'},
-            id_grupo:0,
-            grid:true,
-            form:true
-        },
-        {
-            config: {
-                name: 'id_uo',
-                baseParams: {
-                    estado_reg: 'activo'
                 },
-                origen:'UO',
-                allowBlank:true,
-                fieldLabel:'Area',
-                gdisplayField:'nombre_unidad', //mapea al store del grid
-                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre_unidad}</p> </div></tpl>',
-                width : 300,
-                gwidth: 250,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['nombre_unidad']);
-                }
+                type:'TextField',
+                filters:{pfiltro:'aom.nro_tramite_wf',type:'string'},
+                id_grupo:0,
+                grid:true,
+                form:false,
             },
-            type:'ComboRec',
-            id_grupo:1,
-            filters:{
-                pfiltro:'desc_uo',
-                type:'string'
+            {
+                config:{
+                    name: 'nro_tramite_wf',
+                    fieldLabel: 'Codigo',
+                    allowBlank: true,
+                    anchor: '50%',
+                    gwidth: 140,
+                    renderer: function(value,p,record){
+                        var color = '#575F90';
+                        return '<font color="'+color+'">'+record.data['nro_tramite_wf']+'</font>';
+                    }
+                },
+                type:'TextField',
+                filters:{pfiltro:'aom.nro_tramite_wf',type:'string'},
+                id_grupo:0,
+                grid:true,
+                form:false,
+                bottom_filter:true
             },
-            grid:false,
-            form:true
-        },
-        {
-            config:{
-                name: 'descrip_aom1',
-                fieldLabel: 'Descripcion',
-                allowBlank: true,
-                resizable:true,
-                anchor: '80%',
-                gwidth: 350,
-                renderer : function(value, p, record) {
-                    return String.format('<div class="gridmultiline" style="text-align: justify;">{0}</div>', record.data['descrip_aom1']);
-                }
+            {
+                config:{
+                    name: 'nombre_aom1',
+                    fieldLabel: 'Nombre',
+                    allowBlank: false,
+                    anchor: '80%',
+                    emptyText: 'Intruzca titulo...',
+                    gwidth: 280
+                },
+                type:'TextField',
+                filters:{pfiltro:'aom.nombre_aom1',type:'string'},
+                id_grupo:0,
+                grid:true,
+                form:true,
+                bottom_filter:true
             },
-            type:'TextArea',
-            filters:{pfiltro:'aom.descrip_aom1',type:'string'},
-            id_grupo:0,
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'fecha_prog_inicio',
-                fieldLabel: 'Fecha Inicio',
-                allowBlank: false,
-                emptyText: 'Fecha Inicio...',
-                anchor: '40%',
-                gwidth: 80,
-                format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            {
+                config:{
+                    name: 'fecha_prog_inicio',
+                    fieldLabel: 'Fecha Inicio',
+                    allowBlank: false,
+                    anchor: '50%',
+                    gwidth: 80,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_prog_inicio',type:'date'},
+                id_grupo:0,
+                grid:true,
+                form:true
             },
-            type:'DateField',
-            filters:{pfiltro:'aom.fecha_prog_inicio',type:'date'},
-            id_grupo:0,
-            valorInicial: (new Date().getDate()),
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'fecha_prog_fin',
-                fieldLabel: 'Fecha Fin',
-                allowBlank: false,
-                emptyText: 'Fecha Fin...',
-                anchor: '40%',
-                gwidth: 80,
-                format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            {
+                config:{
+                    name: 'fecha_prog_fin',
+                    fieldLabel: 'Fecha Fin',
+                    allowBlank: false,
+                    anchor: '50%',
+                    gwidth: 80,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_prog_fin',type:'date'},
+                id_grupo:0,
+                grid:true,
+                form:true
             },
-            type:'DateField',
-            filters:{pfiltro:'aom.fecha_prog_fin',type:'date'},
-            id_grupo:0,
-            valorInicial: (new Date().getDate()),
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name:'id_funcionario',
-                origen:'FUNCIONARIOCAR',
-                fieldLabel:'Responsable',
-                gdisplayField:'desc_funcionario2', //mapea al store del grid
-                valueField:'id_funcionario',
-                width:300,
-                gwidth:250,
-                renderer:function(value, p, record) {
-                    return String.format('{0}', record.data['desc_funcionario2']);
-                }
+            {
+                config:{
+                    name: 'estado_wf',
+                    fieldLabel: 'Estado',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 150,
+                    renderer: function(value,p,record){
+                        var color = '#BC4D05';
+                        return '<font color="'+color+'">'+record.data['estado_wf']+'</font>';
+                    }
+                },
+                type:'TextField',
+                id_grupo:0,
+                grid:true,
+                form:false
             },
-            type:'ComboRec',
-            id_grupo:2,
-            grid:false,
-            form:true
-        },
-        {
-            config:{
-                name: 'lugar',
-                fieldLabel: 'Lugar',
-                allowBlank: false,
-                anchor: '80%',
-                gwidth: 200
-            },
-            type:'TextField',
-            filters:{pfiltro:'aom.lugar',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
-        {
-            config:{
-                name: 'recomendacion',
-                fieldLabel: 'Recomendacion',
-                allowBlank: true,
-                anchor: '80%',
-                height: 200,
-                gwidth: 200
-            },
-            type:'TextArea',
-            filters:{pfiltro:'aom.recomendacion',type:'string'},
-            rows:50,
-            id_grupo:1,
-            grid:true,
-            form:false
-        },
-
-        {
-            config: {
-                name: 'id_gconsultivo',
-                fieldLabel: 'Grupo Consultivo',
-                allowBlank: true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/GrupoConsultivo/listarGrupoConsultivo',
-                    id: 'id_gconsultivo',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre_gconsultivo',
-                        direction: 'ASC'
+            {
+                config: {
+                    name: 'id_uo',
+                    baseParams: {
+                      estado_reg : 'activo'
                     },
-                    totalProperty: 'total',
-                    fields: ['id_gconsultivo', 'nombre_gconsultivo','requiere_programacion','requiere_formulario','nombre_programacion','nombre_formulario'],//208
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'gct.nombre_gconsultivo'}
-                }),
-                valueField: 'id_gconsultivo',
-                displayField: 'nombre_gconsultivo',
-                gdisplayField: 'nombre_gconsultivo',
-                hiddenName: 'id_gconsultivo',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '60%',
-                gwidth: 200,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['nombre_gconsultivo']);
-                }
+                    origen:'UO',
+                    allowBlank:true,
+                    fieldLabel:'Area',
+                    gdisplayField:'nombre_unidad', //mapea al store del grid
+                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre_unidad}</p> </div></tpl>',
+                    gwidth: 250,
+                    anchor: '80%',
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['nombre_unidad']);
+                    }
+                },
+                type:'ComboRec',
+                id_grupo:1,
+                filters:{
+                    pfiltro:'uni.nombre_unidad',
+                    type:'string'
+                },
+                grid:true,
+                form:true,
+                bottom_filter:true
             },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: false,
-            form: true
-        },
-        {
-            config: {
-                name: 'id_tipo_om',
-                fieldLabel: 'Tipo OM',
-                allowBlank: false,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/Parametro/listarParametro',
-                    id: 'id_parametro',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'valor_parametro',
-                        direction: 'DESC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'prm.id_tipo_parametro',tipo_parametro:'TIPO_OPORTUNIDAD_MEJORA'}
-                }),
-                valueField: 'id_parametro',
-                displayField: 'valor_parametro',
-                gdisplayField: 'desc_tipo_om',
-                hiddenName: 'id_tipo_om',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '60%',
-                gwidth: 200,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('<div class="gridmultiline">{0}</div>', record.data['desc_tipo_om']);
-                }
+            {
+                config: {
+                    name: 'id_funcionario',
+                    fieldLabel: 'Responsable',
+                    allowBlank: false,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListFuncionario',
+                        id: 'id_funcionario',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'desc_funcionario1',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_funcionario','desc_funcionario1','descripcion_cargo','cargo_equipo'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'fu.desc_funcionario1'}
+                    }),
+                    valueField: 'id_funcionario',
+                    displayField: 'desc_funcionario1',
+                    gdisplayField: 'desc_funcionario2',
+                    hiddenName: 'id_funcionario',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '80%',
+                    gwidth: 200,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['desc_funcionario2']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {pfiltro: 'vfc.desc_funcionario1',type: 'string'},
+                grid: true,
+                form: true,
+                bottom_filter:true
             },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
-        },
-        {
-            config: {
-                name: 'id_tnorma',
-                fieldLabel: 'Tipo Norma',
-                allowBlank: false,
-                resizable:true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/Parametro/listarParametro',
-                    id: 'id_parametro',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'valor_parametro',
-                        direction: 'DESC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'prm.id_parametro',tipo_parametro:'TIPO_NORMA'}
-                }),
-                valueField: 'id_parametro',
-                displayField: 'valor_parametro',
-                gdisplayField: 'desc_tipo_norma',
-                hiddenName: 'id_parametro',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '60%',
-                gwidth: 200,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['desc_tipo_norma']);
-                }
+            {
+                config: {
+                    name: 'id_destinatario',
+                    fieldLabel: 'Destinatario',
+                    allowBlank: false,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListFuncionario',
+                        id: 'id_funcionario',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'desc_funcionario1',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_funcionario','desc_funcionario1','descripcion_cargo','cargo_equipo'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'fu.desc_funcionario1', codigo:'RESP'}
+                    }),
+                    valueField: 'id_funcionario',
+                    displayField: 'desc_funcionario1',
+                    gdisplayField: 'desc_funcionario_destinatario',
+                    hiddenName: 'id_destinatario',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '80%',
+                    gwidth: 200,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['desc_funcionario_destinatario']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {pfiltro: 'vfc.desc_funcionario1',type: 'string'},
+                grid: true,
+                form: false
             },
-            type: 'ComboBox',
-            id_grupo: 1,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
-        },
-        {
-            config: {
-                name: 'id_tobjeto',
-                fieldLabel: 'Objeto Auditoria',
-                allowBlank: false,
-                resizable:true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/Parametro/listarParametro',
-                    id: 'id_parametro',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'valor_parametro',
-                        direction: 'DESC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'prm.id_parametro',tipo_parametro:'OBJETO_AUDITORIA'}
-                }),
-                valueField: 'id_parametro',
-                displayField: 'valor_parametro',
-                gdisplayField: 'desc_tipo_objeto',
-                hiddenName: 'id_tobjeto',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '60%',
-                gwidth: 200,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['desc_tipo_objeto']);
-                }
+            {
+                config:{
+                    name: 'descrip_aom1',
+                    fieldLabel: 'Descripcion',
+                    allowBlank: true,
+                    resizable:true,
+                    anchor: '80%',
+                    gwidth: 350,
+                    renderer : function(value, p, record) {
+                        return String.format('<div class="gridmultiline" style="text-align: justify;">{0}</div>', record.data['descrip_aom1']);
+                    }
+                },
+                type:'TextArea',
+                filters:{pfiltro:'aom.descrip_aom1',type:'string'},
+                id_grupo:0,
+                grid:true,
+                form:true
             },
-            type: 'ComboBox',
-            id_grupo: 1,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form:  true
-        },
-        {
-            config:{
-                name: 'fecha_prev_inicio',
-                fieldLabel: 'Fecha PV-Inicio',
-                allowBlank: true,
-                anchor: '40%',
-                gwidth: 100,
-                format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            {
+                config:{
+                    name: 'lugar',
+                    fieldLabel: 'Lugar',
+                    allowBlank: false,
+                    anchor: '80%',
+                    gwidth: 200
+                },
+                type:'TextField',
+                filters:{pfiltro:'aom.lugar',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:true
             },
-            type:'DateField',
-            filters:{pfiltro:'aom.fecha_prev_inicio',type:'date'},
-            id_grupo:1,
-            valorInicial: (new Date().getDate()),
-            grid:true,
-            form:false
-        },
-        {
-            config:{
-                name: 'fecha_prev_fin',
-                fieldLabel: 'Fecha PV-Fin',
-                allowBlank: true,
-                anchor: '40%',
-                gwidth: 100,
-                format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            {
+                config:{
+                    name: 'recomendacion',
+                    fieldLabel: 'Recomendacion',
+                    allowBlank: true,
+                    anchor: '80%',
+                    height: 200,
+                    gwidth: 200
+                },
+                type:'TextArea',
+                filters:{pfiltro:'aom.recomendacion',type:'string'},
+                rows:50,
+                id_grupo:1,
+                grid:true,
+                form:false
             },
-            type:'DateField',
-            filters:{pfiltro:'aom.fecha_prev_fin',type:'date'},
-            id_grupo:1,
-            valorInicial: (new Date().getDate()),
-            grid:true,
-            form:false
-        },
-        {
-            config:{
-                name: 'fecha_eje_inicio',
-                fieldLabel: 'Fecha Ej. Inicio',
-                allowBlank: true,
-                anchor: '50%',
-                gwidth: 100,
-                format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            {
+                config:{
+                    name: 'resumen',
+                    fieldLabel: 'Resumen',
+                    allowBlank: true,
+                    anchor: '80%',
+                    height: 200,
+                    gwidth: 200
+                },
+                type:'TextArea',
+                filters:{pfiltro:'aom.resumen',type:'string'},
+                rows:50,
+                id_grupo:1,
+                grid:false,
+                form:false
             },
-            type:'DateField',
-            filters:{pfiltro:'aom.fecha_eje_inicio',type:'date'},
-            id_grupo:1,
-            grid:true,
-            form:false
-        },
-        {
-            config:{
-                name: 'fecha_eje_fin',
-                fieldLabel: 'Fecha Ej. Fin',
-                allowBlank: true,
-                anchor: '50%',
-                gwidth: 100,
-                format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            {
+                config: {
+                    name: 'id_gconsultivo',
+                    fieldLabel: 'Grupo Consultivo',
+                    allowBlank: true,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/GrupoConsultivo/listarGrupoConsultivo',
+                        id: 'id_gconsultivo',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'nombre_gconsultivo',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_gconsultivo', 'nombre_gconsultivo','requiere_programacion','requiere_formulario','nombre_programacion','nombre_formulario'],//208
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'gct.nombre_gconsultivo'}
+                    }),
+                    valueField: 'id_gconsultivo',
+                    displayField: 'nombre_gconsultivo',
+                    gdisplayField: 'nombre_gconsultivo',
+                    hiddenName: 'id_gconsultivo',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '60%',
+                    gwidth: 200,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['nombre_gconsultivo']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {pfiltro: 'movtip.nombre',type: 'string'},
+                grid: false,
+                form: true
             },
-            type:'DateField',
-            filters:{pfiltro:'aom.fecha_eje_fin',type:'date'},
-            id_grupo:1,
-            grid:true,
-            form:false
-        },
-		{
-			config:{
-				name: 'estado_reg',
-				fieldLabel: 'Estado Reg.',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:10
-			},
-				type:'TextField',
-				filters:{pfiltro:'aom.estado_reg',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:false
-		},
-		{
-			config:{
-				name: 'id_usuario_ai',
-				fieldLabel: 'jjj',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:4
-			},
-				type:'Field',
-				filters:{pfiltro:'aom.id_usuario_ai',type:'numeric'},
-				id_grupo:1,
-				grid:false,
-				form:false
-		},
-		{
-			config:{
-				name: 'fecha_reg',
-				fieldLabel: 'Fecha creación',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
-			},
-				type:'DateField',
-				filters:{pfiltro:'aom.fecha_reg',type:'date'},
-				id_grupo:1,
-				grid:true,
-				form:false
-		},
-		{
-			config:{
-				name: 'usuario_ai',
-				fieldLabel: '',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:300
-			},
-				type:'TextField',
-				filters:{pfiltro:'aom.usuario_ai',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:false
-		},
-		{
-			config:{
-				name: 'usr_reg',
-				fieldLabel: 'Creado por',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:4
-			},
-				type:'Field',
-				filters:{pfiltro:'usu1.cuenta',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:false
-		},
-		{
-			config:{
-				name: 'usr_mod',
-				fieldLabel: 'Modificado por',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:4
-			},
-				type:'Field',
-				filters:{pfiltro:'usu2.cuenta',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:false
-		},
-		{
-			config:{
-				name: 'fecha_mod',
-				fieldLabel: 'Fecha Modif.',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
-			},
-				type:'DateField',
-				filters:{pfiltro:'aom.fecha_mod',type:'date'},
-				id_grupo:1,
-				grid:true,
-				form:false
-		}
+            {
+                config: {
+                    name: 'id_tipo_om',
+                    fieldLabel: 'Tipo OM',
+                    allowBlank: false,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/Parametro/listarParametro',
+                        id: 'id_parametro',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'valor_parametro',
+                            direction: 'DESC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'prm.id_tipo_parametro',tipo_parametro:'TIPO_OPORTUNIDAD_MEJORA'}
+                    }),
+                    valueField: 'id_parametro',
+                    displayField: 'valor_parametro',
+                    gdisplayField: 'desc_tipo_om',
+                    hiddenName: 'id_tipo_om',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '60%',
+                    gwidth: 200,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('<div class="gridmultiline">{0}</div>', record.data['desc_tipo_om']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {pfiltro: 'movtip.nombre',type: 'string'},
+                grid: true,
+                form: true
+            },
+            {
+                config: {
+                    name: 'id_tnorma',
+                    fieldLabel: 'Tipo Norma',
+                    allowBlank: false,
+                    resizable:true,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/Parametro/listarParametro',
+                        id: 'id_parametro',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'valor_parametro',
+                            direction: 'DESC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'prm.id_parametro',tipo_parametro:'TIPO_NORMA'}
+                    }),
+                    valueField: 'id_parametro',
+                    displayField: 'valor_parametro',
+                    gdisplayField: 'desc_tipo_norma',
+                    hiddenName: 'id_parametro',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '60%',
+                    gwidth: 200,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['desc_tipo_norma']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 1,
+                filters: {pfiltro: 'movtip.nombre',type: 'string'},
+                grid: true,
+                form: true
+            },
+            {
+                config: {
+                    name: 'id_tobjeto',
+                    fieldLabel: 'Objeto Auditoria',
+                    allowBlank: false,
+                    resizable:true,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/Parametro/listarParametro',
+                        id: 'id_parametro',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'valor_parametro',
+                            direction: 'DESC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'prm.id_parametro',tipo_parametro:'OBJETO_AUDITORIA'}
+                    }),
+                    valueField: 'id_parametro',
+                    displayField: 'valor_parametro',
+                    gdisplayField: 'desc_tipo_objeto',
+                    hiddenName: 'id_tobjeto',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '60%',
+                    gwidth: 200,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['desc_tipo_objeto']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 1,
+                filters: {pfiltro: 'movtip.nombre',type: 'string'},
+                grid: true,
+                form:  true
+            },
+            {
+                config:{
+                    name: 'fecha_prev_inicio',
+                    fieldLabel: 'Fecha PV-Inicio',
+                    allowBlank: true,
+                    anchor: '50%',
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_prev_inicio',type:'date'},
+                id_grupo:1,
+                valorInicial: (new Date().getDate()),
+                grid:true,
+                form:true
+            },
+            {
+                config:{
+                    name: 'fecha_prev_fin',
+                    fieldLabel: 'Fecha PV-Fin',
+                    allowBlank: true,
+                    anchor: '50%',
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_prev_fin',type:'date'},
+                id_grupo:1,
+                valorInicial: (new Date().getDate()),
+                grid:true,
+                form:true
+            },
+            {
+                config:{
+                    name: 'fecha_eje_inicio',
+                    fieldLabel: 'Fecha Ej. Inicio',
+                    allowBlank: true,
+                    anchor: '50%',
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_eje_inicio',type:'date'},
+                id_grupo:1,
+                grid:true,
+                form:true
+            },
+            {
+                config:{
+                    name: 'fecha_eje_fin',
+                    fieldLabel: 'Fecha Ej. Fin',
+                    allowBlank: true,
+                    anchor: '50%',
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_eje_fin',type:'date'},
+                id_grupo:1,
+                grid:true,
+                form:true
+            },
+            {
+                config:{
+                    name: 'estado_reg',
+                    fieldLabel: 'Estado Reg.',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:10
+                },
+                    type:'TextField',
+                    filters:{pfiltro:'aom.estado_reg',type:'string'},
+                    id_grupo:1,
+                    grid:true,
+                    form:false
+            },
+            {
+                config:{
+                    name: 'fecha_reg',
+                    fieldLabel: 'Fecha creación',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                                format: 'd/m/Y',
+                                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+                },
+                    type:'DateField',
+                    filters:{pfiltro:'aom.fecha_reg',type:'date'},
+                    id_grupo:1,
+                    grid:true,
+                    form:false
+            },
+            {
+                config:{
+                    name: 'usuario_ai',
+                    fieldLabel: 'Funcionaro AI',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:300
+                },
+                type:'TextField',
+                filters:{pfiltro:'aro.usuario_ai',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config:{
+                    name: 'usr_reg',
+                    fieldLabel: 'Creado por',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:4
+                },
+                    type:'Field',
+                    filters:{pfiltro:'usu1.cuenta',type:'string'},
+                    id_grupo:1,
+                    grid:true,
+                    form:false
+            },
+            {
+                config:{
+                    name: 'usr_mod',
+                    fieldLabel: 'Modificado por',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:4
+                },
+                    type:'Field',
+                    filters:{pfiltro:'usu2.cuenta',type:'string'},
+                    id_grupo:1,
+                    grid:true,
+                    form:false
+            },
+            {
+                config:{
+                    name: 'fecha_mod',
+                    fieldLabel: 'Fecha Modif.',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                                format: 'd/m/Y',
+                                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+                },
+                    type:'DateField',
+                    filters:{pfiltro:'aom.fecha_mod',type:'date'},
+                    id_grupo:1,
+                    grid:true,
+                    form:false
+            }
 	],
-	tam_pag:50,	
+	tam_pag:50,
 	title:'Auditoria - Oportunidad Mejora',
     id:'AOM',
 	ActSave:'../../sis_auditoria/control/AuditoriaOportunidadMejora/insertarAuditoriaOportunidadMejora',
@@ -798,10 +791,11 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
 		{name:'codigo_parametro', type: 'string'},
 		{name:'desc_tipo_om', type: 'string'},
 		{name:'codigo_tpo_aom', type: 'string'},
-		{name:'requiere_programacion', type: 'string'},
-		{name:'requiere_formulario', type: 'string'},
 		{name:'contador_estados', type: 'numeric'},
-        {name:'nombre_estado', type: 'string'}
+        {name:'nombre_estado', type: 'string'},
+        {name:'id_destinatario', type: 'numeric'},
+        {name:'desc_funcionario_destinatario', type: 'string'},
+        {name:'resumen', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_aom',
@@ -815,6 +809,10 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
         this.ocultarComponente(this.Cmp.id_tnorma);
         this.ocultarComponente(this.Cmp.id_tobjeto);
         this.ocultarComponente(this.Cmp.id_gconsultivo);
+        this.ocultarComponente(this.Cmp.fecha_prev_inicio);
+        this.ocultarComponente(this.Cmp.fecha_prev_fin);
+        this.ocultarComponente(this.Cmp.fecha_eje_inicio);
+        this.ocultarComponente(this.Cmp.fecha_eje_fin);
     },
     sigEstado:function(){
         var rec = this.sm.getSelected();
@@ -858,7 +856,6 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
             timeout:this.timeout,
             scope:this
         });
-
     },
     successWizard:function(resp){
         Phx.CP.loadingHide();
@@ -934,8 +931,86 @@ Phx.vista.AuditoriaOportunidadMejora=Ext.extend(Phx.gridInterfaz,{
     },
     successEstadoSinc:function(resp){
         Phx.CP.loadingHide();
-        resp.argument.wizard.panel.destroy()
+        resp.argument.wizard.panel.destroy();
         this.reload();
+    },
+    filtroVentana:function () {
+        var desde = new Ext.form.DateField({
+            name: 'desde',
+            fieldLabel: 'Fecha Desde',
+            allowBlank: false,
+            anchor: '80%',
+            format: 'd/m/Y',
+            hidden : false
+        });
+        var hasta = new Ext.form.DateField({
+            name: 'hasta',
+            fieldLabel: 'Fecha Hasta',
+            allowBlank: false,
+            anchor: '80%',
+            format: 'd/m/Y',
+            hidden : false
+        });
+
+        this.formFiltro = new Ext.form.FormPanel({
+            baseCls: 'x-plain',
+            autoDestroy: true,
+            border: false,
+            layout: 'form',
+            autoHeight: true,
+            items: [desde,hasta]
+        });
+        this.ventanaFiltro = new Ext.Window({
+            title: 'Filtro',
+            collapsible: true,
+            maximizable: true,
+            autoDestroy: true,
+            width: 350,
+            height: 180,
+            layout: 'fit',
+            plain: true,
+            bodyStyle: 'padding:5px;',
+            buttonAlign: 'center',
+            items: this.formFiltro,
+            modal:true,
+            closeAction: 'hide',
+            buttons: [{
+                text: 'Aplicar',
+                handler: this.aplicarFiltro,
+                scope: this},
+                {
+                    text: 'Cancelar',
+                    handler: function(){ this.ventanaFiltro.hide() },
+                    scope: this
+                }]
+        });
+        this.cmpDesde = this.formFiltro.getForm().findField('desde');
+        this.cmpHasta= this.formFiltro.getForm().findField('hasta');
+    },
+    aplicarFiltro: function(){
+        Phx.CP.loadingShow();
+        if(this.validarFiltros()){
+            Phx.CP.loadingHide();
+            this.store.baseParams.desde = this.cmpDesde.getValue().dateFormat('d/m/y');
+            this.store.baseParams.hasta = this.cmpHasta.getValue().dateFormat('d/m/y');
+            this.ventanaFiltro.hide();
+            this.load();
+        }
+        Phx.CP.loadingHide();
+    },
+    validarFiltros:function(){
+        let resultado = false;
+        if(this.cmpDesde.validate() && this.cmpHasta.validate()){
+            resultado = true
+        }
+        return resultado;
+    },
+    west: {
+           url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/FormFiltro.php',
+           width: '30%',
+           title:'Filtros',
+           collapsed: true,
+           cls: 'FormFiltro'
     }
 }
 )
