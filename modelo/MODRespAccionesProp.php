@@ -34,7 +34,8 @@ class MODRespAccionesProp extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('desc_funcionario1','text');
-		
+        $this->captura('id_nc','int4');
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -128,6 +129,23 @@ class MODRespAccionesProp extends MODbase{
 		$this->captura('descripcion_cargo','varchar');
 		$this->captura('cargo_codigo','varchar');
 		$this->captura('nombre_unidad','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function insertarItemRespAccionesProp(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_resp_acciones_prop_ime';
+        $this->transaccion='SSOM_REAF_INS';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_nc','id_nc','int4');
+        $this->setParametro('id_res_funcionarios','id_res_funcionarios','text');
 
         //Ejecuta la instruccion
         $this->armarConsulta();

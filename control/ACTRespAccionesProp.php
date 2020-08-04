@@ -16,7 +16,11 @@ class ACTRespAccionesProp extends ACTbase{
 		if ($this->objParam->getParametro('id_ap')!=''){
 			$this->objParam->addFiltro("resap.id_ap = ".$this->objParam->getParametro('id_ap'));
 		}
-		//******************		
+		//******************
+
+        if ($this->objParam->getParametro('id_nc')!=''){
+            $this->objParam->addFiltro("resap.id_nc = ".$this->objParam->getParametro('id_nc'));
+        }
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODRespAccionesProp','listarRespAccionesProp');
@@ -50,7 +54,11 @@ class ACTRespAccionesProp extends ACTbase{
         $this->res=$this->objFunc->listarRsinUsuario($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-
+    function insertarItemRespAccionesProp(){
+        $this->objFunc=$this->create('MODRespAccionesProp');
+        $this->res=$this->objFunc->insertarItemRespAccionesProp($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 			
 }
 
