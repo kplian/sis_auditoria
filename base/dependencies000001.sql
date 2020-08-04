@@ -60,5 +60,17 @@ select pxp.f_insert_testructura_gui ('APD', 'SGUI');
 select pxp.f_insert_testructura_gui ('AID', 'SGUI');
 /***********************************F-DEP-MMV-SSOM-6-4/9/2020*****************************************/
 
+/***********************************I-DEP-MMV-SSOM-5-4/9/2020*****************************************/
+----------------------------------------------------
+-- Dependencias de configuracion de Estados Worflow
+----------------------------------------------------
+select wf.f_import_ttipo_documento_estado ('delete','AUD','AUDSE','vbplanificacion','AUDSE',NULL,NULL,NULL);
+select wf.f_import_ttipo_documento_estado ('insert','AREV','AUNC','propuesta','AUNC','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','AREV','AUNC','propuesta','AUNC','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('delete','INOC','AUNC','propuesta','AUNC',NULL,NULL,NULL);
+select wf.f_import_ttipo_documento_estado ('delete','INOC','AUNC','propuesta','AUNC',NULL,NULL,NULL);
+/***********************************F-DEP-MMV-SSOM-5-4/9/2020*****************************************/
+
+
 
 
