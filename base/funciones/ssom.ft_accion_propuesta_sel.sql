@@ -17,7 +17,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
  #0				04-07-2019 22:32:50								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.taccion_propuesta'	
- #
+ #3				04-08-2020 19:53:16								Refactorización No Conformidad
  ***************************************************************************/
 
 DECLARE
@@ -26,21 +26,21 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'ssom.ft_accion_propuesta_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'SSOM_ACCPRO_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		szambrana	
+ 	#AUTOR:		szambrana
  	#FECHA:		04-07-2019 22:32:50
 	***********************************/
 
 	if(p_transaccion='SSOM_ACCPRO_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -69,33 +69,36 @@ BEGIN
                         accpro.codigo_ap,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        param.valor_parametro,	
+                        param.valor_parametro,
                         ofunc.desc_funcionario1 as funcionario_name,
                         (select count(*)
                                from unnest(id_tipo_estado_wfs) elemento
-                               where elemento = ew.id_tipo_estado)::integer  as contador_estados                        
+                               where elemento = ew.id_tipo_estado)::integer  as contador_estados,
+                        accpro.revisar,
+                        accpro.rechazar,
+                        accpro.implementar
 						from ssom.taccion_propuesta accpro
 						inner join segu.tusuario usu1 on usu1.id_usuario = accpro.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = accpro.id_usuario_mod
                         left join ssom.tparametro param on param.id_parametro = accpro.id_parametro
                         left join orga.vfuncionario_cargo ofunc on ofunc.id_funcionario = accpro.id_funcionario
                         left join wf.tproceso_wf pw on pw.id_proceso_wf = accpro.id_proceso_wf  	--borrar
-                        left join wf.testado_wf ew on ew.id_estado_wf = accpro.id_estado_wf 		--para integrar con nuevo wf                        
+                        left join wf.testado_wf ew on ew.id_estado_wf = accpro.id_estado_wf 		--para integrar con nuevo wf
 				        where  ';
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			--Devuelve la respuesta
             raise notice '%',v_consulta;
 			return v_consulta;
-						
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'SSOM_ACCPRO_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		szambrana	
+ 	#AUTOR:		szambrana
  	#FECHA:		04-07-2019 22:32:50
 	***********************************/
 
@@ -112,23 +115,23 @@ BEGIN
                         left join wf.tproceso_wf pw on pw.id_proceso_wf = accpro.id_proceso_wf  	--borrar
                         left join wf.testado_wf ew on ew.id_estado_wf = accpro.id_estado_wf 		--para integrar con nuevo wf
                         where ';
-			
-			--Definicion de la respuesta		    
+
+			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
-					
+
 	else
-					     
+
 		raise exception 'Transaccion inexistente';
-					         
+
 	end if;
-					
+
 EXCEPTION
-					
+
 	WHEN OTHERS THEN
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
@@ -141,4 +144,8 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
+
+ALTER FUNCTION ssom.ft_accion_propuesta_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

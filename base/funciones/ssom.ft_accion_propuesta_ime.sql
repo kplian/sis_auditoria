@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION ssom.ft_accion_propuesta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -19,7 +17,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
  #0				04-07-2019 22:32:50								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.taccion_propuesta'
- #
+ #3				04-08-2020 19:53:16								Refactorización No Conformidad
  ***************************************************************************/
 
 DECLARE
@@ -67,8 +65,19 @@ DECLARE
     v_fecha_ini				date;
     v_fecha_fin				date;
     v_fechas_validas 		boolean;
+    v_aceptar				varchar;
+
+  va_id_tipo_estado 	  integer [];
+    va_codigo_estado 		  varchar [];
+    va_disparador 	      varchar [];
+    va_regla 				  varchar [];
+    va_prioridad 		      integer [];
+    v_registro_estado			record;
+    v_record_accion				record;
 
 
+    v_estado_new			varchar;
+    v_id_estado_new			integer;
 
 BEGIN
 
@@ -169,7 +178,7 @@ BEGIN
                 v_parametros.obs_resp_area,
                 v_parametros.descripcion_ap,
                 v_parametros.id_parametro,
-                v_parametros.id_funcionario,
+                null, --v_parametros.id_funcionario,
                 v_parametros.descrip_causa_nc,
                 'activo',
                 v_parametros.efectividad_cumpl_ap,
@@ -214,7 +223,7 @@ BEGIN
 			obs_resp_area = v_parametros.obs_resp_area,
 			descripcion_ap = v_parametros.descripcion_ap,
 			id_parametro = v_parametros.id_parametro,
-			id_funcionario = v_parametros.id_funcionario,
+			-- id_funcionario = v_parametros.id_funcionario,
 			descrip_causa_nc = v_parametros.descrip_causa_nc,
 			efectividad_cumpl_ap = v_parametros.efectividad_cumpl_ap,
 			fecha_fin_ap = v_parametros.fecha_fin_ap,
@@ -472,6 +481,210 @@ BEGIN
               --Devuelve la respuesta
                 return v_resp;
  			end;
+     /*********************************
+ 	#TRANSACCION:  'SSOM_APACE_IME'
+ 	#DESCRIPCION:	Obtener responsable no conformidad
+ 	#AUTOR:		MMV
+ 	#FECHA:		29/7/2020
+	***********************************/
+
+	elsif(p_transaccion='SSOM_APACE_IME')then
+
+		begin
+			--Sentencia de la modificacion
+           if( v_parametros.fieldName = 'revisar')then
+
+                  select no.revisar into v_aceptar
+                  from ssom.taccion_propuesta no
+                  where no.id_ap = v_parametros.id_ap;
+
+
+                  if (v_aceptar = 'si')then
+
+                  	update ssom.taccion_propuesta set
+                    revisar = 'no',
+                    rechazar = 'no'
+                    where id_ap=v_parametros.id_ap;
+
+                  end if;
+
+                  if (v_aceptar = 'no')then
+
+                    	update ssom.taccion_propuesta set
+                        revisar = 'si',
+                        rechazar = 'no'
+                        where id_ap=v_parametros.id_ap;
+
+                  end if;
+           end if;
+
+           if( v_parametros.fieldName = 'rechazar')then
+
+           		 	select no.rechazar into v_aceptar
+                    from ssom.taccion_propuesta no
+                    where no.id_ap = v_parametros.id_ap;
+
+
+                  if (v_aceptar = 'si')then
+
+                  	update ssom.taccion_propuesta set
+                    revisar = 'no',
+                    rechazar = 'no'
+                    where id_ap=v_parametros.id_ap;
+
+                  end if;
+
+                  if (v_aceptar = 'no')then
+
+                    	update ssom.taccion_propuesta set
+                        revisar = 'no',
+                        rechazar = 'si'
+                        where id_ap=v_parametros.id_ap;
+
+                  end if;
+
+           end if;
+
+           if( v_parametros.fieldName = 'implementar')then
+
+           		 	select no.implementar into v_aceptar
+                    from ssom.taccion_propuesta no
+                    where no.id_ap = v_parametros.id_ap;
+
+
+                  if (v_aceptar = 'si')then
+
+                  	update ssom.taccion_propuesta set
+                    implementar = 'no'
+                    where id_ap=v_parametros.id_ap;
+
+                  end if;
+
+                  if (v_aceptar = 'no')then
+
+                    	update ssom.taccion_propuesta set
+                        implementar = 'si'
+                        where id_ap=v_parametros.id_ap;
+
+                  end if;
+
+           end if;
+
+
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidades modificado(a)');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_ap',v_parametros.id_ap::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+	end;
+        /****************************************************
+    #TRANSACCION:     'SSOM_IMES_IME'
+    #DESCRIPCION:     Cambiar estado
+    #AUTOR:           MMV
+    #FECHA:			  8/7/2020
+    ***************************************************/
+
+    elseif( p_transaccion='SSOM_IMES_IME') then
+
+    begin
+
+
+  	for v_record_accion in (  select 	ac.id_proceso_wf,
+                                          ac.id_estado_wf,
+                                          ac.rechazar,
+                                          ac.revisar
+                                  from ssom.taccion_propuesta ac
+                                  where ac.id_nc = v_parametros.id_nc
+                              )loop
+
+    -- Validar estado
+	select  pw.id_proceso_wf,
+            ew.id_estado_wf,
+            te.codigo,
+            pw.fecha_ini,
+            te.id_tipo_estado,
+            te.pedir_obs,
+            pw.nro_tramite
+          into
+            v_registro_estado
+          from wf.tproceso_wf pw
+          inner join wf.testado_wf ew  on ew.id_proceso_wf = pw.id_proceso_wf and ew.estado_reg = 'activo'
+          inner join wf.ttipo_estado te on ew.id_tipo_estado = te.id_tipo_estado
+          where pw.id_proceso_wf =  v_record_accion.id_proceso_wf;
+
+    --- obtener
+
+         select  ps_id_tipo_estado,
+                 ps_codigo_estado,
+                 ps_disparador,
+                 ps_regla,
+                 ps_prioridad
+             into
+                va_id_tipo_estado,
+                va_codigo_estado,
+                va_disparador,
+                va_regla,
+                va_prioridad
+            from wf.f_obtener_estado_wf(
+            v_registro_estado.id_proceso_wf,
+             null,
+             v_registro_estado.id_tipo_estado,
+             'siguiente',
+             p_id_usuario);
+
+            v_acceso_directo = '';
+            v_clase = '';
+            v_parametros_ad = '';
+            v_tipo_noti = 'notificacion';
+            v_titulo  = 'Aprobado';
+
+            if (v_record_accion.revisar = 'si') then
+
+            	v_id_estado_new = va_id_tipo_estado[1]::integer;
+                v_estado_new =  va_codigo_estado[1]::varchar;
+
+            end if;
+
+            if (v_record_accion.rechazar = 'si') then
+            		v_id_estado_new = va_id_tipo_estado[2]::integer;
+                	v_estado_new =  va_codigo_estado[2]::varchar;
+            end if;
+
+             v_id_estado_actual = wf.f_registra_estado_wf(  v_id_estado_new,
+                                                            null,--v_parametros.id_funcionario_wf,
+                                                            v_registro_estado.id_estado_wf,
+                                                            v_registro_estado.id_proceso_wf,
+                                                            p_id_usuario,
+                                                            v_parametros._id_usuario_ai,
+                                                            v_parametros._nombre_usuario_ai,
+                                                            null,--v_id_depto,                       --depto del estado anterior
+                                                            'Aprobado', --obt
+                                                            v_acceso_directo,
+                                                            v_clase,
+                                                            v_parametros_ad,
+                                                            v_tipo_noti,
+                                                            v_titulo);
+
+
+
+          update ssom.taccion_propuesta set
+          id_estado_wf =  v_id_estado_actual,
+          estado_wf = v_estado_new,
+          id_usuario_mod = p_id_usuario,
+          fecha_mod = now()
+          where id_proceso_wf = v_record_accion.id_proceso_wf;
+
+      end loop;
+      --Definicion de la respuesta
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Exito');
+      v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_parametros.id_nc::varchar);
+
+      --Devuelve la respuesta
+      return v_resp;
+
+    end;
 
 
 	else
@@ -495,4 +708,8 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
+
+ALTER FUNCTION ssom.ft_accion_propuesta_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

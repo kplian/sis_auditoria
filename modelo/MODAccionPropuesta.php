@@ -51,7 +51,9 @@ class MODAccionPropuesta extends MODbase{
 		$this->captura('valor_parametro','varchar');
 		$this->captura('funcionario_name','text');
 		$this->captura('contador_estados','int4'); //contador_estados
-		
+        $this->captura('revisar','varchar');
+        $this->captura('rechazar','varchar');
+        $this->captura('implementar','varchar');
 
 		
 		//Ejecuta la instruccion
@@ -210,7 +212,39 @@ class MODAccionPropuesta extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-	
+    function aceptarAccion(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_accion_propuesta_ime';
+        $this->transaccion='SSOM_APACE_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_ap','id_ap','int4');
+        $this->setParametro('fieldName','fieldName','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function multiCambiarEstadoAccionPropuesta(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_accion_propuesta_ime';
+        $this->transaccion='SSOM_IMES_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_nc','id_nc','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 			
 }
 ?>

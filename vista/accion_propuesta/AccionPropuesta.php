@@ -11,14 +11,15 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
-
-	constructor:function(config){
+    nombreVista :'AccionPropuesta',
+    constructor:function(config){
 		this.maestro = config.maestro; //comentado ahorita
-       
-    	//llama al constructor de la clase padre
+
 		Phx.vista.AccionPropuesta.superclass.constructor.call(this,config);
-		this.init();
-		this.addButton('atras',{argument: { estado: 'anterior'},
+        this.init();
+        this.grid.addListener('cellclick', this.oncellclick,this);
+
+        this.addButton('atras',{argument: { estado: 'anterior'},
 			text:'Anterior',
 			iconCls: 'batras',
 			disabled:true,
@@ -26,9 +27,9 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 			tooltip: '<b>Pasar al anterior Estado</b>'});		
 		
 		//insertamos y habilitamos el boton siguiente
-		this.addButton('siguiente',{text:'Siguiente',
-			iconCls: 'badelante',
-			disabled:true,
+		this.addButton('siguiente',{text:'Aprobar',
+			iconCls: 'bok',
+			disabled:false,
 			handler:this.onButtonSiguiente,   //creamos esta funcion para disparar el evento al presionar siguiente
 			tooltip: '<b>Siguiente</b><p>Pasar al siguiente estado</p>'});		
 		
@@ -43,20 +44,7 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 				handler: this.loadCheckDocumentosPlanWf,
 				tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.'
 			}
-		);	
-		
-		//insertamos y habilitamos el boton de observaciones						
-		this.addButton('btnObs',
-			{
-				text :'Obs Wf',
-				iconCls : 'bchecklist',
-				disabled: true,
-				handler : this.onOpenObs,
-				tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
-		}
-		);		
-		
-			
+		);
 	},
 			
 	Atributos:[
@@ -113,25 +101,82 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
-                name: 'dibu_icono',
-                fieldLabel: 'A. P.',
+                name: 'revisar',
+                fieldLabel: 'Revisar',
                 allowBlank: true,
-                anchor: '80%',
+                anchor: '40%',
                 gwidth: 60,
-                maxLength:150,
-                renderer: function (value, p, record) {
-                    var result;
-                    result = String.format('{0}', "<div style='text-align:center'><img src = '../../../lib/imagenes/icono_dibu/dibu_gear.png' align='center' width='35' height='35' title=''/></div>");
-                    return result;
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no'],
+                renderer:function (value,p,record){
+                    let checked = '';
+                    if(value === 'si'){
+                        checked = 'checked';
+                    }
+                    return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:20px;width:20px;" type="checkbox"{0}></div>',checked);
                 }
             },
-            type:'TextField',
-            filters:{pfiltro:'accpro.id_ap',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:false
-        },	
-
+            type:'ComboBox',
+            id_grupo:3,
+            valorInicial: 'no',
+            grid: true,
+            form: false
+        },
+        {
+            config:{
+                name: 'rechazar',
+                fieldLabel: 'Rechazar',
+                allowBlank: true,
+                anchor: '40%',
+                gwidth: 60,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no'],
+                renderer:function (value,p,record){
+                    let checked = '';
+                    if(value === 'si'){
+                        checked = 'checked';
+                    }
+                    return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:20px;width:20px;" type="checkbox"{0}></div>',checked);
+                }
+            },
+            type:'ComboBox',
+            id_grupo:3,
+            valorInicial: 'no',
+            grid: true,
+            form: false
+        },
+        {
+            config:{
+                name: 'implementar',
+                fieldLabel: 'Implementar',
+                allowBlank: true,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no'],
+                renderer:function (value,p,record){
+                    let checked = '';
+                    if(value === 'si'){
+                        checked = 'checked';
+                    }
+                    return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:20px;width:20px;" type="checkbox"{0}></div>',checked);
+                }
+            },
+            type:'ComboBox',
+            id_grupo:3,
+            valorInicial: 'no',
+            grid: true,
+            form: false
+        },
         {
             //configuracion del componente -->nro_tramite
             config:{
@@ -145,8 +190,7 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
             type:'TextField',
             filters:{pfiltro:'smt.nro_tramite',type:'string'},
             id_grupo:1,
-            grid:true,
-            bottom_filter:true,
+            grid:false,
             form:false
         },
 		{
@@ -161,50 +205,28 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 				type:'Field',
 				filters:{pfiltro:'accpro.codigo_ap',type:'string'},
 				id_grupo:1,
-				grid:true,
+				grid:false,
 				form:false
-		},	
-
-        //configuracion del componente -->estado_wf
+		},
         {
             config:{
                 name: 'estado_wf',
                 fieldLabel: 'Estado',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 200,
-                maxLength:100 ,
-				//**********
-				renderer: function(value, p, record){
-                    var aux1;
-                    if(record.data.estado_wf=='propuesta'){
-                        aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="brown">{0} - ({1})</font></b></div>';
-                    }
-                    else if (record.data.estado_wf=='vbpropuesta_responsable'){
-                        aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="orange">{0} - ({1})</font></b></div>';
-                    }
-					else if (record.data.estado_wf=='vbpropuesta_auditor'){
-						aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="cyan">{0} - ({1})</font></b></div>';
-					}
-					else if (record.data.estado_wf=='implementada'){
-						aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="green">{0} - ({1})</font></b></div>';
-					}
-					else if (record.data.estado_wf=='vbimplementada_responsable'){
-						aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="orange">{0} - ({1})</font></b></div>';
-					}
-					else if (record.data.estado_wf=='vbimplementada_auditor'){
-						aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="cyan">{0} - ({1})</font></b></div>';
-					}
-					else if (record.data.estado_wf=='finalizado'){
-						aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="blue">{0} - ({1})</font></b></div>';
-					}else{
-						aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="black">{0} - ({1})</font></b></div>';
+                gwidth: 180,
+                renderer: function(value,p,record){
+                    let color = '#1419CC';
 
-					}
-                    
-					return String.format(aux1, value, record.data.contador_estados);					
+                    if (record.data['estado_wf'] === 'accion_aprobada_responsable'){
+                        color = '#0a7f15';
+                    }
+                    if (record.data['estado_wf'] === 'accion_rechazada_responsable'){
+                        color = '#a20007';
+                    }
+
+                    return '<font color="'+color+'">'+record.data['estado_wf']+'</font>';
                 }
-				//**********
             },
             type:'TextField',
             filters:{pfiltro:'smt.estado',type:'string'},
@@ -556,7 +578,10 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 		
 		{name:'codigo_ap', type: 'string'},
 		{name:'contador_estados', type: 'numeric'},		
-		{name:'nro_tramite_padre', type: 'numeric'}		
+		{name:'nro_tramite_padre', type: 'numeric'},
+        {name:'revisar', type: 'string'},
+        {name:'rechazar', type: 'string'},
+        {name:'implementar', type: 'string'},
 	],
 	sortInfo:{
 		field: 'id_ap',
@@ -564,11 +589,13 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:false,
-	onReloadPage:function(m){
+    fwidth: '60%',
+    fheight: '80%',
+	/*onReloadPage:function(m){
 		
 		this.maestro = m;
 		console.log('padre',this.maestro);
-		this.store.baseParams={id_nc:this.maestro.id_nc};
+		this.store.baseParams={id_nc:this.maestro.id_nc,interfaz : this.nombreVista};
 		this.load({params:{start:0, limit:50}})
 		
 	},
@@ -576,55 +603,24 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.AccionPropuesta.superclass.loadValoresIniciales.call(this);
         this.Cmp.id_nc.setValue(this.maestro.id_nc);
 		this.Cmp.nro_tramite_padre.setValue(this.maestro.nro_tramite);
-    },
-	//para su hijo
-	tabeast:[
-		{
-			url:'../../../sis_auditoria/vista/resp_acciones_prop/RespAccionesProp.php',
-			title:'Responsables Accion Propuesta',
-			//height: '40%',
-			width: '30%',
-			cls: 'RespAccionesProp' 
-		}
-	],	
-
-	//los botones se preparan al inicar la vista
+    },*/
 	preparaMenu:function(n){
 		Phx.vista.AccionPropuesta.superclass.preparaMenu.call(this, n);
-		
-					if ((this.maestro.estado_wf === 'propuesta') || (this.maestro.estado_wf === 'vbnoconformidad')) {
-						this.getBoton('new').disable();
-						this.getBoton('edit').disable();
-						this.getBoton('del').disable();
-					}
-		
-				this.getBoton('siguiente').enable();
-				this.getBoton('atras').enable(); 	//se habilita para el boton para atras
-				this.getBoton('diagrama_gantt').enable();
-				this.getBoton('btnChequeoDocumentosWf').enable();
-				this.getBoton('btnObs').enable();					
-			
+           // this.getBoton('siguiente').enable();
+            this.getBoton('atras').enable(); 	//se habilita para el boton para atras
+            this.getBoton('diagrama_gantt').enable();
+            this.getBoton('btnChequeoDocumentosWf').enable();
 	},
 
 	// al seleccionar un resgistro el boton se ativa o desativa
 	liberaMenu:function() {
 		var tb = Phx.vista.AccionPropuesta.superclass.liberaMenu.call(this);
-		//console.log('libresoy',this.maestro);
 		if (tb) {
-			
-			if ((this.maestro.estado_wf === 'propuesta') || (this.maestro.estado_wf === 'vbnoconformidad')){
-						this.getBoton('new').disable();
-						this.getBoton('edit').disable();
-						this.getBoton('del').disable();
-					}
-		
-		
-				this.getBoton('siguiente').disable();
+			//	this.getBoton('siguiente').disable();
 				this.getBoton('atras').disable();	//se habilita para el boton para atras
 				this.getBoton('diagrama_gantt').disable();
-				this.getBoton('btnChequeoDocumentosWf').disable();				
-				this.getBoton('btnObs').disable();
-			
+				this.getBoton('btnChequeoDocumentosWf').disable();
+
 		}
 	},	
 	//Boton Siguiente
@@ -724,8 +720,8 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 	},
 
 	diagramGanttDinamico : function(){
-	var data=this.sm.getSelected().data.id_proceso_wf;
-	window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)
+        var data=this.sm.getSelected().data.id_proceso_wf;
+        window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)
 	},	
 	
 	addBotonesGantt: function() {
@@ -783,30 +779,36 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 		)
 	},		
 
-	onOpenObs:function() {
-		var rec=this.sm.getSelected();            
-		var data = {
-			id_proceso_wf: rec.data.id_proceso_wf,
-			id_estado_wf: rec.data.id_estado_wf,
-			num_tramite: rec.data.num_tramite
-		}
-		
-		Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
-			'Observaciones del WF',
-			{
-				width: '80%',
-				height: '70%'
-			},
-			data,
-			this.idContenedor,
-			'Obs');
-	},
 	onButtonNew:function(){
-			Phx.vista.AccionPropuesta.superclass.onButtonNew.call(this);
-			this.Cmp.id_funcionario.setValue(this.maestro.id_funcionario);
-			this.Cmp.id_funcionario.setRawValue(this.maestro.funcionario_uo);
-	}
-	
+        Phx.vista.AccionPropuesta.superclass.onButtonNew.call(this);
+        this.Cmp.id_funcionario.setValue(this.maestro.id_funcionario);
+        this.Cmp.id_funcionario.setRawValue(this.maestro.funcionario_uo);
+	},
+    oncellclick : function(grid, rowIndex, columnIndex, e) {
+        const record = this.store.getAt(rowIndex),
+            fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
+        if (fieldName === 'revisar' || fieldName === 'rechazar'|| fieldName === 'implementar')
+            this.cambiarAsignacion(record,fieldName);
+    },
+    cambiarAsignacion: function(record,name){
+        Phx.CP.loadingShow();
+        var d = record.data;
+        console.log(d)
+        Ext.Ajax.request({
+            url:'../../sis_auditoria/control/AccionPropuesta/aceptarAccion',
+            params:{ id_ap: d.id_ap, fieldName: name  },
+            success: this.successRevision,
+            failure: this.conexionFailure,
+            timeout: this.timeout,
+            scope: this
+        });
+        this.reload();
+    },
+        successRevision: function(resp){
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+        },
+
 }
 )
 </script>
