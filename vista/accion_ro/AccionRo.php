@@ -254,23 +254,17 @@ Phx.vista.AccionRo=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true/*,
+	bsave:false,
     onReloadPage:function(m){
         this.maestro=m;
-        console.log("ggggggddddddddddxxx",this.maestro);
         this.store.baseParams = {id_aom_ro: this.maestro.id_aom_ro};
-        //Ext.apply(this.Cmp.id_centro_costo.store.baseParams,{id_gestion: this.maestro.id_gestion});
         this.load({params:{start:0, limit:50}});
-        //this.Cmp.id_aom_ro.disable(true);
-        //this.Cmp.id_accion_ro.store.baseParams.id_aom_ro = this.maestro.id_aom_ro;
     },
     loadValoresIniciales: function () {
-        //this.Cmp.id_aom.setValue(this.maestro.id_aom);
-        //Phx.vista.AuditoriaNorma.superclass.loadValoresIniciales.call(this);
         this.Cmp.id_aom_ro.setValue(this.maestro.id_aom_ro);
         Phx.vista.AccionRo.superclass.loadValoresIniciales.call(this);
 
-    },*/
+    },
 	}
 )
 </script>

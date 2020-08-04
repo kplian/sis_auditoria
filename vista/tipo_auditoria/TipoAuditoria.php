@@ -211,11 +211,11 @@ Phx.vista.TipoAuditoria=Ext.extend(Phx.gridInterfaz,{
 	bsave:false,
     onButtonNew:function () {
         Phx.vista.TipoAuditoria.superclass.onButtonNew.call(this);
-        this.Cmp.codigo_tpo_aom.enable();
+    //    this.Cmp.codigo_tpo_aom.enable();
     },
     onButtonEdit:function () {
       Phx.vista.TipoAuditoria.superclass.onButtonEdit.call(this);
-      this.Cmp.codigo_tpo_aom.disable();
+  //    this.Cmp.codigo_tpo_aom.disable();
     }
 	}
 )

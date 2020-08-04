@@ -401,10 +401,10 @@ Phx.vista.AomRiesgoOportunidad=Ext.extend(Phx.gridInterfaz,{
         },
         bdel:true,
         bsave:false,
-        south:{
+        east:{
             url:'../../../sis_auditoria/vista/accion_ro/AccionRo.php',
             title:'Acciones',
-            height:'40%',
+            width:'30%',
             cls:'AccionRo'
         },
         tipoStore: 'GroupingStore',//GroupingStore o JsonStore #

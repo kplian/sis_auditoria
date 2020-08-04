@@ -69,8 +69,8 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
                 displayField: 'proceso',
                 gdisplayField: 'proceso',
                 hiddenName: 'id_proceso',
-                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{proceso}</p>' +
-                '<p><b>Responsable: </b>{desc_funcionario1}</div></tpl>',
+               // tpl:'<tpl for="."><div class="x-combo-list-item"><p>{proceso}</p>' +
+               // '<p><b>Responsable: </b>{desc_funcionario1}</div></tpl>',
                 forceSelection: true,
                 typeAhead: false,
                 triggerAction: 'all',
@@ -82,11 +82,7 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
                 gwidth: 200,
                 minChars: 2,
                 renderer : function(value, p, record) {
-                    // return String.format('{0}', record.data['proceso']);
-                    return '<tpl for="."><div class="gridmultiline">' +
-                        '<p>'+record.data['proceso']+'</p>' +
-                        '<p><b>Resp.: </b> <font color="#922B21">'+record.data['desc_funcionario']+'</font></p></div></tpl>';
-
+                    return String.format('{0}', record.data['proceso']);
                 }
             },
             type: 'ComboBox',
@@ -97,12 +93,11 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
-                name: 'ap_valoracion',
-                fieldLabel: 'Valoracion',
+                name: 'desc_funcionario',
+                fieldLabel: 'Responsable',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 100,
-                maxLength:20
+                gwidth: 200,
             },
             type:'TextField',
             filters:{pfiltro:'aupc.ap_valoracion',type:'string'},
@@ -122,7 +117,7 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
             type:'TextField',
             filters:{pfiltro:'aupc.obs_pcs',type:'string'},
             id_grupo:1,
-            grid:true,
+            grid:false,
             form:false
         },
 		{
@@ -264,6 +259,8 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:false,
+    fwidth: '40%',
+    fheight: '20%',
     onReloadPage:function(m){
         this.maestro=m;
         this.store.baseParams = {id_aom: this.maestro.id_aom};
@@ -273,29 +270,6 @@ Phx.vista.AuditoriaProceso=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.AuditoriaProceso.superclass.loadValoresIniciales.call(this);
         this.Cmp.id_aom.setValue(this.maestro.id_aom);
     },
-    preparaMenu:function(n){
-        var tb =this.tbar;
-        Phx.vista.AuditoriaProceso.superclass.preparaMenu.call(this,n);
-        this.getBoton('new').enable();
-        this.getBoton('edit').enable();
-        this.getBoton('del').enable();
-        return tb
-    },
-    liberaMenu:function(){
-        var tb = Phx.vista.AuditoriaProceso.superclass.liberaMenu.call(this);
-        if(tb){
-            if (this.maestro.estado_wf ==='programada'){
-                this.getBoton('new').disable();
-                this.getBoton('edit').disable();
-                this.getBoton('del').disable();
-            }else{
-                this.getBoton('new').enable();
-                this.getBoton('edit').enable();
-                this.getBoton('del').enable();
-            }
-        }
-        return tb
-    }
 	}
 )
 </script>

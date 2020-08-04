@@ -70,7 +70,7 @@ Phx.vista.AuditoriaNpnpg=Ext.extend(Phx.gridInterfaz,{
                 mode: 'remote',
                 pageSize: 15,
                 queryDelay: 1000,
-                anchor: '100%',
+                anchor: '80%',
                 gwidth: 150,
                 minChars: 2,
                 renderer : function(value, p, record) {
@@ -96,7 +96,7 @@ Phx.vista.AuditoriaNpnpg=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'apnp.pg_valoracion',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:false
 		},
 		{
 			config:{
@@ -111,7 +111,7 @@ Phx.vista.AuditoriaNpnpg=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'apnp.obs_pg',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:false
 		},
 		{
 			config:{
@@ -253,11 +253,13 @@ Phx.vista.AuditoriaNpnpg=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:false,
+    fwidth: '40%',
+    fheight: '30%',
     onReloadPage:function (m) {
         this.maestro=m;
         this.store.baseParams={id_anpn:this.maestro.id_anpn};
         this.load({params:{start:0, limit:50}});
-        this.Cmp.id_anpn.disable(true);
+
         this.Cmp.id_pregunta.store.baseParams.id_pn = this.maestro.id_pn;
     },
     loadValoresIniciales: function () {
