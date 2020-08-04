@@ -212,12 +212,13 @@ BEGIN
                                                       fecha_mod
                                                      ) values(
                                                       v_parametros.id_funcionario,
+                                                       null,
                                                       (select id_parametro from ssom.tparametro where codigo_parametro = 'RESP'),
                                                       '',
                                                       'activo',
                                                       v_id_aom,
                                                       v_parametros._id_usuario_ai,
-                                                      insercion,
+                                                      p_id_usuario,
                                                       v_parametros._nombre_usuario_ai,
                                                       now(),
                                                       null,
