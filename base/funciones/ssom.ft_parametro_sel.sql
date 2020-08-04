@@ -17,7 +17,8 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				03-07-2019 16:18:31								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tparametro'
-   #
+      #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
+
    ***************************************************************************/
 
 DECLARE
@@ -72,7 +73,6 @@ BEGIN
 
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
 			--Devuelve la respuesta
 			return v_consulta;
 
