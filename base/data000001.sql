@@ -362,7 +362,6 @@ VALUES
 --COPY LINES TO SUBSYSTEM data.sql FILE
 --Datos de Configuracion: Proceso Macro, Tipo Proceso, Tipo Estado y Estructura de Estados de worflow del Sistema SSOM
 ------------------------------------------------------------------------------------------------------------------------
-select wf.f_import_tproceso_macro ('insert','AUD', 'SSOM', 'Auditoria','si');
 select wf.f_import_tcategoria_documento ('insert','legales', 'Legales');
 select wf.f_import_tcategoria_documento ('insert','proceso', 'Proceso');
 select wf.f_import_ttipo_proceso ('insert','AUDSE',NULL,NULL,'AUD','Seguimiento de Auditoria','ssom.tauditoria_oportunidad_mejora','id_aom','si','','','','AUDSE',NULL);
