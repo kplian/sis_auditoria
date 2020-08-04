@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION ssom.f_get_funcionario_responsable (
   p_id_usuario integer,
-  p_id_estado integer,
+  p_id_tipo_estado integer,
   p_fecha date = now(),
   p_id_estado_wf integer = NULL::integer,
   p_count boolean = false,
@@ -8,14 +8,14 @@ CREATE OR REPLACE FUNCTION ssom.f_get_funcionario_responsable (
   p_start integer = 0,
   p_filtro varchar = '0=0'::character varying
 )
-  RETURNS SETOF record AS
+RETURNS SETOF record AS
 $body$
   /**************************************************************************
    SISTEMA: Sistema de Seguimiento de Oportunidades de Mejoras
   ***************************************************************************
    SCRIPT: 		ssom.f_get_funcionario_responsable
    DESCRIPCIÓN:	Lista los fucionarios por Departamento seleccionado
-   AUTOR: 		MCCH
+   AUTOR: 		MMV
    FECHA:			09/12/2019
    COMENTARIOS:
   ***************************************************************************
@@ -37,16 +37,6 @@ DECLARE
 
   v_record			record;
 
-  /*v_id_funcionario   	integer;
-  v_record			record;
-  v_id_uo				integer;*/
-
-  /* v_id_estado_wf		integer;
-   v_id_proceso_wf		integer;
-   v_id_tipo_proceso	integer;
-   v_id_proceso_macro	integer;
-   v_id_subistema		integer;*/
-
 
 BEGIN
 
@@ -63,27 +53,15 @@ BEGIN
   from ssom.tauditoria_oportunidad_mejora aom
   where aom.id_estado_wf =  p_id_estado_wf;
 
-  --VERIFICAMOS SI HAY O NO UNA UO ADICIONAL
-  /*if v_record.id_uo_adicional is null then
-      v_id_uo = v_record.id_uo;
-     else
-        v_id_uo = v_record.id_uo_adicional;
-     end if;*/
-
-
-  --raise EXCEPTION 'holllllllllllllaaaaaaaaaaaaaaa %', p_id_estado_wf;
-
   if not p_count then
     begin
-      --raise exception 'hollllllllllll % %',v_record.id_aom,v_record.id_funcionario;
-      v_consulta:='select
-                        vfcx.id_funcionario
-                        ,vfcx.desc_funcionario1 as desc_funcionario
+      v_consulta:='select fun.id_funcionario
+                        ,fun.desc_funcionario1 as desc_funcionario
                         ,''''::text  as desc_funcionario_cargo
                         ,1 as prioridad
                         from ssom.tauditoria_oportunidad_mejora aom
-                        join orga.vfuncionario_cargo_xtra vfcx on aom.id_funcionario = vfcx.id_funcionario
-                        where aom.id_aom = '||v_record.id_aom||' and aom.estado_reg = ''activo'' and (vfcx.fecha_finalizacion is null or vfcx.fecha_finalizacion >= now()) and '||p_filtro||'
+                        inner join orga.vfuncionario fun on fun.id_funcionario = aom.id_funcionario
+                        where aom.id_aom = '||v_record.id_aom||' and aom.estado_reg = ''activo'' and '||p_filtro||'
                         limit '|| p_limit::varchar||' offset '||p_start::varchar ;
 
       FOR g_registros in execute (v_consulta)LOOP
@@ -93,13 +71,12 @@ BEGIN
     end;
 
   else
-    v_consulta:='select count(vfcx.id_funcionario)
+    v_consulta:='select count(fun.id_funcionario)
                         from ssom.tauditoria_oportunidad_mejora aom
-                        join orga.vfuncionario_cargo_xtra vfcx on aom.id_funcionario = vfcx.id_funcionario
-                        where aom.id_aom = '||v_record.id_aom||' and aom.estado_reg = ''activo'' and (vfcx.fecha_finalizacion is null or vfcx.fecha_finalizacion >= now()) and '||p_filtro||'
+                        inner join orga.vfuncionario fun on fun.id_funcionario = aom.id_funcionario
+                        where aom.id_aom = '||v_record.id_aom||' and aom.estado_reg = ''activo'' and '||p_filtro||'
                         limit '|| p_limit::varchar||' offset '||p_start::varchar ;
 
-    raise notice '%', v_consulta;
 
     FOR g_registros in execute (v_consulta)LOOP
       RETURN NEXT g_registros;
@@ -120,8 +97,12 @@ BEGIN
 
 END;
 $body$
-  LANGUAGE 'plpgsql'
-  VOLATILE
-  CALLED ON NULL INPUT
-  SECURITY INVOKER
-  COST 100 ROWS 1000;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100 ROWS 1000;
+
+ALTER FUNCTION ssom.f_get_funcionario_responsable (p_id_usuario integer, p_id_tipo_estado integer, p_fecha date, p_id_estado_wf integer, p_count boolean, p_limit integer, p_start integer, p_filtro varchar)
+  OWNER TO postgres;
