@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_auditoria_proceso_ime (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -17,7 +17,7 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				25-07-2019 15:51:56								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tauditoria_proceso'
-   #
+   #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
    ***************************************************************************/
 
 DECLARE
@@ -45,15 +45,16 @@ BEGIN
  	#AUTOR:		max.camacho
  	#FECHA:		25-07-2019 15:51:56
 	***********************************/
-	select count(id_aproceso) into v_cantidad from ssom.tauditoria_proceso where id_aom = v_parametros.id_aom and id_proceso = v_parametros.id_proceso;
-
-	if(v_cantidad > 0) then
-		RAISE EXCEPTION ' Ya tiene Registrado el proceso no es posible asignar mas de una ves a una Auditoria...!!! ';
-	end if;
 
 	if(p_transaccion='SSOM_AUPC_INS')then
 
 		begin
+
+        if exists ( select 1
+                    from ssom.tauditoria_proceso
+                    where id_aom = v_parametros.id_aom and id_proceso = v_parametros.id_proceso) then
+        	raise exception ' Ya tiene Registrado el proceso no es posible asignar mas de una ves a una Auditoria...!!! ';
+        end if;
 
 			if pxp.f_existe_parametro(p_tabla,'ap_valoracion') then
 				v_ap_valoracion = v_parametros.ap_valoracion;
@@ -117,14 +118,13 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update ssom.tauditoria_proceso set
-																			 id_aom = v_parametros.id_aom,
-																			 id_proceso = v_parametros.id_proceso,
-																			 ap_valoracion = v_parametros.ap_valoracion,
-																			 obs_pcs = v_parametros.obs_pcs,
-																			 id_usuario_mod = p_id_usuario,
-																			 fecha_mod = now(),
-																			 id_usuario_ai = v_parametros._id_usuario_ai,
-																			 usuario_ai = v_parametros._nombre_usuario_ai
+           id_proceso = v_parametros.id_proceso,
+          -- ap_valoracion = v_parametros.ap_valoracion,
+          -- obs_pcs = v_parametros.obs_pcs,
+           id_usuario_mod = p_id_usuario,
+           fecha_mod = now(),
+           id_usuario_ai = v_parametros._id_usuario_ai,
+           usuario_ai = v_parametros._nombre_usuario_ai
 			where id_aproceso=v_parametros.id_aproceso;
 
 			--Definicion de la respuesta
@@ -136,7 +136,7 @@ BEGIN
 
 		end;
 
-		/*********************************
+	/*********************************
      #TRANSACCION:  'SSOM_AUPC_ELI'
      #DESCRIPCION:	Eliminacion de registros
      #AUTOR:		max.camacho
@@ -153,6 +153,58 @@ BEGIN
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria Proceso eliminado(a)');
 			v_resp = pxp.f_agrega_clave(v_resp,'id_aproceso',v_parametros.id_aproceso::varchar);
+
+			--Devuelve la respuesta
+			return v_resp;
+
+		end;
+
+    /*********************************
+     #TRANSACCION:  'SSOM_AUPC_ELI'
+     #DESCRIPCION:	Eliminacion de registros
+     #AUTOR:		MMV
+     #FECHA:		25-07-2019 15:51:56
+    ***********************************/
+
+	elsif(p_transaccion='SSOM_INSE_INS')then
+
+		begin
+			--Sentencia de la eliminacion
+            delete from ssom.tauditoria_proceso
+			where id_aom = v_parametros.id_aom;
+
+              foreach v_id_aproceso IN  array (string_to_array(v_parametros.id_aproceso::varchar,','))  loop
+
+               insert into ssom.tauditoria_proceso( estado_reg,
+                                                    id_aom,
+                                                    id_proceso,
+                                                    ap_valoracion,
+                                                    obs_pcs,
+                                                    id_usuario_reg,
+                                                    fecha_reg,
+                                                    id_usuario_ai,
+                                                    usuario_ai,
+                                                    id_usuario_mod,
+                                                    fecha_mod
+                                                    ) values(
+                                                    'activo',
+                                                    v_parametros.id_aom,
+                                                    v_id_aproceso,
+                                                    '',
+                                                    '',
+                                                    p_id_usuario,
+                                                    now(),
+                                                    v_parametros._id_usuario_ai,
+                                                    v_parametros._nombre_usuario_ai,
+                                                    null,
+                                                    null);
+
+            end loop;
+
+
+			--Definicion de la respuesta
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria Proceso eliminado(a)');
+			v_resp = pxp.f_agrega_clave(v_resp,'id_aom',v_parametros.id_aom::varchar);
 
 			--Devuelve la respuesta
 			return v_resp;
@@ -176,8 +228,12 @@ BEGIN
 
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_auditoria_proceso_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

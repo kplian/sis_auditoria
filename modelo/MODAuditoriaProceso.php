@@ -8,17 +8,17 @@
 */
 
 class MODAuditoriaProceso extends MODbase{
-	
+
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
-			
+
 	function listarAuditoriaProceso(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='ssom.ft_auditoria_proceso_sel';
 		$this->transaccion='SSOM_AUPC_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-				
+
 		//Definicion de la lista del resultado del query
 		$this->captura('id_aproceso','int4');
 		$this->captura('estado_reg','varchar');
@@ -40,7 +40,7 @@ class MODAuditoriaProceso extends MODbase{
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
@@ -64,13 +64,13 @@ class MODAuditoriaProceso extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function modificarAuditoriaProceso(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_auditoria_proceso_ime';
 		$this->transaccion='SSOM_AUPC_MOD';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_aproceso','id_aproceso','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
@@ -86,13 +86,13 @@ class MODAuditoriaProceso extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function eliminarAuditoriaProceso(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_auditoria_proceso_ime';
 		$this->transaccion='SSOM_AUPC_ELI';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_aproceso','id_aproceso','int4');
 
@@ -103,6 +103,24 @@ class MODAuditoriaProceso extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
+	function itemSelectionAuditoriaProceso(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='ssom.ft_auditoria_proceso_ime';
+		$this->transaccion='SSOM_INSE_INS';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_aom','id_aom','int4');
+		$this->setParametro('id_aproceso','id_aproceso','text');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 }
 ?>

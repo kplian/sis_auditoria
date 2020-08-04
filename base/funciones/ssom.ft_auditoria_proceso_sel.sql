@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_auditoria_proceso_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -17,7 +17,7 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				25-07-2019 15:51:56								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tauditoria_proceso'
-   #
+   #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
    ***************************************************************************/
 
 DECLARE
@@ -58,19 +58,17 @@ BEGIN
 						aupc.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        aom.nombre_aom1,
+                        initcap(fu.desc_funcionario1) as desc_funcionario,
                         pcs.proceso
 						from ssom.tauditoria_proceso aupc
 						inner join segu.tusuario usu1 on usu1.id_usuario = aupc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = aupc.id_usuario_mod
-                        join ssom.tauditoria_oportunidad_mejora aom on aupc.id_aom = aom.id_aom
-                        join ssom.tproceso pcs on aupc.id_proceso = pcs.id_proceso
-				        where  ';
-
+                        inner join ssom.tproceso pcs on aupc.id_proceso = pcs.id_proceso
+                        inner join orga.vfuncionario fu on fu.id_funcionario = pcs.id_responsable
+            			where  ';
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			raise notice 'v_consulta %',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -91,14 +89,14 @@ BEGIN
 					    from ssom.tauditoria_proceso aupc
 					    inner join segu.tusuario usu1 on usu1.id_usuario = aupc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = aupc.id_usuario_mod
+                        inner join ssom.tproceso pcs on aupc.id_proceso = pcs.id_proceso
+                        inner join orga.vfuncionario fu on fu.id_funcionario = pcs.id_responsable
 					    where ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-
 			--Devuelve la respuesta
 			return v_consulta;
-
 		end;
 
 	else
@@ -117,8 +115,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_auditoria_proceso_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

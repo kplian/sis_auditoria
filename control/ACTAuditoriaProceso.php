@@ -7,8 +7,8 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 
-class ACTAuditoriaProceso extends ACTbase{    
-			
+class ACTAuditoriaProceso extends ACTbase{
+
 	function listarAuditoriaProceso(){
 		$this->objParam->defecto('ordenacion','id_aproceso');
         $this->objParam->defecto('dir_ordenacion','asc');
@@ -25,21 +25,25 @@ class ACTAuditoriaProceso extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 	function insertarAuditoriaProceso(){
-		$this->objFunc=$this->create('MODAuditoriaProceso');	
+		$this->objFunc=$this->create('MODAuditoriaProceso');
 		if($this->objParam->insertar('id_aproceso')){
-			$this->res=$this->objFunc->insertarAuditoriaProceso($this->objParam);			
-		} else{			
+			$this->res=$this->objFunc->insertarAuditoriaProceso($this->objParam);
+		} else{
 			$this->res=$this->objFunc->modificarAuditoriaProceso($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-						
+
 	function eliminarAuditoriaProceso(){
         $this->objFunc=$this->create('MODAuditoriaProceso');
 		$this->res=$this->objFunc->eliminarAuditoriaProceso($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-			
+	function itemSelectionAuditoriaProceso(){
+		$this->objFunc=$this->create('MODAuditoriaProceso');
+		$this->res=$this->objFunc->itemSelectionAuditoriaProceso($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 }
 
 ?>
