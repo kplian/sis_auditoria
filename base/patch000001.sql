@@ -53,18 +53,16 @@ CREATE TABLE ssom.tauditoria_oportunidad_mejora (
   id_gconsultivo INTEGER,
   documento VARCHAR(150),
   codigo_aom VARCHAR(50),
-  nombre_aom1 VARCHAR(300) NOT NULL,
+  nombre_aom1 VARCHAR(300),
   descrip_aom1 TEXT,
   id_funcionario INTEGER,
   fecha_prog_inicio DATE,
   fecha_prog_fin DATE,
-  nombre_aom2 VARCHAR(300),
   lugar VARCHAR(300),
-  descrip_aom2 TEXT,
   fecha_prev_inicio DATE,
   fecha_prev_fin DATE,
-  id_tnorma VARCHAR(50),
-  id_tobjeto VARCHAR(50),
+  id_tnorma INTEGER,
+  id_tobjeto INTEGER,
   resumen TEXT,
   recomendacion TEXT,
   fecha_eje_inicio DATE,
@@ -76,10 +74,11 @@ CREATE TABLE ssom.tauditoria_oportunidad_mejora (
   id_estado_wf INTEGER,
   nro_tramite_wf VARCHAR(100),
   estado_wf VARCHAR(100),
+  id_destinatario INTEGER,
+  id_gestion INTEGER,
   CONSTRAINT tauditoria_oportunidad_mejora_pkey PRIMARY KEY(id_aom)
 ) INHERITS (pxp.tbase)
-
-  WITH (oids = false);
+WITH (oids = false);
 
 CREATE TABLE ssom.tparametro_aom (
   id_parametro_aom SERIAL,
@@ -93,15 +92,15 @@ CREATE TABLE ssom.tparametro_aom (
 
 CREATE TABLE ssom.tdestinatario (
   id_destinatario_aom SERIAL,
-  id_parametro INTEGER NOT NULL,
+  id_parametro INTEGER,
   id_aom INTEGER NOT NULL,
   id_funcionario INTEGER,
   exp_tec_externo VARCHAR(150),
   obs_destinatario VARCHAR(300),
-  CONSTRAINT tdestinatario_pkey PRIMARY KEY(id_destinatario_aom)
+  incluir_informe VARCHAR(5) DEFAULT 'no'::character varying NOT NULL,
+  CONSTRAINT tdestinatario_pkey PRIMARY KEY(id_destinatario_aom),
 ) INHERITS (pxp.tbase)
-
-  WITH (oids = false);
+WITH (oids = false);
 
 CREATE TABLE ssom.tactividad (
   id_actividad SERIAL,
@@ -161,7 +160,6 @@ CREATE TABLE ssom.tproceso (
   id_responsable INTEGER NOT NULL,
   vigencia VARCHAR(50) NOT NULL,
   CONSTRAINT tproceso_acronimo_key UNIQUE(acronimo),
-  CONSTRAINT tproceso_pkey PRIMARY KEY(id_proceso)
 ) INHERITS (pxp.tbase)
 
   WITH (oids = false);
@@ -318,7 +316,7 @@ CREATE TABLE ssom.tno_conformidad (
   id_aom INTEGER,
   id_parametro INTEGER NOT NULL,
   id_uo INTEGER,
-  descrip_nc VARCHAR(500),
+  descrip_nc VARCHAR(10000),
   evidencia VARCHAR(500),
   obs_resp_area TEXT,
   obs_consultor TEXT,
@@ -330,10 +328,16 @@ CREATE TABLE ssom.tno_conformidad (
   estado_wf VARCHAR(100),
   codigo_nc VARCHAR(100),
   id_funcionario_nc INTEGER,
+  calidad BOOLEAN DEFAULT false,
+  medio_ambiente BOOLEAN DEFAULT false,
+  responsabilidad_social BOOLEAN DEFAULT false,
+  seguridad BOOLEAN DEFAULT false,
+  sistemas_integrados BOOLEAN DEFAULT false,
+  revisar VARCHAR(5) DEFAULT 'no'::character varying,
+  rechazar VARCHAR(5) DEFAULT 'no'::character varying,
   CONSTRAINT tno_conformidad_pkey PRIMARY KEY(id_nc)
 ) INHERITS (pxp.tbase)
-
-  WITH (oids = false);
+WITH (oids = false);
 
 --------------- SQL ---------------
 
@@ -354,13 +358,16 @@ CREATE TABLE ssom.taccion_propuesta (
   nro_tramite VARCHAR(100),
   estado_wf VARCHAR(100),
   codigo_ap VARCHAR(100),
+  revisar VARCHAR(5) DEFAULT 'no'::character varying,
+  rechazar VARCHAR(5) DEFAULT 'no'::character varying,
+  implementar VARCHAR(5) DEFAULT 'no'::character varying,
   CONSTRAINT taccion_propuesta_pkey PRIMARY KEY(id_ap)
 ) INHERITS (pxp.tbase)
-
-  WITH (oids = false);
+WITH (oids = false);
 
 COMMENT ON COLUMN ssom.taccion_propuesta.id_funcionario
-  IS 'Funcion que aprueba la accion propuesta';
+IS 'Funcion que aprueba la accion propuesta';
+
 
 --------------- SQL ---------------
 
@@ -392,10 +399,10 @@ CREATE TABLE ssom.tresp_acciones_prop (
   id_respap SERIAL,
   id_ap INTEGER,
   id_funcionario INTEGER,
+  id_nc INTEGER,
   CONSTRAINT tresp_acciones_prop_pkey PRIMARY KEY(id_respap)
 ) INHERITS (pxp.tbase)
-
-  WITH (oids = false);
+WITH (oids = false);
 
 --------------- SQL ---------------
 
