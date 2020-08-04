@@ -12,12 +12,34 @@ class ACTNoConformidad extends ACTbase{
 			
 	function listarNoConformidad(){
 		$this->objParam->defecto('ordenacion','id_nc');
-
 		$this->objParam->defecto('dir_ordenacion','asc');
-        //*** Metodo que filtra acorde al id del padre (Max)
         if($this->objParam->getParametro('id_aom')!=''){
             $this->objParam->addFiltro("noconf.id_aom = ".$this->objParam->getParametro('id_aom'));
-        }// Fin***** (Max)
+        }
+        
+        if($this->objParam->getParametro('interfaz') == 'NoConformidadSeg'){
+            $this->objParam->addFiltro("noconf.estado_wf in (''correccion'')");
+        }
+
+        if($this->objParam->getParametro('interfaz') == 'NoConformidadAccion'){
+            $this->objParam->addFiltro("noconf.estado_wf in (''acciones_propuestas_responsable'') and noconf.revisar in (''si'')");
+        }
+        if($this->objParam->getParametro('interfaz') == 'NoConformidadImplementar'){
+            $this->objParam->addFiltro("noconf.estado_wf in (''acciones_propuestas_responsable'') and noconf.revisar in (''si'')");
+        }
+        if($this->objParam->getParametro('interfaz') == 'NoConformidadInforme'){
+            $this->objParam->addFiltro("noconf.estado_wf in (''propuesta'',''vbnoconformidad'')");
+        }
+        if($this->objParam->getParametro('interfaz') == 'NoConformidadAceptada'){
+            $this->objParam->addFiltro("noconf.revisar in (''si'',''no'')");
+        }
+
+        if($this->objParam->getParametro('interfaz') == 'NoConformidadAdmin'){
+            $this->objParam->addFiltro("noconf.revisar in (''si'') and noconf.estado_wf in (''aceptada_responsable_area'')  ");
+        }
+
+
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODNoConformidad','listarNoConformidad');
@@ -40,7 +62,7 @@ class ACTNoConformidad extends ACTbase{
 	}
 						
 	function eliminarNoConformidad(){
-			$this->objFunc=$this->create('MODNoConformidad');	
+	    $this->objFunc=$this->create('MODNoConformidad');
 		$this->res=$this->objFunc->eliminarNoConformidad($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
@@ -125,7 +147,36 @@ class ACTNoConformidad extends ACTbase{
         $this->res=$this->objFunc->sigueienteGrupo($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-
+    function insertarItemNoConformidad(){
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->insertarItemNoConformidad($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function getUo(){
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->getUo($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function aceptarNoConformidad(){
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->aceptarNoConformidad($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function siTodoNoConformidad(){
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->siTodoNoConformidad($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function getNoConformidad(){
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->getNoConformidad($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function aprobarEstado(){
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->aprobarEstado($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

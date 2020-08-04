@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION ssom.ft_no_conformidad_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -19,7 +17,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
  #0				04-07-2019 19:53:16								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tno_conformidad'
- #
+ #3				04-08-2020 19:53:16								Refactorización No Conformidad
  ***************************************************************************/
 
 DECLARE
@@ -78,6 +76,19 @@ DECLARE
     v_estado_sigue			record;
 
     v_id_nuevo				integer;
+	v_id_pn					integer;
+    v_record_uo				record;
+	v_aceptar				varchar;
+    v_param					record;
+    v_norma					record;
+
+    va_id_tipo_estado 	  integer [];
+    va_codigo_estado 		  varchar [];
+    va_disparador 	      varchar [];
+    va_regla 				  varchar [];
+    va_prioridad 		      integer [];
+    v_registro_estado			record;
+
 
 
 
@@ -143,8 +154,6 @@ BEGIN
                  v_parametros.nro_tramite_padre);
 
         	--- raise exception 'nro -> %',v_nro_tramite;
-        	---Sentencia de la insercion en la tabla
-
 
         	insert into ssom.tno_conformidad(
                 obs_consultor,
@@ -162,13 +171,18 @@ BEGIN
                 id_usuario_ai,
                 id_usuario_mod,
                 fecha_mod,
-                id_uo_adicional,
+                -- id_uo_adicional,
                 id_proceso_wf,	--integrar con wf new
                 id_estado_wf,	--integrar con wf new
                 nro_tramite, 	--integrar con wf new
                 estado_wf,  	--integrar con wf new
-                codigo_nc --,
-              --  id_funcionario_nc
+                codigo_nc,
+                calidad,
+                medio_ambiente,
+                seguridad,
+                responsabilidad_social,
+                sistemas_integrados
+
           	) values(
                 v_parametros.obs_consultor,
                 'activo',
@@ -185,13 +199,17 @@ BEGIN
                 v_parametros._id_usuario_ai,
                 null,
                 null,
-                v_parametros.id_uo_adicional,
+                -- v_parametros.id_uo_adicional,
                 v_id_proceso_wf,	--integrar con wf new
                 v_id_estado_wf,		--integrar con wf new
                 v_nro_tramite,		--integrar con wf new
                 v_codigo_estado,	--integrar con wf new
-                ssom.f_generar_correlativo('NOCONF', EXTRACT(YEAR FROM current_date)::integer) --,
-               -- v_parametros.id_funcionario_nc
+                ssom.f_generar_correlativo('NOCONF', EXTRACT(YEAR FROM current_date)::integer),
+                v_parametros.calidad,
+                v_parametros.medio_ambiente,
+                v_parametros.seguridad,
+                v_parametros.responsabilidad_social,
+                v_parametros.sistemas_integrados
 			)RETURNING id_nc into v_id_nc;
 
 			--Definicion de la respuesta
@@ -213,6 +231,18 @@ BEGIN
 	elsif(p_transaccion='SSOM_NOCONF_MOD')then
 
 		begin
+
+
+        if v_parametros.extra = 'si' then
+
+        	update ssom.tno_conformidad set
+			obs_consultor = v_parametros.obs_consultor,
+			id_usuario_mod = p_id_usuario,
+			fecha_mod = now()
+			where id_nc=v_parametros.id_nc;
+
+
+        else
 			--Sentencia de la modificacion
 			update ssom.tno_conformidad set
 			obs_consultor = v_parametros.obs_consultor,
@@ -225,12 +255,15 @@ BEGIN
 			id_aom = v_parametros.id_aom,
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
-            id_uo_adicional = v_parametros.id_uo_adicional,
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai,
-            id_funcionario_nc = v_parametros.id_funcionario_nc
+            calidad = v_parametros.calidad,
+            medio_ambiente = v_parametros.medio_ambiente,
+            seguridad = v_parametros.seguridad,
+            responsabilidad_social = v_parametros.responsabilidad_social,
+            sistemas_integrados = v_parametros.sistemas_integrados
 			where id_nc=v_parametros.id_nc;
-
+        end if;
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidades modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_parametros.id_nc::varchar);
@@ -611,7 +644,7 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-		end;
+	end;
     /*********************************
  	#TRANSACCION:  'SSOM_SIAG_IME'
  	#DESCRIPCION:	Cambiar de estado en grupo por estado propuesto
@@ -646,32 +679,6 @@ BEGIN
               where ewf.id_estado_wf = v_registos.id_estado_wf;
 
 
-         /*      select tipes.id_tipo_estado,
-                      tipes.nombre_estado,
-                      tipes.codigo
-                      into
-                      v_estado_sigue
-                      from wf.ttipo_estado tipes
-                      where tipes.estado_reg = 'activo' and
-                      tipes.id_tipo_estado = v_estado_actual.id_tipo_estado; */
-
-                  /*
-                      select tipes.id_tipo_estado,
-						tipes.nombre_estado
-                        into
-                      v_estado_sigue
-						from wf.ttipo_estado tipes
-						inner join segu.tusuario usu1 on usu1.id_usuario = tipes.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = tipes.id_usuario_mod
-                        INNER JOIN wf.ttipo_proceso tp on tp.id_tipo_proceso = tipes.id_tipo_proceso
-                        LEFT JOIN wf.ttipo_estado_rol terol on terol.id_tipo_estado = tipes.id_tipo_estado
-                        	and terol.estado_reg = 'activo'
-                        LEFT JOIN wf.ttipo_estado tea on tea.id_tipo_estado = tipes.id_tipo_estado_anterior
-
-				        where tipes.estado_reg = 'activo' and  tipes.id_tipo_estado = v_estado_actual.id_tipo_estado;*/
-
-                    --  raise exception '%',v_estado_sigue;
-               ---obtener datos de actual estado
 
                v_id_nuevo = ssom.f_id_estado_sigue(v_registos.id_proceso_wf,'verificar',p_id_usuario);
 
@@ -751,6 +758,454 @@ BEGIN
             return v_resp;
 
 		end;
+    /*********************************
+ 	#TRANSACCION:  'SSOM_INTE_INS'
+ 	#DESCRIPCION:	Obtener responsable no conformidad
+ 	#AUTOR:		MMV
+ 	#FECHA:		27-11-2019
+	***********************************/
+
+	elsif(p_transaccion='SSOM_INTE_INS')then
+
+		begin
+			--Sentencia de la modificacion
+
+
+
+        	select
+            	g.id_gestion,
+           		g.gestion
+            into
+                v_rec_gestion
+            from param.tgestion g
+            where g.gestion = EXTRACT(YEAR FROM current_date);
+
+        	---Obtener el codigo del proceso macro y id proceso (sirve para wf
+            select
+            	tp.codigo,
+         		pm.id_proceso_macro
+                into
+                v_codigo_tipo_proceso,
+                v_id_proceso_macro
+           	from  wf.tproceso_macro pm
+           	inner join wf.ttipo_proceso tp on tp.id_proceso_macro = pm.id_proceso_macro
+			where  pm.codigo='AUD' and tp.estado_reg = 'activo'
+            and tp.codigo = 'AUNC';
+
+            --- generar nro de tramite usando funcion de wf (sirve para wf)
+
+         	select
+                 ps_num_tramite ,
+                 ps_id_proceso_wf ,
+                 ps_id_estado_wf ,
+                 ps_codigo_estado
+            into
+                 v_nro_tramite,
+                 v_id_proceso_wf,
+                 v_id_estado_wf,
+                 v_codigo_estado
+        	from wf.f_inicia_tramite(
+                 p_id_usuario,
+                 v_parametros._id_usuario_ai,
+                 v_parametros._nombre_usuario_ai,
+                 v_rec_gestion.id_gestion,
+                 v_codigo_tipo_proceso,
+                 NULL,
+                 NULL,
+                 'No conformidad',
+                 v_codigo_tipo_proceso,
+                 v_parametros.nro_tramite_padre);
+
+               if (v_parametros.id_nc is null)then
+                 insert into ssom.tno_conformidad(  obs_consultor,
+                                                    estado_reg,
+                                                    evidencia,
+                                                    id_funcionario,
+                                                    id_uo,
+                                                    descrip_nc,
+                                                    id_parametro,
+                                                    obs_resp_area,
+                                                    id_aom,
+                                                    fecha_reg,
+                                                    usuario_ai,
+                                                    id_usuario_reg,
+                                                    id_usuario_ai,
+                                                    id_usuario_mod,
+                                                    fecha_mod,
+                                                    id_proceso_wf,
+                                                    id_estado_wf,
+                                                    nro_tramite,
+                                                    estado_wf,
+                                                    codigo_nc,
+                                                    calidad,
+                                                    medio_ambiente,
+                                                    responsabilidad_social,
+                                                    seguridad,
+                                                    sistemas_integrados
+                                                	) values(
+                                                    v_parametros.obs_consultor,
+                                                    'activo',
+                                                    v_parametros.evidencia,
+                                                    v_parametros.id_funcionario,
+                                                    v_parametros.id_uo,
+                                                    v_parametros.descrip_nc,
+                                                    v_parametros.id_parametro,
+                                                    v_parametros.obs_resp_area,
+                                                    v_parametros.id_aom,
+                                                    now(),
+                                                    v_parametros._nombre_usuario_ai,
+                                                    p_id_usuario,
+                                                    v_parametros._id_usuario_ai,
+                                                    null,
+                                                    null,
+                                                    v_id_proceso_wf,
+                                                    v_id_estado_wf,
+                                                    v_nro_tramite,
+                                                    v_codigo_estado,
+                                                    ssom.f_generar_correlativo('NOCONF', EXTRACT(YEAR FROM current_date)::integer),
+                                                    v_parametros.calidad,
+                                                    v_parametros.medio_ambiente,
+                                                    v_parametros.responsabilidad_social,
+                                                    v_parametros.seguridad,
+                                                    v_parametros.sistemas_integrados
+                                                	)RETURNING id_nc into v_id_nc;
+
+               else
+
+               update ssom.tno_conformidad set
+                obs_consultor = v_parametros.obs_consultor,
+                evidencia = v_parametros.evidencia,
+                descrip_nc = v_parametros.descrip_nc,
+                id_parametro = v_parametros.id_parametro,
+                obs_resp_area = v_parametros.obs_resp_area,
+                id_usuario_mod = p_id_usuario,
+                fecha_mod = now(),
+                id_usuario_ai = v_parametros._id_usuario_ai,
+                usuario_ai = v_parametros._nombre_usuario_ai,
+                calidad = v_parametros.calidad,
+                medio_ambiente = v_parametros.medio_ambiente,
+                seguridad = v_parametros.seguridad,
+                responsabilidad_social = v_parametros.responsabilidad_social,
+                sistemas_integrados = v_parametros.sistemas_integrados
+                where id_nc=v_parametros.id_nc;
+
+               end if;
+
+            if (v_parametros.id_nc is not null)then
+
+            	delete from ssom.tpnorma_noconformidad np
+                where np.id_nc = v_parametros.id_nc;
+
+             	v_id_nc = v_parametros.id_nc;
+
+            end if;
+
+            foreach v_id_pn in array string_to_array(v_parametros.id_pn,',')
+           				 										loop
+                         insert into ssom.tpnorma_noconformidad(  id_nc,
+                                                                  estado_reg,
+                                                                  id_pn,
+                                                                  id_norma,
+                                                                  usuario_ai,
+                                                                  fecha_reg,
+                                                                  id_usuario_reg,
+                                                                  id_usuario_ai,
+                                                                  fecha_mod,
+                                                                  id_usuario_mod
+                                                                  ) values(
+                                                                  v_id_nc,
+                                                                  'activo',
+                                                                  v_id_pn,
+                                                                  v_parametros.id_norma,
+                                                                  v_parametros._nombre_usuario_ai,
+                                                                  now(),
+                                                                  p_id_usuario,
+                                                                  v_parametros._id_usuario_ai,
+                                                                  null,
+                                                                  null
+                                                                  );
+
+        	end loop;
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidades modificado(a)');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_id_nc::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    /*********************************
+ 	#TRANSACCION:  'SSOM_NOGET_IME'
+ 	#DESCRIPCION:	Obtener responsable no conformidad
+ 	#AUTOR:		MMV
+ 	#FECHA:		29/07/2020
+	***********************************/
+
+	elsif(p_transaccion='SSOM_NOGET_IME')then
+
+		begin
+			--Sentencia de la modificacion
+
+            select  uo.id_uo,
+                    uo.nombre_unidad,
+                    fu.id_funcionario,
+                    fu.desc_funcionario1
+                    into
+                    v_record_uo
+            from orga.tuo uo
+            inner join orga.tnivel_organizacional ni on ni.id_nivel_organizacional = uo.id_nivel_organizacional
+            inner join orga.tuo_funcionario fo on fo.id_uo = uo.id_uo
+            inner join orga.vfuncionario fu on fu.id_funcionario = fo.id_funcionario
+            where uo.estado_reg = 'activo'
+                    and ni.numero_nivel not in (9,8,7,0)
+                    and (fo.fecha_finalizacion is null or fo.fecha_finalizacion >= now())
+                    and uo.id_uo = v_parametros.id_uo
+            order by numero_nivel;
+
+
+
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidades modificado(a)');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_uo',v_record_uo.id_uo::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'nombre_unidad',v_record_uo.nombre_unidad::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_funcionario',v_record_uo.id_funcionario::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'desc_funcionario1',v_record_uo.desc_funcionario1::varchar);
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    /*********************************
+ 	#TRANSACCION:  'SSOM_RNACE_IME'
+ 	#DESCRIPCION:	Obtener responsable no conformidad
+ 	#AUTOR:		MMV
+ 	#FECHA:		29/7/2020
+	***********************************/
+
+	elsif(p_transaccion='SSOM_RNACE_IME')then
+
+		begin
+			--Sentencia de la modificacion
+
+           if( v_parametros.fieldName = 'revisar')then
+
+                  select no.revisar into v_aceptar
+                  from ssom.tno_conformidad no
+                  where no.id_nc = v_parametros.id_nc;
+
+
+                  if (v_aceptar = 'si')then
+
+                  	update ssom.tno_conformidad set
+                    revisar = 'no',
+                    rechazar = 'no'
+                    where id_nc=v_parametros.id_nc;
+
+                  end if;
+
+                  if (v_aceptar = 'no')then
+
+                    	update ssom.tno_conformidad set
+                        revisar = 'si',
+                        rechazar = 'no'
+                        where id_nc=v_parametros.id_nc;
+
+                  end if;
+           end if;
+
+           if( v_parametros.fieldName = 'rechazar')then
+
+           		 	select no.rechazar into v_aceptar
+                    from ssom.tno_conformidad no
+                    where no.id_nc = v_parametros.id_nc;
+
+
+                  if (v_aceptar = 'si')then
+
+                  	update ssom.tno_conformidad set
+                    revisar = 'no',
+                    rechazar = 'no'
+                    where id_nc=v_parametros.id_nc;
+
+                  end if;
+
+                  if (v_aceptar = 'no')then
+
+                    	update ssom.tno_conformidad set
+                        revisar = 'no',
+                        rechazar = 'si'
+                        where id_nc=v_parametros.id_nc;
+
+                  end if;
+
+           end if;
+
+
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidades modificado(a)');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_parametros.id_nc::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+	end;
+    /*********************************
+ 	#TRANSACCION:  'SSOM_NOTOD_IME'
+ 	#DESCRIPCION:	Obtener responsable no conformidad
+ 	#AUTOR:		MMV
+ 	#FECHA:		29/7/2020
+	***********************************/
+
+	elsif(p_transaccion='SSOM_NOTOD_IME')then
+
+		begin
+
+        --Sentencia de la modificacion
+
+        update ssom.tno_conformidad set
+        revisar = 'si',
+        rechazar = 'no'
+        where id_aom = v_parametros.id_aom;
+
+
+        --Definicion de la respuesta
+        v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidades modificado(a)');
+        v_resp = pxp.f_agrega_clave(v_resp,'id_aom',v_parametros.id_aom::varchar);
+
+        --Devuelve la respuesta
+        return v_resp;
+
+	end;
+
+    /*********************************
+ 	#TRANSACCION:  'SSOM_NGET_IME'
+ 	#DESCRIPCION:	Obtener responsable no conformidad
+ 	#AUTOR:		MMV
+ 	#FECHA:		29/7/2020
+	***********************************/
+
+	elsif(p_transaccion='SSOM_NGET_IME')then
+
+		begin
+
+        --Sentencia de la modificacion
+
+     	select  pa.id_parametro,
+        		pa.valor_parametro
+                into
+                v_param
+        from ssom.tno_conformidad  no
+        inner join ssom.tparametro pa on pa.id_parametro = no.id_parametro
+        where no.id_nc = v_parametros.id_nc;
+
+        select  pn.id_norma,
+        		no.sigla_norma
+                into
+                v_norma
+        from ssom.tpnorma_noconformidad pn
+        inner join ssom.tnorma no on no.id_norma = pn.id_norma
+        where pn.id_nc = v_parametros.id_nc;
+
+
+        --Definicion de la respuesta
+        v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidades modificado(a)');
+        v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_parametros.id_nc::varchar);
+        v_resp = pxp.f_agrega_clave(v_resp,'id_parametro',v_param.id_parametro::varchar);
+        v_resp = pxp.f_agrega_clave(v_resp,'valor_parametro',v_param.valor_parametro::varchar);
+        v_resp = pxp.f_agrega_clave(v_resp,'id_norma',v_norma.id_norma::varchar);
+        v_resp = pxp.f_agrega_clave(v_resp,'sigla_norma',v_norma.sigla_norma::varchar);
+
+
+        --Devuelve la respuesta
+        return v_resp;
+
+	end;
+    /****************************************************
+    #TRANSACCION:     'SSOM_ACES_IME'
+    #DESCRIPCION:     Cambiar estado
+    #AUTOR:           MMV
+    #FECHA:			  8/7/2020
+    ***************************************************/
+
+    elseif( p_transaccion='SSOM_ACES_IME') then
+
+    begin
+
+    -- Validar estado
+	select  pw.id_proceso_wf,
+            ew.id_estado_wf,
+            te.codigo,
+            pw.fecha_ini,
+            te.id_tipo_estado,
+            te.pedir_obs,
+            pw.nro_tramite
+          into
+            v_registro_estado
+          from wf.tproceso_wf pw
+          inner join wf.testado_wf ew  on ew.id_proceso_wf = pw.id_proceso_wf and ew.estado_reg = 'activo'
+          inner join wf.ttipo_estado te on ew.id_tipo_estado = te.id_tipo_estado
+          where pw.id_proceso_wf =  v_parametros.id_proceso_wf;
+
+    --- obtener
+
+         select  ps_id_tipo_estado,
+                 ps_codigo_estado,
+                 ps_disparador,
+                 ps_regla,
+                 ps_prioridad
+             into
+                va_id_tipo_estado,
+                va_codigo_estado,
+                va_disparador,
+                va_regla,
+                va_prioridad
+            from wf.f_obtener_estado_wf(
+            v_registro_estado.id_proceso_wf,
+             null,
+             v_registro_estado.id_tipo_estado,
+             'siguiente',
+             p_id_usuario);
+
+                v_acceso_directo = '';
+                v_clase = '';
+                v_parametros_ad = '';
+                v_tipo_noti = 'notificacion';
+                v_titulo  = 'Aprobado';
+
+
+                 v_id_estado_actual = wf.f_registra_estado_wf(  va_id_tipo_estado[1]::integer,
+                                                                null,--v_parametros.id_funcionario_wf,
+                                                                v_registro_estado.id_estado_wf,
+                                                                v_registro_estado.id_proceso_wf,
+                                                                p_id_usuario,
+                                                                v_parametros._id_usuario_ai,
+                                                                v_parametros._nombre_usuario_ai,
+                                                                null,--v_id_depto,                       --depto del estado anterior
+                                                                'Aprobado', --obt
+                                                                v_acceso_directo,
+                                                                v_clase,
+                                                                v_parametros_ad,
+                                                                v_tipo_noti,
+                                                                v_titulo);
+
+
+
+     --  raise exception '%',va_codigo_estado[1];
+       update ssom.tno_conformidad set
+        id_estado_wf =  v_id_estado_actual,
+        estado_wf = va_codigo_estado[1],
+        id_usuario_mod=p_id_usuario,
+        fecha_mod=now()
+       where id_proceso_wf = v_parametros.id_proceso_wf;
+
+      --Definicion de la respuesta
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Exito');
+      v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_wf',v_parametros.id_proceso_wf::varchar);
+
+      --Devuelve la respuesta
+      return v_resp;
+
+    end;
+
 	else
 
     	raise exception 'Transaccion inexistente: %',p_transaccion;
@@ -772,4 +1227,8 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
+
+ALTER FUNCTION ssom.ft_no_conformidad_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

@@ -58,8 +58,22 @@ class MODNoConformidad extends MODbase{
         $this->captura('gerencia_uo1','varchar');
 		$this->captura('gerencia_uo2','varchar');
         $this->captura('funcionario_uo','text');   
-		$this->captura('contador_estados','int4'); //contador_estados
-		$this->captura('funcionario_resp','text');  
+		$this->captura('contador_estados','int4');
+		$this->captura('funcionario_resp','text');
+
+        $this->captura('calidad','bool');
+        $this->captura('medio_ambiente','bool');
+        $this->captura('seguridad','bool');
+        $this->captura('responsabilidad_social','bool');
+        $this->captura('sistemas_integrados','bool');
+
+        $this->captura('revisar','varchar');
+        $this->captura('rechazar','varchar');
+        $this->captura('nombre_aom1','varchar');
+        $this->captura('nombre_unidad','varchar');
+        $this->captura('desc_funcionario_resp','text');
+
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -85,12 +99,17 @@ class MODNoConformidad extends MODbase{
 		$this->setParametro('id_parametro','id_parametro','int4');
 		$this->setParametro('obs_resp_area','obs_resp_area','text');
 		$this->setParametro('id_aom','id_aom','int4');
-
 		$this->setParametro('id_uo_adicional','id_uo_adicional','int4');
 		$this->setParametro('codigo_nc','codigo_nc','text');	
-		$this->setParametro('nro_tramite_padre','nro_tramite_padre','varchar');	
-        
-		//Ejecuta la instruccion
+		$this->setParametro('nro_tramite_padre','nro_tramite_padre','varchar');
+
+        $this->setParametro('calidad','calidad','bool');
+        $this->setParametro('medio_ambiente','medio_ambiente','bool');
+        $this->setParametro('seguridad','seguridad','bool');
+        $this->setParametro('responsabilidad_social','responsabilidad_social','bool');
+        $this->setParametro('sistemas_integrados','sistemas_integrados','bool');
+
+        //Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 
@@ -115,9 +134,16 @@ class MODNoConformidad extends MODbase{
 		$this->setParametro('id_parametro','id_parametro','int4');
 		$this->setParametro('obs_resp_area','obs_resp_area','text');
 		$this->setParametro('id_aom','id_aom','int4');
-
         $this->setParametro('id_uo_adicional','id_uo_adicional','int4');    
-		$this->setParametro('codigo_nc','codigo_nc','text');	
+		$this->setParametro('codigo_nc','codigo_nc','text');
+
+        $this->setParametro('calidad','calidad','bool');
+        $this->setParametro('medio_ambiente','medio_ambiente','bool');
+        $this->setParametro('seguridad','seguridad','bool');
+        $this->setParametro('responsabilidad_social','responsabilidad_social','bool');
+        $this->setParametro('sistemas_integrados','sistemas_integrados','bool');
+        $this->setParametro('extra','extra','varchar');
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -266,30 +292,23 @@ class MODNoConformidad extends MODbase{
 
         //Define los parametros para la funcion
         $this->setParametro('id_aom', 'id_aom', 'int4');
+
         $this->captura('id_aom','int4');
+        $this->captura('id_proceso_wf', 'int4');
+        $this->captura('nro_tramite_wf', 'varchar');
         $this->captura('nombre_aom1', 'varchar');
-        $this->captura('nro_tramite_wf', 'varchar');  
-		$this->captura('auditor', 'text');				//aom.id_responsable as auditor
-		$this->captura('nombre_uo', 'varchar');
-        $this->captura('destinatario', 'text');			//des.id_funcionario as destinatario
-        $this->captura('tipo_miembro', 'varchar');			//des.id_parametro as tipoMiembro 
-        $this->captura('id_nc', 'int4');				//id_nc,
-        $this->captura('tipo_no_conf', 'varchar');  	//nc.id_parametro as tipoNoConformidad 
+        $this->captura('responsable', 'varchar');
+        $this->captura('tipo_norma', 'varchar');
+        $this->captura('tipo_objeto', 'varchar');
+        $this->captura('valor_parametro', 'varchar');
         $this->captura('descrip_nc', 'varchar');
         $this->captura('evidencia', 'varchar');
-        $this->captura('obs_resp_area', 'text');
-        $this->captura('obs_consultor', 'text');
-        //$this->captura('estado_nc', 'varchar');
-        $this->captura('resp_area_no_conf', 'text');    	//nc.id_funcionario as respAreaNoConfor
-        $this->captura('id_estado_nc', 'int4');    	//nc.id_funcionario as respAreaNoConfor
 
-		//*******************************
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
-		//para probar en el network si se envia los datos correctamente
-		//var_dump($this->respuesta);exit; 
-        //Devuelve la respuesta
+
+		// var_dump($this->respuesta);exit;
         return $this->respuesta;
     }	
 	
@@ -323,8 +342,118 @@ class MODNoConformidad extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-	
-	
+    function insertarItemNoConformidad(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_no_conformidad_ime';
+        $this->transaccion='SSOM_INTE_INS';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_aom','id_aom','int4');
+        $this->setParametro('nro_tramite_padre','nro_tramite_padre','varchar');
+        $this->setParametro('id_parametro','id_parametro','int4');
+        $this->setParametro('id_uo','id_uo','int4');
+        $this->setParametro('id_funcionario','id_funcionario','int4');
+
+        $this->setParametro('calidad','calidad','bool');
+        $this->setParametro('medio_ambiente','medio_ambiente','bool');
+        $this->setParametro('responsabilidad_social','responsabilidad_social','bool');
+        $this->setParametro('seguridad','seguridad','bool');
+        $this->setParametro('sistemas_integrados','sistemas_integrados','bool');
+
+        $this->setParametro('descrip_nc','descrip_nc','varchar');
+        $this->setParametro('evidencia','evidencia','varchar');
+        $this->setParametro('obs_resp_area','obs_resp_area','text');
+        $this->setParametro('obs_consultor','obs_consultor','text');
+
+        $this->setParametro('id_norma','id_norma','int4');
+        $this->setParametro('id_pn','id_pn','text');
+        $this->setParametro('id_nc','id_nc','int4');
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function getUo(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_no_conformidad_ime';
+        $this->transaccion='SSOM_NOGET_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_uo','id_uo','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function aceptarNoConformidad(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_no_conformidad_ime';
+        $this->transaccion='SSOM_RNACE_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_nc','id_nc','int4');
+        $this->setParametro('fieldName','fieldName','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function siTodoNoConformidad(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_no_conformidad_ime';
+        $this->transaccion='SSOM_NOTOD_IME';
+        $this->tipo_procedimiento='IME';
+        //Define los parametros para la funcion
+        $this->setParametro('id_aom','id_aom','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function getNoConformidad(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_no_conformidad_ime';
+        $this->transaccion='SSOM_NGET_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_nc','id_nc','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function aprobarEstado(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_no_conformidad_ime';
+        $this->transaccion='SSOM_ACES_IME';
+        $this->tipo_procedimiento='IME';
+        //Define los parametros para la funcion
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+        $this->setParametro('id_estado_wf','id_estado_wf','int4');
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
 
 }
 ?>

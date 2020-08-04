@@ -12,178 +12,215 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 	nombreVista: 'base',
-	constructor:function(config){
+    dblclickEdit: true,
+
+    constructor:function(config){
 		this.maestro=config.maestro;
     	Phx.vista.NoConformidad.superclass.constructor.call(this,config);
 		this.store.baseParams = {tipo_interfaz: this.nombreVista};
 		this.init();
+        this.addButton('btnChequeoDocumentosWf', {
+            text: 'Documentos',
+            iconCls: 'bchecklist',
+            disabled: false,
+            handler: this.loadCheckDocumentosPlanWf,
+            tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.',
+            scope:this
+        });
+        this.addButton('btnNoram', {
+                text: 'Puntos Norma',
+                iconCls: 'bdocuments',
+                disabled: false,
+                handler: this.onButtonPuntoNorma,
+                tooltip: '<b>Asigna puntos de norma a la No conformidades...</b>',
+                scope:this
+        });
     },
 
 	Atributos:[
-		{
-			//configuracion del componente --> id_nc
+                {
+                    //configuracion del componente --> id_nc
 
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_nc'
-			},
-			type:'Field',
-			form:true
-		},
+                    config:{
+                            labelSeparator:'',
+                            inputType:'hidden',
+                            name: 'id_nc'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+                    config:{
+                            labelSeparator:'',
+                            inputType:'hidden',
+                            name: 'id_uo'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+                    //configuracion del componente --> id_aom
+                    config:{
+                            labelSeparator:'',
+                            inputType:'hidden',
+                            name: 'id_aom'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+                    //configuracion del componente -->id_estado_wf
+                    config:{
+                        labelSeparator:'',
+                        inputType:'hidden',
+                        name: 'id_estado_wf'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+                    //configuracion del componente -->id_proceso_wf
+                    config:{
+                        labelSeparator:'',
+                        inputType:'hidden',
+                        name: 'id_proceso_wf'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+                    //configuracion del componente -->id_proceso_wf
+                    config:{
+                        labelSeparator:'',
+                        inputType:'hidden',
+                        name: 'nro_tramite_padre'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+                    //configuracion del componente -->id_proceso_wf
+                    config:{
+                        labelSeparator:'',
+                        inputType:'hidden',
+                        name: 'nombre_aom1'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+                    //configuracion del componente -->id_proceso_wf
+                    config:{
+                        labelSeparator:'',
+                        inputType:'hidden',
+                        name: 'nombre_unidad'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+                    //configuracion del componente -->id_proceso_wf
+                    config:{
+                        labelSeparator:'',
+                        inputType:'hidden',
+                        name: 'desc_funcionario_resp'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+                    //configuracion del componente -->id_proceso_wf
+                    config:{
+                        labelSeparator:'',
+                        inputType:'hidden',
+                        name: 'extra',
+                        value: 'no'
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
+		 	     config:{
+		 	         name: 'revisar',
+		 	         fieldLabel: 'Revisar',
+		 	         allowBlank: true,
+		 	         anchor: '40%',
+		 	         gwidth: 60,
+		 	         typeAhead: true,
+		 	         triggerAction: 'all',
+		 	         lazyRender:true,
+		 	         mode: 'local',
+		 	         store:['si','no'],
+		 	         renderer:function (value,p,record){
+		 	             let checked = '';
+		 	             if(value === 'si'){
+		 	                 checked = 'checked';
+		 	             }
+		 	             return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:20px;width:20px;" type="checkbox"{0}></div>',checked);
+		 	         }
+		 	     },
+		 	     type:'ComboBox',
+		 	     id_grupo:3,
+		 	     valorInicial: 'no',
+		 	     filters: { pfiltro: 'rho.martes', type: 'string' },
+		 	     grid: true,
+		 	     form: false
+		 	 },
+			 {
+				 config:{
+						 name: 'rechazar',
+						 fieldLabel: 'Rechazar',
+						 allowBlank: true,
+						 anchor: '40%',
+						 gwidth: 60,
+						 typeAhead: true,
+						 triggerAction: 'all',
+						 lazyRender:true,
+						 mode: 'local',
+						 store:['si','no'],
+						 renderer:function (value,p,record){
+								 let checked = '';
+								 if(value === 'si'){
+										 checked = 'checked';
+								 }
+								 return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:20px;width:20px;" type="checkbox"{0}></div>',checked);
+						 }
+				 },
+				 type:'ComboBox',
+				 id_grupo:3,
+				 valorInicial: 'no',
+				 filters: { pfiltro: 'rho.martes', type: 'string' },
+				 grid: true,
+				 form: false
+		 },
         {
-			//configuracion del componente --> id_nc
-
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_uo'
-			},
-			type:'Field',
-			form:true
-		},
-        {
-			//configuracion del componente --> id_aom
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_aom'
-			},
-			type:'Field',
-			form:true
-		},
-        {
-            //configuracion del componente -->id_estado_wf
-            config:{
-                labelSeparator:'',
-                inputType:'hidden',
-                name: 'id_estado_wf'
-            },
-            type:'Field',
-            form:true
-        },
-        {
-            //configuracion del componente -->id_proceso_wf
-            config:{
-                labelSeparator:'',
-                inputType:'hidden',
-                name: 'id_proceso_wf'
-            },
-            type:'Field',
-            form:true
-        },
-		{
-            //configuracion del componente -->id_proceso_wf
-            config:{
-                labelSeparator:'',
-                inputType:'hidden',
-                name: 'nro_tramite_padre'
-            },
-            type:'Field',
-            form:true
-        },
-		{
-            //configuracion del componente -->id_proceso_wf
-            config:{
-                labelSeparator:'',
-                inputType:'hidden',
-                name: 'id_funcionario_nc'
-            },
-            type:'Field',
-            form:true
-        },
-
-		//imagen
-        {
-            config:{
-                name: 'dibu_icono',
-                fieldLabel: 'N. C.',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 60,
-                maxLength:150,
-                renderer: function (value, p, record) {
-                    var result;
-                    console.log(record.data)
-                    result = String.format('{0}', "<div style='text-align:center'><img src = '../../../lib/imagenes/icono_dibu/dibu_engine_remove.png' align='center' width='35' height='35' title=''/></div>");
-                    return result;
-                }
-            },
-            type:'TextField',
-            filters:{pfiltro:'noconf.id_nc',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:false
-        },		
-
-        {
-            //configuracion del componente -->nro_tramite
             config:{
                 name: 'nro_tramite',
                 fieldLabel: 'Nro Tramite',
                 allowBlank: true,
                 anchor: '75%',
-                gwidth: 120,
-                maxLength:100
+                gwidth: 100
             },
             type:'TextField',
             filters:{pfiltro:'smt.nro_tramite',type:'string'},
             id_grupo:1,
-            grid:true,
-            bottom_filter:true,
+            grid:false,
             form:false
         },
-		//
 		{
 			config:{
 				name: 'codigo_nc',
 				fieldLabel: 'Codigo',
 				allowBlank: true,
 				anchor: '75%',
-				gwidth: 130,
-				maxLength:4
+				gwidth: 150
 			},
 				type:'Field',
 				filters:{pfiltro:'noconf.codigo_nc',type:'string'},
 				id_grupo:1,
 				grid:true,
 				form:false
-		},		
-		
-        //configuracion del componente -->estado_wf
-        {
-            config:{
-                name: 'estado_wf',
-                fieldLabel: 'Estado',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 160,
-                maxLength:100, // ,
-				renderer: function(value, p, record){
-                    var aux1;
-                    if(record.data.estado_wf=='propuesta'){
-                        aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="brown">{0} - ({1})</font></b></div>';
-                    }else if (record.data.estado_wf=='correccion'){
-                        aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="green">{0} - ({1})</font></b></div>';
-                    }else if (record.data.estado_wf=='vbnoconformidad'){
-						aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="red">{0} - ({1})</font></b></div>';
-					}else if (record.data.estado_wf=='finalizado'){
-						aux1='<div title="Número de revisiones: {1}"><b><font size=2 color="blue">{0} - ({1})</font></b></div>';
-					}
-                    //aux1 = aux1 +value+'</font></b>';
-					console.log(record.data)
-					//return String.format('<div title="Número de revisiones: {1}"><b><font color="red">{0} - ({1})</font></b></div>', value, record.data.contador_estados);
-					return String.format(aux1, value, record.data.contador_estados);
-                    //return String.format('{0}', aux1);
-                }
-            },
-            type:'TextField',
-            filters:{pfiltro:'smt.estado',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:false
-        },
-        //configuracion del componente -->id_parametro
+		},
 		{
 			config: {
 				name: 'id_parametro',
@@ -201,7 +238,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 					totalProperty: 'total',
 					fields: ['id_parametro', 'valor_parametro', 'id_tipo_parametro'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'prm.id_parametro#prm.valor_parametro',id_tipo_parametro:5}
+					baseParams: {par_filtro: 'prm.id_parametro#prm.valor_parametro',tipo_no:'TIPO_NO_CONFORMIDAD'}
 				}),
 				valueField: 'id_parametro',
 				displayField: 'valor_parametro',
@@ -214,7 +251,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				mode: 'remote',
 				pageSize: 15,
 				queryDelay: 1000,
-				anchor: '50%',
+                anchor: '75%',
 				gwidth: 90,
 				minChars: 2,
 				renderer : function(value, p, record) {
@@ -227,174 +264,83 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
-
-		//cambiamos el combo por textfield para la UO
-		
-		{
-			config:{
-				name: 'mostrar',
-				fieldLabel: 'Area/UO',
-				allowBlank: true,
-				anchor: '75%',
-				gwidth: 150,
-				maxLength:500,
-				//disabled : true,
-				useClearIcon : false,
-				readOnly: true,
-				renderer : function(value, p, record) {
-					//return String.format('{0}', record.data['gerencia_uo1']);
-					return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>', record.data['gerencia_uo1']);
-
-				}
-            },
-				type:'TextField',
-				filters:{pfiltro:'noconf.id_uo',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:true
-		},
-
-		//adicionamos el checkbox para habilitar la uo adicional
-		{
+        {
             config:{
-                name: 'bandera',
-                fieldLabel: 'Habilitar Area/UO adicional',
+                name: 'estado_wf',
+                fieldLabel: 'Estado',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 65
-            },
-            type:'Checkbox',
-            id_grupo:1,
-            grid:false,
-            form:true
-        },
-		
-		//adicionamos el combo para la uo adicional 
-        {
-            config: {
-                name: 'id_uo_adicional',
-                fieldLabel: 'Area/UO adicional',
-                allowBlank: false,
-                resizable:true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListUO',
-                    id: 'id_uo',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre_unidad',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_uo', 'nombre_unidad','codigo','nivel_organizacional'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'nombre_unidad'}
-                }),
-                valueField: 'id_uo', //modificado
-                displayField: 'nombre_unidad',
-                gdisplayField: 'gerencia_uo',
-                hiddenName: 'id_uo_adicional',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '75%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-					console.log('asd',record);
-					//return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>', value);
-					return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>',  record.data['gerencia_uo2']);
+                gwidth: 180,
+                maxLength:100, // ,
+                renderer: function(value,p,record){
+                    let color = '#1419CC';
+
+                    if (record.data['estado_wf'] === 'aceptada_responsable_area'){
+                        color = '#0a7f15';
+                    }
+                    if (record.data['estado_wf'] === 'rechazada_responsable_area'){
+                        color = '#a20007';
+                    }
+
+                    return '<font color="'+color+'">'+record.data['estado_wf']+'</font>';
                 }
             },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            //valorInicial: 0,
-            grid: true,
-            form: true
-        },		
-		
-		{
-			config: {
-				name: 'id_funcionario',
-				fieldLabel: 'Responsable de Area de No Conformidad',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_auditoria/control/NoConformidad/listarSomUsuario',
-					id: 'id_funcionario',
-					root: 'datos',
-					sortInfo: {
-						field: 'id_funcionario',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_funcionario', 'desc_funcionario1'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'ofunc.id_funcionario#ofunc.desc_funcionario1'}
-				}),
-				valueField: 'id_funcionario',
-				displayField: 'desc_funcionario1',
-				gdisplayField: 'desc_funcionario1',
-				hiddenName: 'id_funcionario',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '75%',
-				gwidth: 150,
-				minChars: 2,
-				//editable : false,
-				disabled : false,
-				//readOnly : true,
-				renderer : function(value, p, record) {
-					console.log('asd',record);
-                    //return String.format('{0}', record.data['funcionario_uo']);
-					return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>',  record.data['funcionario_uo']);
-				}
-			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'ofunc.id_funcionario',type: 'string'},
-			grid: true,
-			form: true
-		},		
-		
-		
-		//*****
+            type:'TextField',
+            filters:{pfiltro:'smt.estado',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config : {
+                name : 'id_uo',
+                baseParams : {
+                    gerencia : 'si'
+                },
+                origen : 'UO',
+                allowBlank: true,
+                fieldLabel : 'Area',
+                gdisplayField : 'gerencia_uo1', //mapea al store del grid
+                anchor: '75%',
+                gwidth: 200,
+                renderer : function(value, p, record) {
+                    return String.format('{0}', record.data['gerencia_uo1']);
+                }
+            },
+            type : 'ComboRec',
+            id_grupo : 1,
+            filters : {
+                pfiltro : 'desc_uo',
+                type : 'string'
+            },
+            grid : true,
+            form : true
+        },
+        {
+            config : {
+                name : 'id_funcionario',
+                origen : 'FUNCIONARIOCAR',
+                fieldLabel : 'Responsable',
+                gdisplayField : 'funcionario_uo', //mapea al store del grid
+                valueField : 'id_funcionario',
+                anchor: '75%',
+                gwidth: 250,
+                renderer : function(value, p, record) {
+                    return String.format('{0}', record.data['funcionario_uo']);
+                }
+            },
+            type : 'ComboRec',
+            id_grupo : 2,
+            grid : true,
+            form : true
+        },
 		{
 			config:{
 				name: 'descrip_nc',
-				fieldLabel: 'Descripcion de la No Conformidad',
+				fieldLabel: 'Descripcion',
 				allowBlank: true,
 				anchor: '75%',
-				gwidth: 280,
-				maxLength : 500,
-                /*renderer: function(value, p, record){
-                    var aux;
-                    if(record.data.tipo=='salida'){
-                        aux='<b><font color="brown">';
-                    }
-                    else {
-                        aux='<b><font color="green">';
-                    }
-                    aux = aux +value+'</font></b>';
-                    return String.format('{0}', aux);
-                }*/
-				renderer: function(value, metaData, record, rowIndex, colIndex, store) {
-					metaData.css = 'multilineColumn'; 
-					//return String.format('<div style="background-color:lightgreen" class="gridmultiline">{0}</div>', value);
-					return String.format('<div style="font-color:blue" class="gridmultiline">{0}</div>', value);
-                }
-				
-				
+				gwidth: 280
 			},
 				type:'TextArea',
 				filters:{pfiltro:'noconf.descrip_nc',type:'string'},
@@ -410,15 +356,14 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				anchor: '75%',
 				gwidth: 150,
 				maxLength:500,
-				renderer: function(value, metaData, record, rowIndex, colIndex, store) {
-					metaData.css = 'multilineColumn'; 
-					return String.format('<div class="gridmultiline">{0}</div>', value);
+				renderer: function(value, p, record) {
+                    return String.format('{0}', value);
                 }
 			},
 				type:'TextField',
 				filters:{pfiltro:'noconf.evidencia',type:'string'},
 				id_grupo:1,
-				grid:true,
+				grid:false,
 				form:true
 		},
 		{
@@ -428,10 +373,9 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '75%',
 				gwidth: 150,
-				//maxLength:-5
-				renderer: function(value, metaData, record, rowIndex, colIndex, store) {
-					metaData.css = 'multilineColumn'; 
-					return String.format('<div class="gridmultiline">{0}</div>', value);
+                renderer: function(value, p, record) {
+                    return String.format('{0}', value);
+
                 }
 			},
 				type:'TextArea',
@@ -448,10 +392,10 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				anchor: '75%',
 				gwidth: 150,
 				//maxLength:-5
-				renderer: function(value, metaData, record, rowIndex, colIndex, store) {
-					metaData.css = 'multilineColumn'; 
-					return String.format('<div class="gridmultiline">{0}</div>', value);
-                }				
+				renderer: function(value, p, record) {
+                    return String.format('{0}', value);
+
+                }
 			},
 				type:'TextArea',
 				filters:{pfiltro:'noconf.obs_consultor',type:'string'},
@@ -460,7 +404,6 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				form:true
 		},
 
-		//funcionario responsable de la no conformidad 666
         {
             config:{
                 name: 'funcionario_resp',
@@ -473,10 +416,109 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
             type:'TextField',
             filters:{pfiltro:'rfun.funcionario_resp',type:'string'},
             id_grupo:1,
-            grid:true,
+            grid:false,
             form:false
         },
-		
+        {
+            config:{
+                name: 'calidad',
+                fieldLabel: 'Calidad',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 80,
+                renderer : function(value, p, record) {
+                    let cap =  (value === 't');
+                    if(cap){
+                        return 'si';
+                    }
+                    return 'no';
+                },
+            },
+            type:'Checkbox',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'medio_ambiente',
+                fieldLabel: 'Medio Ambiente',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 80,
+                renderer : function(value, p, record) {
+                    let cap =  (value === 't');
+                    if(cap){
+                        return 'si';
+                    }
+                    return 'no';
+                },
+            },
+            type:'Checkbox',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'seguridad',
+                fieldLabel: 'Seguridad',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 80,
+                renderer : function(value, p, record) {
+                     let cap =  (value === 't');
+                     if(cap){
+                        return 'si';
+                     }
+                     return 'no';
+                },
+            },
+            type:'Checkbox',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'responsabilidad_social',
+                fieldLabel: 'Responsabilidad Social',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 80,
+                renderer : function(value, p, record) {
+                    let cap =  (value === 't');
+                    if(cap){
+                        return 'si';
+                    }
+                    return 'no';
+                },
+            },
+            type:'Checkbox',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'sistemas_integrados',
+                fieldLabel: 'Sistemas Integrados',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 80,
+                renderer : function(value, p, record) {
+                    let cap =  (value === 't');
+                    if(cap){
+                        return 'si';
+                    }
+                    return 'no';
+                },
+            },
+            type:'Checkbox',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
         {
             config:{
                 name: 'estado_reg',
@@ -593,11 +635,11 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 	id_store:'id_nc',
 	fields: [
 		{name:'id_nc', type: 'numeric'},
-		{name:'obs_consultor', type: 'string'},		
+		{name:'obs_consultor', type: 'string'},
 		{name:'estado_reg', type: 'string'},
 		{name:'evidencia', type: 'string'},
 		{name:'id_funcionario', type: 'int4'}, //aumentado
-        {name:'id_uo', type: 'numeric'},		
+        {name:'id_uo', type: 'numeric'},
 		{name:'descrip_nc', type: 'string'},
         {name:'id_parametro', type: 'numeric'},
 		{name:'obs_resp_area', type: 'string'},
@@ -609,31 +651,62 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_uo_adicional', type: 'numeric'},
-
         {name:'id_proceso_wf', type: 'numeric'},
 		{name:'id_estado_wf', type: 'numeric'},
-        {name:'nro_tramite', type: 'string'},		
+        {name:'nro_tramite', type: 'string'},
         {name:'estado_wf', type: 'string'},
-
 		{name:'codigo_nc', type: 'string'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		
-		
 		{name:'nombreaom', type: 'string'}, //aumentado
 		{name:'valor_parametro', type: 'string'},
         {name:'gerencia_uo1', type: 'string'},
 		{name:'gerencia_uo2', type: 'string'},
 		{name:'funcionario_uo', type: 'string'},
 		{name:'contador_estados', type: 'numeric'},
-		{name:'funcionario_resp', type: 'numeric'}
+		{name:'funcionario_resp', type: 'numeric'},
+
+        {name:'calidad', type: 'string'},
+        {name:'medio_ambiente', type: 'string'},
+        {name:'seguridad', type: 'string'},
+        {name:'responsabilidad_social', type: 'string'},
+        {name:'sistemas_integrados', type: 'string'},
+
+        {name:'revisar', type: 'string'},
+        {name:'rechazar', type: 'string'},
+
+        {name:'nombre_aom1', type: 'string'},
+        {name:'nombre_unidad', type: 'string'},
+        {name:'desc_funcionario_resp', type: 'string'},
+        {name:'extra', type: 'string'},
 	],
 	sortInfo:{
 		field: 'id_nc',
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:false
+	bsave:false,
+    onButtonPuntoNorma:function () {
+        var rec = this.sm.getSelected();
+        Phx.CP.loadWindows('../../../sis_auditoria/vista/pnorma_noconformidad/PnormaNoconformidad.php', 'Puntos de Norma',{
+            //modal : true,
+            width:'70%',
+            height:'70%'
+        }, rec.data,
+            this.idContenedor, 'PnormaNoconformidad');
+    },
+    onButtonEdit:function(){
+        Phx.vista.NoConformidad.superclass.onButtonEdit.call(this);
+        const rec = this.sm.getSelected().data;
+        this.Cmp.calidad.setValue(this.onBool(rec.calidad));
+        this.Cmp.medio_ambiente.setValue(this.onBool(rec.medio_ambiente));
+        this.Cmp.seguridad.setValue(this.onBool(rec.seguridad));
+        this.Cmp.responsabilidad_social.setValue(this.onBool(rec.responsabilidad_social));
+        this.Cmp.sistemas_integrados.setValue(this.onBool(rec.sistemas_integrados));
+    },
+    onBool:function(valor){
+        return  (valor === 't');
+    },
 	}
 )
 </script>
