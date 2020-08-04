@@ -6,18 +6,18 @@ CREATE OR REPLACE FUNCTION ssom.ft_auditoria_oportunidad_mejora_sel (
 )
 RETURNS varchar AS
 $body$
-	/**************************************************************************
+/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
    FUNCION: 		ssom.ft_auditoria_oportunidad_mejora_sel
    DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tauditoria_oportunidad_mejora'
-   AUTOR: 		 (max.camacho)
+   AUTOR: 		 MMV
    FECHA:	        17-07-2019 17:41:55
    COMENTARIOS:
   ***************************************************************************
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				17-07-2019 17:41:55								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tauditoria_oportunidad_mejora'
-   #
+   #2				4/8/20202				MMV						Refactorización funciones auditoria oportunidad de mejora
    ***************************************************************************/
 
 DECLARE
@@ -26,28 +26,7 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-
-	v_bandera 			varchar;
-	v_p                 varchar;
-	v_param_estado		varchar;
-
-	v_filtro_unidad     varchar;
-	v_estado            varchar;
-
-	--variables para consult SSOM_AUDSTATUS_SEL
-	v_id_proceso_macro 	integer;
-	v_codigo_pm 		varchar;
-	v_nombre_pm 		varchar;
-	v_id_tipo_proceso 	integer;
-	v_codigo_tp 		varchar;
-	v_nombre_tp 		varchar;
-
-	v_codigo_tipo_aom	varchar;
-	v_codigo_dpto		varchar;
-	v_id_depto          integer;
-
-	v_codigo_parametro  varchar;
-	v_id_uo_i			integer;
+    v_filtro			varchar;
 
 BEGIN
 
@@ -81,7 +60,7 @@ BEGIN
                             aom.fecha_prev_fin,
                             aom.recomendacion,
                             aom.codigo_aom,
-                            aom.nombre_aom1,
+                            initcap(aom.nombre_aom1)::varchar as nombre_aom1,
                             aom.descrip_aom1,
                             aom.estado_reg,
                             aom.estado_wf,
@@ -100,7 +79,7 @@ BEGIN
                             usu1.cuenta as usr_reg,
                             usu2.cuenta as usr_mod,
                             initcap(uni.nombre_unidad)::varchar as nombre_unidad,
-                            initcap(vfc.desc_funcionario2) as desc_funcionario2,
+                            initcap(vfc.desc_funcionario1) as desc_funcionario2,
                             gct.nombre_gconsultivo,
                             vpto.valor_parametro_to as desc_tipo_objeto,
                             vptn.valor_parametro_tn as desc_tipo_norma,
@@ -109,7 +88,10 @@ BEGIN
                             initcap(tau.tipo_auditoria) as tipo_auditoria,
 							tau.codigo_tpo_aom,
                             gct.requiere_programacion,
-                            gct.requiere_formulario
+                            gct.requiere_formulario,
+                            aom.id_destinatario,
+                            initcap(df.desc_funcionario1) as desc_funcionario_destinatario,
+                            aom.resumen
                             from ssom.tauditoria_oportunidad_mejora aom
                             inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
                             inner join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
@@ -122,6 +104,7 @@ BEGIN
                             left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
                             left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
                             left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
+                            left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario
                             where ';
 
 			--Definicion de la respuesta
@@ -156,6 +139,7 @@ BEGIN
                             left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
                             left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
                             left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
+            				left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario
 					        where ';
 
 			--Definicion de la respuesta
@@ -189,141 +173,54 @@ BEGIN
           return v_consulta;
     end;
 
-	/*********************************
-    #TRANSACCION:  'SSOM_AOMX1_SEL'
-    #DESCRIPCION:	Consult area list
-    #AUTOR:		max.camacho
-    #FECHA:		17-07-2019 17:41:55
-    ***********************************/
-
-	elsif(p_transaccion='SSOM_AOMX1_SEL')then
-		v_bandera = pxp.f_get_variable_global('ssom_exc_nivel_organizacional');
-		begin
-			--Sentencia de la consulta
-			v_consulta:='select
-                            id_uo,
-                            nombre_unidad,
-                            codigo,
-                            id_nivel_organizacional as nivel_organizacional
-                            from orga.tuo
-                            where estado_reg = ''activo'' and id_nivel_organizacional not in ('||v_bandera||') and';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
-			--Devuelve la respuesta
-			RAISE NOTICE 'v_consulta %',v_consulta ;
-			return v_consulta;
-
-		end;
-
-    /*********************************
-    #TRANSACCION:  'SSOM_AOMX1_CONT'
-    #DESCRIPCION:	Count area list
-    #AUTOR:		max.camacho
-    #FECHA:		17-07-2019 17:41:55
-    ***********************************/
-
-	elsif(p_transaccion='SSOM_AOMX1_CONT')then
-		v_bandera = pxp.f_get_variable_global('ssom_exc_nivel_organizacional');
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(uo.id_uo)
-                            from orga.tuo as uo
-                            where estado_reg = ''activo'' and id_nivel_organizacional not in ('||v_bandera||') and';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
 
 	/*********************************
     #TRANSACCION:  'SSOM_AOMX2_SEL'
     #DESCRIPCION:	Consult lista funcionario activos
-    #AUTOR:		max.camacho
+    #AUTOR:		MMV
     #FECHA:		17-07-2019 17:41:55
     ***********************************/
 
 	elsif(p_transaccion='SSOM_AOMX2_SEL')then
-		--v_bandera = pxp.f_get_variable_global('ssom_exc_nivel_organizacional');
 		begin
-			--Sentencia de la consulta
-			v_codigo_dpto = pxp.f_get_variable_global('ssom_parametro_codigo_dpto');
-
-			select
-				id_depto
-				into
-					v_id_depto
-			from param.tdepto
-			where codigo = ''||v_codigo_dpto||'' and estado_reg = 'activo';
-
-			--raise exception 'deptoooooooooo %', v_id_depto;
-			v_consulta:='select
-                                vfcx.id_persona,
-                                vfcx.id_funcionario,
-                                vfcx.desc_funcionario1||'' ''||''(''||(case when (depusu.cargo=''administrador'') then ''Responsable'' when (depusu.cargo=''responsable'') then ''Interno'' else ''En entrenamiento'' end)||'')'' desc_funcionario1,
-                                vfcx.desc_funcionario2||'' ''||''(''||(case when (depusu.cargo=''administrador'') then ''Responsable'' when (depusu.cargo=''responsable'') then ''Interno'' else ''En entrenamiento'' end)||'')'' desc_funcionario2,
-                                vfcx.nombre_cargo,
-                                vfcx.descripcion_cargo,
-                                vfcx.cargo_codigo,
-                                vfcx.id_uo,
-                                vfcx.nombre_unidad
-                                from param.tdepto_usuario depusu
-                                inner join segu.tusuario usu1 on usu1.id_usuario = depusu.id_usuario_reg
-                                left join segu.tusuario usu2 on usu2.id_usuario = depusu.id_usuario_mod
-                                inner join segu.tusuario usudep on usudep.id_usuario=depusu.id_usuario
-                                inner join segu.vpersona person on person.id_persona=usudep.id_persona
-                                inner join orga.vfuncionario_cargo_xtra vfcx on vfcx.id_persona = person.id_persona
-                                --where depusu.id_depto = 56 and vfcx.fecha_finalizacion is null
-                                where depusu.id_depto = '||v_id_depto||' and (vfcx.fecha_finalizacion is null or vfcx.fecha_finalizacion >= now()) and depusu.cargo in (''administrador'',''responsable'') and ';
+			v_consulta:='select   fu.id_funcionario,
+                                  fu.desc_funcionario1,
+                                  fu.descripcion_cargo,
+                                  dep.cargo  as cargo_equipo
+                          from param.tdepto_usuario dep
+                          inner join segu.vusuario us on us.id_usuario = dep.id_usuario
+                          inner join orga.vfuncionario_cargo_xtra fu on fu.id_persona = us.id_persona
+                          inner join param.tdepto de on de.id_depto = dep.id_depto
+                          where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()) and
+                                dep.cargo in (''administrador'',''responsable'') and de.codigo = ''SAOM_CENTRAL'' and ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
 			--Devuelve la respuesta
-			RAISE NOTICE 'v_consulta %',v_consulta ;
 			return v_consulta;
 
 		end;
 		/*********************************
     #TRANSACCION:  'SSOM_AOMX2_CONT'
     #DESCRIPCION:	Count funcionarios
-    #AUTOR:		max.camacho
+    #AUTOR:		MMV
     #FECHA:		17-07-2019 17:41:55
     ***********************************/
 
 	elsif(p_transaccion='SSOM_AOMX2_CONT')then
-		--v_bandera = pxp.f_get_variable_global('ssom_exc_nivel_organizacional');
 		begin
-			--Sentencia de la consulta de conteo de registros
-			v_codigo_dpto = pxp.f_get_variable_global('ssom_parametro_codigo_dpto');
 
-			select
-				id_depto
-				into
-					v_id_depto
-			from param.tdepto
-			where codigo = ''||v_codigo_dpto||'' and estado_reg = 'activo';
-
-			--raise exception 'deptoooooooooo %', v_id_depto;
-			v_consulta:='select count(vfcx.id_funcionario)
-                            from param.tdepto_usuario depusu
-                            inner join segu.tusuario usu1 on usu1.id_usuario = depusu.id_usuario_reg
-                            left join segu.tusuario usu2 on usu2.id_usuario = depusu.id_usuario_mod
-                            inner join segu.tusuario usudep on usudep.id_usuario=depusu.id_usuario
-                            inner join segu.vpersona person on person.id_persona=usudep.id_persona
-                            inner join orga.vfuncionario_cargo_xtra vfcx on vfcx.id_persona = person.id_persona
-                            --where depusu.id_depto = 56 and vfcx.fecha_finalizacion is null
-                            where depusu.id_depto = '||v_id_depto||' and (vfcx.fecha_finalizacion is null or vfcx.fecha_finalizacion >= now()) and depusu.cargo in (''administrador'',''responsable'') and ';
+			v_consulta:='select count(fu.id_funcionario)
+                         from param.tdepto_usuario dep
+                                inner join segu.vusuario us on us.id_usuario = dep.id_usuario
+                                inner join orga.vfuncionario_cargo_xtra fu on fu.id_persona = us.id_persona
+                                inner join param.tdepto de on de.id_depto = dep.id_depto
+                                where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()) and
+                                dep.cargo in (''administrador'',''responsable'') and de.codigo = ''SAOM_CENTRAL'' and';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -332,26 +229,35 @@ BEGIN
 	/*********************************
     #TRANSACCION:  'SSOM_ADPTO_SEL'
     #DESCRIPCION:	Consult lista funcionario activos
-    #AUTOR:
-    #FECHA:
+    #AUTOR:			MMV
+    #FECHA:		    17-07-2019 17:41:55
     ***********************************/
 	elsif(p_transaccion='SSOM_ADPTO_SEL')then
-		begin
-		if(v_parametros.codigo = 'MEQ') then
 
-        v_consulta:='select fu.id_funcionario,
-                            fu.desc_funcionario1
-                    from param.tdepto de
-                    inner join param.tdepto_usuario du on du.id_depto = de.id_depto
-                    inner join segu.vusuario uo on uo.id_usuario = du.id_usuario
-                    inner join orga.vfuncionario_persona  fu on fu.id_persona = uo.id_persona
-                    where de.codigo = ''SAOM_CENTRAL'' and ';
+        begin
 
-        end if;
+        if(v_parametros.codigo = 'RESP' or v_parametros.codigo = 'MEQ' )then
 
-        if (v_parametros.codigo = 'ETI' or v_parametros.codigo = 'RESP' ) then
+        	if (v_parametros.codigo = 'RESP')then
+        		v_filtro = 'in (''administrador'',''responsable'')';
+            else
+                v_filtro = 'in (''auxiliar'')';
+        	end if;
 
-        		v_consulta:= 'with recursive uo_mas_subordinados(id_uo_hijo,id_uo_padre) as (
+        	v_consulta:='select   fu.id_funcionario,
+                                  fu.desc_funcionario1,
+                                  fu.descripcion_cargo,
+                                  dep.cargo as cargo_equipo
+                          from param.tdepto_usuario dep
+                          inner join segu.vusuario us on us.id_usuario = dep.id_usuario
+                          inner join orga.vfuncionario_cargo_xtra fu on fu.id_persona = us.id_persona
+                          inner join param.tdepto de on de.id_depto = dep.id_depto
+                          where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()) and
+                                dep.cargo '|| v_filtro ||' and de.codigo = ''SAOM_CENTRAL'' and ';
+
+       	else
+
+        v_consulta:= 'with recursive uo_mas_subordinados(id_uo_hijo,id_uo_padre) as (
                                                      select euo.id_uo_hijo,--id
                                                            id_uo_padre---padre
                                                      from orga.testructura_uo euo
@@ -362,42 +268,51 @@ BEGIN
                                                      from orga.testructura_uo e
                                                      inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
                                                      and e.estado_reg = ''activo''
-                                                  )select fun.id_funcionario,
-                                                          fun.desc_funcionario1
+                                                  )select fu.id_funcionario,
+                                                          fu.desc_funcionario1,
+                                                          fu.descripcion_cargo,
+                                                          ''''::varchar as cargo_equipo
                                                    from uo_mas_subordinados suo
-                                                   inner join orga.vfuncionario_cargo fun on fun.id_uo = suo.id_uo_hijo
-                                                   where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                                                   inner join orga.vfuncionario_cargo fu on fu.id_uo = suo.id_uo_hijo
+                                                   where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()::date)
                                                    and ';
-		end if;
+
+        end if;
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			raise notice '%',v_consulta;
 			return v_consulta;
 
 		end;
 	/*********************************
     #TRANSACCION:  'SSOM_ADPTO_CONT'
     #DESCRIPCION:	Count funcionarios
-    #AUTOR:		max.camacho
+    #AUTOR:		MMV
     #FECHA:		17-07-2019 17:41:55
     ***********************************/
 	elsif(p_transaccion='SSOM_ADPTO_CONT')then
-		begin
-		--Sentencia de la consulta de conteo de registros
 
-			if (v_parametros.codigo = 'MEQ') then
-				v_consulta:='select count(fu.id_funcionario)
-                            from param.tdepto de
-                            inner join param.tdepto_usuario du on du.id_depto = de.id_depto
-                            inner join segu.vusuario uo on uo.id_usuario = du.id_usuario
-                            inner join orga.vfuncionario_persona  fu on fu.id_persona = uo.id_persona
-                            where de.codigo = ''SAOM_CENTRAL'' and';
-			end if;
+    	begin
 
-			if (v_parametros.codigo = 'ETI' or v_parametros.codigo = 'RESP') then
-				v_consulta:= 'with recursive uo_mas_subordinados(id_uo_hijo,id_uo_padre) as (
+            if(v_parametros.codigo = 'RESP' or v_parametros.codigo = 'MEQ' )then
+
+                if (v_parametros.codigo = 'RESP')then
+                    v_filtro = 'in (''administrador'',''responsable'')';
+                else
+                    v_filtro = 'in (''auxiliar'')';
+                end if;
+
+                v_consulta:='select count(fu.id_funcionario)
+                                    from param.tdepto_usuario dep
+                                    inner join segu.vusuario us on us.id_usuario = dep.id_usuario
+                                    inner join orga.vfuncionario_cargo_xtra fu on fu.id_persona = us.id_persona
+                                    inner join param.tdepto de on de.id_depto = dep.id_depto
+                                    where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()) and
+                                         dep.cargo '||v_filtro||'and de.codigo = ''SAOM_CENTRAL'' and ';
+                else
+
+             	        v_consulta:= 'with recursive uo_mas_subordinados(id_uo_hijo,id_uo_padre) as (
                                                      select euo.id_uo_hijo,--id
                                                            id_uo_padre---padre
                                                      from orga.testructura_uo euo
@@ -408,12 +323,14 @@ BEGIN
                                                      from orga.testructura_uo e
                                                      inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
                                                      and e.estado_reg = ''activo''
-                                                  )select count (fun.id_funcionario)
+                                                  )select count(fu.id_funcionario)
                                                    from uo_mas_subordinados suo
-                                                   inner join orga.vfuncionario_cargo fun on fun.id_uo = suo.id_uo_hijo
-                                                   where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
-                                                   and';
-			end if;
+                                                   inner join orga.vfuncionario_cargo fu on fu.id_uo = suo.id_uo_hijo
+                                                   where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()::date)
+                                                   and ';
+
+
+       		 end if;
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -421,20 +338,196 @@ BEGIN
 			return v_consulta;
 
 		end;
+    /*********************************
+    #TRANSACCION:  'SSOM_REPA_SEL'
+    #DESCRIPCION:	Reporte general Auditoria
+    #AUTOR:		MMV
+    #FECHA:		1/7/2020
+    ***********************************/
+    elsif(p_transaccion='SSOM_REPA_SEL')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select  au.id_aom,
+                               au.nro_tramite_wf,
+                               au.estado_wf,
+                               initcap(fu.desc_funcionario1)::varchar as Responsable,
+                               initcap(uo.nombre_unidad)::varchar as area,
+                               au.nombre_aom1 as titulo,
+                               au.descrip_aom1,
+                                to_char( au.fecha_prog_inicio,''DD/MM/YYYY'') as fecha_prog_inicio,
+                                to_char( au.fecha_prog_fin,''DD/MM/YYYY'') as fecha_prog_fin,
+                               au.fecha_prev_inicio,
+                               au.fecha_prev_fin,
+                               au.fecha_eje_inicio,
+                               au.fecha_eje_fin,
+                               au.lugar,
+                               initcap(pn.valor_parametro)::varchar as tipo_norma,
+                               initcap(po.valor_parametro)::varchar as tipo_objeto,
+                               tt.tipo_auditoria,
+                                tt.codigo_tpo_aom
+                        from ssom.tauditoria_oportunidad_mejora au
+                        inner join orga.vfuncionario fu on fu.id_funcionario = au.id_funcionario
+                        inner join orga.tuo uo on uo.id_uo = au.id_uo
+                        inner join ssom.tparametro pn on pn.id_parametro = au.id_tnorma
+                        inner join ssom.tparametro po on po.id_parametro = au.id_tobjeto
+                        inner join ssom.ttipo_auditoria tt on tt.id_tipo_auditoria = au.id_tipo_auditoria
+                        where au.id_proceso_wf =' ||v_parametros.id_proceso_wf;
+          --Devuelve la respuesta
+          return v_consulta;
+    end;
 
-		/*********************************
-   #TRANSACCION:  'SSOM_AOMX3_SEL'
-   #DESCRIPCION:	Consult area list
-   #AUTOR:		max.camacho
-   #FECHA:		17-07-2019 17:41:55
-   ***********************************/
+    /*********************************
+    #TRANSACCION:  'SSOM_REPP_SEL'
+    #DESCRIPCION:	Reporte general Auditoria
+    #AUTOR:		MMV
+    #FECHA:		1/7/2020
+    ***********************************/
+    elsif(p_transaccion='SSOM_REPP_SEL')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select   au.id_aom,
+                                au.nombre_aom1,
+                                au.nro_tramite_wf,
+                                au.fecha_prog_inicio,
+                                au.fecha_prog_fin,
+                                pr.proceso,
+                                initcap(fu.desc_funcionario1)::varchar as responsable_proceso
+                        from ssom.tauditoria_oportunidad_mejora au
+                        inner join ssom.tauditoria_proceso ap on ap.id_aom = au.id_aom
+                        inner join ssom.tproceso pr on pr.id_proceso = ap.id_proceso
+                        inner join orga.vfuncionario fu on fu.id_funcionario = pr.id_responsable
+                        where au.id_proceso_wf =' ||v_parametros.id_proceso_wf;
+          --Devuelve la respuesta
+          return v_consulta;
+    end;
 
-	elsif(p_transaccion='SSOM_AOMX3_SEL')then
+     /*********************************
+    #TRANSACCION:  'SSOM_REPE_SEL'
+    #DESCRIPCION:	Reporte general Auditoria
+    #AUTOR:		MMV
+    #FECHA:		1/7/2020
+    ***********************************/
+    elsif(p_transaccion='SSOM_REPE_SEL')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select   au.id_aom,
+                                au.nombre_aom1,
+                                au.nro_tramite_wf,
+                                au.fecha_prog_inicio,
+                                au.fecha_prog_fin,
+                                pa.valor_parametro as tipo_equipo,
+                                initcap(fun.desc_funcionario1)::varchar as funcionario
+                        from ssom.tauditoria_oportunidad_mejora au
+                        inner join ssom.tequipo_responsable ep on ep.id_aom = au.id_aom
+                        inner join ssom.tparametro pa on pa.id_parametro = ep.id_parametro
+                        inner join orga.vfuncionario fun on fun.id_funcionario = ep.id_funcionario
+                        where au.id_proceso_wf =' ||v_parametros.id_proceso_wf;
+          --Devuelve la respuesta
+          return v_consulta;
+    end;
+
+     /*********************************
+    #TRANSACCION:  'SSOM_REPN_SEL'
+    #DESCRIPCION:	Reporte general Auditoria
+    #AUTOR:		MMV
+    #FECHA:		1/7/2020
+    ***********************************/
+    elsif(p_transaccion='SSOM_REPN_SEL')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select   au.id_aom,
+                                au.nombre_aom1,
+                                au.nro_tramite_wf,
+                                au.fecha_prog_inicio,
+                                au.fecha_prog_fin,
+                                nr.sigla_norma,
+                                nr.nombre_norma,
+                                pn.nombre_pn
+                        from ssom.tauditoria_oportunidad_mejora au
+                        inner join ssom.tauditoria_npn np on np.id_aom = au.id_aom
+                        inner join ssom.tnorma nr on nr.id_norma = np.id_norma
+                        inner join ssom.tpunto_norma pn on pn.id_pn = np.id_pn
+                        where au.id_proceso_wf = ' ||v_parametros.id_proceso_wf||'
+                        order by nombre_norma' ;
+          --Devuelve la respuesta
+          return v_consulta;
+    end;
+
+     /*********************************
+    #TRANSACCION:  'SSOM_REPC_SEL'
+    #DESCRIPCION:	Reporte general Auditoria
+    #AUTOR:		MMV
+    #FECHA:		1/7/2020
+    ***********************************/
+    elsif(p_transaccion='SSOM_REPC_SEL')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select  au.id_aom,
+                                au.nombre_aom1,
+                                au.nro_tramite_wf,
+                                au.fecha_prog_inicio,
+                                au.fecha_prog_fin,
+                                ac.actividad,
+                                to_char( co.fecha_ini_activ,''DD/MM/YYYY'') as fecha_ini_activ,
+                                to_char( co.fecha_fin_activ,''DD/MM/YYYY'') as fecha_fin_activ,
+                                co.hora_ini_activ,
+                                co.hora_fin_activ,
+                                ( select pxp.list( initcap(fu.desc_funcionario1))
+                                         from ssom.tcronograma_equipo_responsable er
+                                         inner join ssom.tequipo_responsable eqr  on eqr.id_equipo_responsable = er.id_equipo_responsable
+                                         inner join orga.vfuncionario fu on fu.id_funcionario = eqr.id_funcionario
+                                         where er.id_cronograma =  co.id_cronograma) as funcionarios
+                        from ssom.tauditoria_oportunidad_mejora au
+                        inner join ssom.tcronograma co on co.id_aom = au.id_aom
+                        inner join ssom.tactividad ac on ac.id_actividad = co.id_actividad
+                        where au.id_proceso_wf = ' ||v_parametros.id_proceso_wf||'
+                        order by fecha_ini_activ' ;
+          --Devuelve la respuesta
+          return v_consulta;
+    end;
+
+
+      /*********************************
+    #TRANSACCION:  'SSOM_REPAA_SEL'
+    #DESCRIPCION:	Reporte general Auditoria
+    #AUTOR:		MMV
+    #FECHA:		1/7/2020
+    ***********************************/
+    elsif(p_transaccion='SSOM_REPAA_SEL')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select  au.estado_wf,
+                               initcap(fu.desc_funcionario1)::varchar as Responsable,
+                               initcap(uo.nombre_unidad)::varchar as area,
+                               au.nombre_aom1 as titulo,
+                               pxp.f_fecha_literal(au.fecha_prog_inicio) as fecha_prog_inicio,
+                               pxp.f_fecha_literal(au.fecha_eje_inicio) as fecha_eje_inicio
+                        from ssom.tauditoria_oportunidad_mejora au
+                        inner join orga.vfuncionario fu on fu.id_funcionario = au.id_funcionario
+                        inner join orga.tuo uo on uo.id_uo = au.id_uo' ;
+          --Devuelve la respuesta
+          return v_consulta;
+    end;
+
+
+    /*********************************
+    #TRANSACCION:  'SSOM_AOMX1_SEL'
+    #DESCRIPCION:	Consult area list
+    #AUTOR:		max.camacho
+    #FECHA:		17-07-2019 17:41:55
+    ***********************************/
+
+	elsif(p_transaccion='SSOM_AOMX1_SEL')then
+
 		begin
 			--Sentencia de la consulta
-			v_consulta:='select id_aom, codigo_aom
-                            from ssom.tauditoria_oportunidad_mejora
-                            where codigo_aom <> ''''  and';
+			v_consulta:='select
+                            id_uo,
+                            nombre_unidad,
+                            codigo,
+                            id_nivel_organizacional as nivel_organizacional
+                            from orga.tuo
+                            where estado_reg = ''activo'' and';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -446,19 +539,20 @@ BEGIN
 
 		end;
 
-		/*********************************
-    #TRANSACCION:  'SSOM_AOMX3_CONT'
+       /*********************************
+    #TRANSACCION:  'SSOM_AOMX1_CONT'
     #DESCRIPCION:	Count area list
     #AUTOR:		max.camacho
     #FECHA:		17-07-2019 17:41:55
     ***********************************/
 
-	elsif(p_transaccion='SSOM_AOMX3_CONT')then
+	elsif(p_transaccion='SSOM_AOMX1_CONT')then
+
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_aom)
-                             from ssom.tauditoria_oportunidad_mejora
-                        where codigo_aom <> ''''  and';
+			v_consulta:='select count(uo.id_uo)
+                            from orga.tuo as uo
+                            where estado_reg = ''activo''  and';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -468,323 +562,56 @@ BEGIN
 
 		end;
 
-		/*********************************
-    #TRANSACCION:  'SSOM_RPTA1_SEL'
+    /*********************************
+    #TRANSACCION:  'SSOM_AOES_SEL'
     #DESCRIPCION:	Consult area list
-    #AUTOR:		max.camacho
+    #AUTOR:		MMV
     #FECHA:		17-07-2019 17:41:55
     ***********************************/
 
-	elsif(p_transaccion='SSOM_RPTA1_SEL')then
-		begin
-			--Sentencia de la consulta
-			--raise EXCEPTION 'Hola valor de unidad exception %',v_parametros.p_unidad;
-			--raise EXCEPTION 'valor del filtro estado %', v_parametros.p_estado;
-			v_estado = ''||v_parametros.p_estado||'';
-			v_codigo_tipo_aom = pxp.f_get_variable_global('ssom_codigo_tipo_auditoria_interna');
-
-
-			if(v_parametros.p_id_unidad = 0) then
-				begin
-					v_filtro_unidad = '';
-				end;
-			elsif (v_parametros.p_id_unidad > 0) then
-
-				begin
-					v_filtro_unidad = ' and aom.id_uo = '||v_parametros.p_id_unidad;
-				end;
-			end if;
-
-			v_consulta:='select
-						aom.id_aom,
-                        aom.codigo_aom,
-                        aom.nro_tramite_wf,
-                        aom.id_tipo_auditoria,
-                        tau.tipo_auditoria,
-                        tau.codigo_tpo_aom,
-                        aom.nombre_aom1,
-                        aom.descrip_aom1,
-                        aom.id_tnorma,
-                        vptn.valor_parametro_tn as tipo_ctrl_auditoria,
-                        aom.id_uo,
-                        uo.nombre_unidad,
-                        aom.fecha_prog_inicio::date,
-                        aom.fecha_prog_fin::date,
-                        aom.id_tipo_om,
-                        vptom.valor_parametro_tom as valor_tipo_om,
-                        aom.estado_wf,
-                        --pwf.fill_codigo,
-                        pwf.fill_nombre_estado,
-                        aom.id_funcionario,
-                        --vfc.desc_funcionario1::varchar
-                        (select ssom.f_list_funcionarios_responsables(aom.id_aom,'''||v_estado||''')) as desc_funcionario1
-                        --aom.id_gconsultivo,
-                        --gct.nombre_gconsultivo
-						from ssom.tauditoria_oportunidad_mejora aom
-						inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = aom.id_usuario_mod
-                        left join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
-                        left join orga.tuo as uo on aom.id_uo=uo.id_uo
-                        --left join ssom.tgrupo_consultivo as gct on aom.id_gconsultivo = gct.id_gconsultivo
-                        left join orga.vfuncionario_cargo vfc on aom.id_funcionario = vfc.id_funcionario
-                        left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
-                        --left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
-                        left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-                        --left join ssom.vestado_wf_aom ewfa on aom.id_estado_wf = ewfa.id_estado_wf
-                        join (select * from ssom.f_list_process_wf_audit_rfe('''||v_parametros.p_fecha_de||''','''||v_parametros.p_fecha_hasta||''', '''||v_parametros.p_estado||''',null)) as pwf on aom.id_proceso_wf = pwf.fill_id_proceso_wf
-				        where aom.nro_tramite_wf is not null and aom.nro_tramite_wf <> '''' '||v_filtro_unidad||' and tau.codigo_tpo_aom in ('||v_codigo_tipo_aom||') order by nro_tramite_wf asc ';
-
-			--Definicion de la respuesta
-			--v_consulta:=v_consulta||v_parametros.filtro;
-			--v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			RAISE NOTICE 'v_consulta %',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-
-		/*********************************
-    #TRANSACCION:  'SSOM_RPTA1_CONT'
-    #DESCRIPCION:	Count area list
-    #AUTOR:		max.camacho
-    #FECHA:		17-07-2019 17:41:55
-    ***********************************/
-
-	elsif(p_transaccion='SSOM_RPTA1_CONT')then
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_codigo_tipo_aom = pxp.f_get_variable_global('ssom_codigo_tipo_auditoria_interna');
-			v_consulta:='select count(aom.id_aom)
-                              from ssom.tauditoria_oportunidad_mejora aom
-                              inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
-                              left join segu.tusuario usu2 on usu2.id_usuario = aom.id_usuario_mod
-                              left join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
-                              left join orga.tuo as uo on aom.id_uo=uo.id_uo
-                              --left join ssom.tgrupo_consultivo as gct on aom.id_gconsultivo = gct.id_gconsultivo
-                              left join orga.vfuncionario_cargo vfc on aom.id_funcionario = vfc.id_funcionario
-                              left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
-                              --left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
-                              left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-                              --left join ssom.vestado_wf_aom ewfa on aom.id_estado_wf = ewfa.id_estado_wf
-                              join (select * from ssom.f_list_process_wf_audit_rfe('''||v_parametros.p_fecha_de||''','''||v_parametros.p_fecha_hasta||''', '''||v_parametros.p_estado||''',null)) as pwf on aom.id_proceso_wf = pwf.fill_id_proceso_wf
-                              where aom.nro_tramite_wf is not null and aom.nro_tramite_wf <> '''' '||v_filtro_unidad||' and tau.codigo_tpo_aom in ('||v_codigo_tipo_aom||') ';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-
-			--Devuelve la respuesta
-			return v_consulta;
-		end;
-
-		/*********************************
-   #TRANSACCION:  'SSOM_RPTOM_SEL'
-   #DESCRIPCION:	Consult area list
-   #AUTOR:		max.camacho
-   #FECHA:		17-07-2019 17:41:55
-   ***********************************/
-
-	elsif(p_transaccion='SSOM_RPTOM_SEL')then
-		begin
-			--Sentencia de la consulta
-			--raise EXCEPTION 'Hola valor de unidad exception %',v_parametros.p_unidad;
-			--raise EXCEPTION 'valor del filtro estado %', v_parametros.p_estado;
-			v_estado = ''||v_parametros.p_estado||'';
-			v_codigo_tipo_aom = pxp.f_get_variable_global('ssom_codigo_tipo_oportunidad_mejora');
-
-			--raise EXCEPTION 'ohhlhlhlhlho %',v_parametros.p_id_gconsultivo;
-
-			if(v_parametros.p_id_unidad = 0) then
-				begin
-					v_filtro_unidad = '';
-				end;
-			elsif (v_parametros.p_id_unidad > 0) then
-
-				begin
-					v_filtro_unidad = ' and aom.id_uo = '||v_parametros.p_id_unidad;
-				end;
-			end if;
-
-			v_consulta:='select
-						aom.id_aom,
-                        aom.codigo_aom,
-                        aom.nro_tramite_wf,
-                        aom.id_tipo_auditoria,
-                        tau.tipo_auditoria,
-                        tau.codigo_tpo_aom,
-                        aom.nombre_aom1,
-                        aom.descrip_aom1,
-                        aom.id_tnorma,
-                        vptn.valor_parametro_tn as tipo_ctrl_auditoria,
-                        aom.id_uo,
-                        uo.nombre_unidad,
-                        aom.fecha_prog_inicio::date,
-                        aom.fecha_prog_fin::date,
-                        aom.id_tipo_om,
-                        vptom.valor_parametro_tom as valor_tipo_om,
-                        aom.estado_wf,
-                        --pwf.fill_codigo,
-                        pwf.fill_nombre_estado,
-                        aom.id_funcionario,
-                        --vfc.desc_funcionario1::varchar
-                        (select ssom.f_list_funcionarios_responsables(aom.id_aom,'''||v_estado||''')) as desc_funcionario1,
-                        aom.id_gconsultivo,
-                        gct.nombre_gconsultivo
-						from ssom.tauditoria_oportunidad_mejora aom
-						inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = aom.id_usuario_mod
-                        left join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
-                        left join orga.tuo as uo on aom.id_uo=uo.id_uo
-                        left join ssom.tgrupo_consultivo as gct on aom.id_gconsultivo = gct.id_gconsultivo
-                        left join orga.vfuncionario_cargo vfc on aom.id_funcionario = vfc.id_funcionario
-                        left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
-                        --left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
-                        left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-                        --left join ssom.vestado_wf_aom ewfa on aom.id_estado_wf = ewfa.id_estado_wf
-                        join (select * from ssom.f_list_process_wf_audit_rfe('''||v_parametros.p_fecha_de||''','''||v_parametros.p_fecha_hasta||''', '''||v_parametros.p_estado||''',null)) as pwf on aom.id_proceso_wf = pwf.fill_id_proceso_wf
-				        where aom.nro_tramite_wf is not null and aom.nro_tramite_wf <> '''' '||v_filtro_unidad||' and tau.codigo_tpo_aom in ('||v_codigo_tipo_aom||') and gct.id_gconsultivo = '||v_parametros.p_id_gconsultivo||' order by nro_tramite_wf asc ';
-
-			--Definicion de la respuesta
-			--v_consulta:=v_consulta||v_parametros.filtro;
-			--v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			RAISE NOTICE 'v_consulta %',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-
-		/*********************************
-    #TRANSACCION:  'SSOM_RPTOM_CONT'
-    #DESCRIPCION:	Count area list
-    #AUTOR:		max.camacho
-    #FECHA:		17-07-2019 17:41:55
-    ***********************************/
-
-	elsif(p_transaccion='SSOM_RPTOM_CONT')then
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_codigo_tipo_aom = pxp.f_get_variable_global('ssom_codigo_tipo_oportunidad_mejora');
-			v_consulta:='select count(aom.id_aom)
-                              from ssom.tauditoria_oportunidad_mejora aom
-                              inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
-                              left join segu.tusuario usu2 on usu2.id_usuario = aom.id_usuario_mod
-                              left join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
-                              left join orga.tuo as uo on aom.id_uo=uo.id_uo
-                              left join ssom.tgrupo_consultivo as gct on aom.id_gconsultivo = gct.id_gconsultivo
-                              left join orga.vfuncionario_cargo vfc on aom.id_funcionario = vfc.id_funcionario
-                              left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
-                              --left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
-                              left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-                              --left join ssom.vestado_wf_aom ewfa on aom.id_estado_wf = ewfa.id_estado_wf
-                              join (select * from ssom.f_list_process_wf_audit_rfe('''||v_parametros.p_fecha_de||''','''||v_parametros.p_fecha_hasta||''', '''||v_parametros.p_estado||''',null)) as pwf on aom.id_proceso_wf = pwf.fill_id_proceso_wf
-                              where aom.nro_tramite_wf is not null and aom.nro_tramite_wf <> '''' '||v_filtro_unidad||' and tau.codigo_tpo_aom in ('||v_codigo_tipo_aom||') and gct.id_gconsultivo = '||v_parametros.p_id_gconsultivo||' order by nro_tramite_wf asc ';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-
-			--Devuelve la respuesta
-			return v_consulta;
-		end;
-
-		/*********************************
-    #TRANSACCION:  'SSOM_AUDSTATUS_SEL'
-    #DESCRIPCION:	Consult area list
-    #AUTOR:		max.camacho
-    #FECHA:		17-07-2019 17:41:55
-    ***********************************/
-
-	elsif(p_transaccion='SSOM_AUDSTATUS_SEL')then
+	elsif(p_transaccion='SSOM_AOES_SEL')then
 
 		begin
 			--Sentencia de la consulta
-
-			if(v_parametros.p_codigo_aom = 'AI') then
-				v_param_estado = pxp.f_get_variable_global('ssom_exc_parametros_estados_ai');
-			elsif (v_parametros.p_codigo_aom = 'OM') then
-				v_param_estado = pxp.f_get_variable_global('ssom_exc_parametros_estados_om');
-			end if;
-
-			--raise exception ' hola %', v_param_estado;
-
-			select
-				pm.id_proceso_macro
-					 ,pm.codigo
-					 ,pm.nombre
-					 ,tp.id_tipo_proceso
-					 ,tp.codigo
-					 ,tp.nombre
-				into
-					v_id_proceso_macro
-					,v_codigo_pm
-					,v_nombre_pm
-					,v_id_tipo_proceso
-					,v_codigo_tp
-					,v_nombre_tp
-			from wf.tproceso_macro pm
-						 join wf.ttipo_proceso tp on pm.id_proceso_macro = tp.id_proceso_macro
-			where pm.codigo = 'SAOM' and pm.estado_reg = 'activo' and pm.inicio = 'si' ;
-
-			v_consulta:='select te.id_tipo_estado, te.id_tipo_proceso, te.codigo, te.nombre_estado, te.estado_reg
-                            from wf.ttipo_estado te
-                            where te.id_tipo_proceso = '||v_id_tipo_proceso||' and te.codigo in ('||v_param_estado||') and te.estado_reg = ''activo'' and ';
-			--order by te.id_tipo_estado asc
+			v_consulta:=' select ts.id_tipo_estado,
+                                 ts.codigo,
+                                 ts.nombre_estado
+                          from wf.tproceso_macro mp
+                          inner join wf.ttipo_proceso tp on tp.id_proceso_macro = mp.id_proceso_macro
+                          inner join wf.ttipo_estado ts on ts.id_tipo_proceso = tp.id_tipo_proceso
+                          where mp.codigo = ''AUD'' and tp.codigo = ''AUDSE''  and ts.estado_reg = ''activo'' and';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
 			--Devuelve la respuesta
-			RAISE NOTICE 'v_consulta %',v_consulta ;
 			return v_consulta;
 
 		end;
 
-		/*********************************
-    #TRANSACCION:  'SSOM_AUDSTATUS_CONT'
+    /*********************************
+    #TRANSACCION:  'SSOM_AOES_CONT'
     #DESCRIPCION:	Count area list
-    #AUTOR:		max.camacho
+    #AUTOR:		MMV
     #FECHA:		17-07-2019 17:41:55
     ***********************************/
-	elsif(p_transaccion='SSOM_AUDSTATUS_CONT')then
-		--v_param_estado = pxp.f_get_variable_global('ssom_exc_parametros_estados_ai');
+
+	elsif(p_transaccion='SSOM_AOES_CONT')then
+
 		begin
 			--Sentencia de la consulta de conteo de registros
-			if(v_parametros.p_codigo_aom = 'AI') then
-				v_param_estado = pxp.f_get_variable_global('ssom_exc_parametros_estados_ai');
-			elsif (v_parametros.p_codigo_aom = 'OM') then
-				v_param_estado = pxp.f_get_variable_global('ssom_exc_parametros_estados_om');
-			end if;
+			v_consulta:=' select count(ts.id_tipo_estado)
+                          from wf.tproceso_macro mp
+                          inner join wf.ttipo_proceso tp on tp.id_proceso_macro = mp.id_proceso_macro
+                          inner join wf.ttipo_estado ts on ts.id_tipo_proceso = tp.id_tipo_proceso
+                          where mp.codigo = ''AUD'' and tp.codigo = ''AUDSE''  and ts.estado_reg = ''activo'' and';
 
-			select
-				pm.id_proceso_macro
-					 ,pm.codigo
-					 ,pm.nombre
-					 ,tp.id_tipo_proceso
-					 ,tp.codigo
-					 ,tp.nombre
-				into
-					v_id_proceso_macro
-					,v_codigo_pm
-					,v_nombre_pm
-					,v_id_tipo_proceso
-					,v_codigo_tp
-					,v_nombre_tp
-			from wf.tproceso_macro pm
-						 join wf.ttipo_proceso tp on pm.id_proceso_macro = tp.id_proceso_macro
-			where pm.codigo = 'SAOM' and pm.estado_reg = 'activo' and pm.inicio = 'si' ;
-
-			v_consulta:='select count(te.id_tipo_estado)
-                            from wf.ttipo_estado te
-                            where te.id_tipo_proceso = '||v_id_tipo_proceso||' and te.codigo in ('||v_param_estado||') and te.estado_reg = ''activo'' ';
-			RAISE NOTICE 'v_consulta %',v_id_tipo_proceso ;
 			--Definicion de la respuesta
-			--v_consulta:=v_consulta||v_parametros.filtro;
-
+			v_consulta:=v_consulta||v_parametros.filtro;
 			--Devuelve la respuesta
-
 			return v_consulta;
 
 		end;
-		/*+++++++++++++++++   Fin   ++++++++++++++++++++*/
 
 	else
 

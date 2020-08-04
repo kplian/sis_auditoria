@@ -6,95 +6,48 @@ CREATE OR REPLACE FUNCTION ssom.ft_auditoria_oportunidad_mejora_ime (
 )
 RETURNS varchar AS
 $body$
-  /**************************************************************************
-   SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
-   FUNCION: 		ssom.ft_auditoria_oportunidad_mejora_ime
-   DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tauditoria_oportunidad_mejora'
-   AUTOR: 		 (max.camacho)
-   FECHA:	        17-07-2019 17:41:55
-   COMENTARIOS:
-  ***************************************************************************
-   HISTORIAL DE MODIFICACIONES:
-  #ISSUE				FECHA				AUTOR				DESCRIPCION
-   #0				17-07-2019 17:41:55								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tauditoria_oportunidad_mejora'
-   #
-   ***************************************************************************/
+/**************************************************************************
+     SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
+     FUNCION: 		ssom.ft_auditoria_oportunidad_mejora_ime
+     DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tauditoria_oportunidad_mejora'
+     AUTOR: 		 (max.camacho)
+     FECHA:	        17-07-2019 17:41:55
+     COMENTARIOS:
+    ***************************************************************************
+     HISTORIAL DE MODIFICACIONES:
+    #ISSUE				FECHA				AUTOR				DESCRIPCION
+     #0				17-07-2019 17:41:55								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tauditoria_oportunidad_mejora'
+     #2				4/8/20202				MMV						Refactorización funciones auditoria oportunidad de mejora
+     ***************************************************************************/
 
 DECLARE
 
-  v_nro_requerimiento    	integer;
   v_parametros           	record;
-  v_id_requerimiento     	integer;
   v_resp		            varchar;
-  v_nombre_funcion        text;
-  v_mensaje_error         text;
-  v_id_aom				integer;
-  v_id_aom2				integer;
-  v_id_nc2				integer;
-
-
-  v_id_aom_delete 		integer;
-  v_resp_record			record;
-
-  v_codigo_tpo_aom 		varchar;
-  v_bandera1              integer;
-  v_bandera2              integer;
-  v_responsable           integer;
-  v_id_equipo_responsable integer;
-  v_parametro_aom         record;
-  v_modificado            boolean;
-  v_array_aux varchar[];
-  v_indice 				integer;
-
-  v_id_usuario			integer;
-  p_id_usuario_ai 		integer;
-  p_usuario_ai 			varchar;
-
+  v_nombre_funcion        	text;
+  v_id_aom					integer;
+  v_responsable           	integer;
+  v_id_usuario			    integer;
+  p_id_usuario_ai 		    integer;
+  p_usuario_ai 			    varchar;
   v_resumen 				text;
-
-  v_id_parametro			integer;
-  v_codigo_parametro		varchar;
-
-  --variables para cambio de siguiente estado automatico
-  va_id_tipo_estado 		integer[];
-  va_codigo_estado 		varchar[];
-  va_disparador    		varchar[];
-  va_regla         		varchar[];
-  va_prioridad     		integer[];
   v_registros				record;
-  v_cantidad				integer;
-  v_cant_process			integer;
-  v_cant_team_resp		integer;
-  v_cant_norma			integer;
-  v_cant_task				integer;
-
-  v_registros_nc        record;
-  v_cant_asig_nc          integer;
-  v_cant_asig_crev    	integer;
-  v_cant_asig_pnnc		integer;
-  v_cant_asig_sinc		integer;
-
-
-  --variables wf
   v_id_proceso_macro      integer;
-  v_num_tramite          varchar;
+  v_num_tramite           varchar;
   v_codigo_tipo_proceso   varchar;
-  v_fecha                 date;
   v_codigo_estado         varchar;
   v_id_proceso_wf         integer;
   v_id_estado_wf          integer;
   v_id_gestion            integer;
 
   -- variables de sig y ant estado de Wf
-  v_id_tipo_estado        integer;
-  v_codigo_estado_siguiente    varchar;
+  v_id_tipo_estado        		integer;
+  v_codigo_estado_siguiente    	varchar;
   v_id_depto              integer;
   v_obs                   varchar;
   v_acceso_directo        varchar;
   v_clase                 varchar;
   v_codigo_estados        varchar;
-  v_id_cuenta_bancaria    integer;
-  v_id_depto_lb           integer;
   v_parametros_ad         varchar;
   v_tipo_noti             varchar;
   v_titulo                varchar;
@@ -102,8 +55,34 @@ DECLARE
   v_registros_proc        record;
   v_codigo_tipo_pro       varchar;
   v_id_usuario_reg        integer;
-  v_id_estado_wf_ant       integer;
+  v_id_estado_wf_ant      integer;
   v_id_funcionario        integer;
+
+  v_registro_estado 	  record;
+
+  va_id_tipo_estado 	  integer [];
+  va_codigo_estado 		  varchar [];
+  va_disparador 	      varchar [];
+  va_regla 				  varchar [];
+  va_prioridad 		      integer [];
+
+   v_json_formularion  json;
+
+    v_json_formulario_record		record;
+    v_equipo_record			record;
+
+    v_fecha_prog_inicio date;
+    v_fecha_prev_inicio date;
+    v_fecha_prev_fin 	date;
+    v_fecha_prog_fin 	date;
+    v_id_tobjeto 		integer;
+    v_id_tnorma 		integer;
+    v_lugar  			varchar;
+     v_id_destinatario integer;
+	v_recomendacion  varchar;
+    v_id_destinatarios varchar;
+    v_equipo		text;
+    v_no_conformindad	record;
 
 BEGIN
 
@@ -113,19 +92,17 @@ BEGIN
   /*********************************
    #TRANSACCION:  'SSOM_AOM_INS'
    #DESCRIPCION:	Insercion de registros
-   #AUTOR:		max.camacho
+   #AUTOR:		MMV
    #FECHA:		17-07-2019 17:41:55
   ***********************************/
 
   if(p_transaccion='SSOM_AOM_INS')then
-   -- v_bandera1 = pxp.f_get_variable_global('ssom_auditoria');
-   -- v_bandera2 = pxp.f_get_variable_global('ssom_oportunidad_mejora');
+
     begin
 
       --Obtener la gestion actual (sirve para wf)
       select
-        g.id_gestion,
-        g.gestion
+        g.id_gestion
         into
           --v_rec_gestion
           v_id_gestion
@@ -176,8 +153,6 @@ BEGIN
         											fecha_prog_inicio,
                                                     fecha_prog_fin,
         											id_uo,
-    												fecha_prev_inicio,
-                                                    fecha_prev_fin,
                                                     nombre_aom1,
                                                     estado_reg,
                                                     estado_wf,
@@ -191,7 +166,9 @@ BEGIN
                                                     usuario_ai,
                                                     id_usuario_reg,
                                                     id_usuario_mod,
-                                                    fecha_mod
+                                                    fecha_mod,
+                                                    id_gestion,
+                                                    id_gconsultivo
       												)values(
                                                     v_id_proceso_wf,
                                                     v_num_tramite,
@@ -199,8 +176,6 @@ BEGIN
                                                     v_parametros.fecha_prog_inicio,
                                                     v_parametros.fecha_prog_fin,
                                                     v_parametros.id_uo,
-                                                    now()::date,
-                                                    now()::date,
                                                     v_parametros.nombre_aom1,
                                                     'activo',
                                                     v_codigo_estado,
@@ -214,47 +189,41 @@ BEGIN
                                                     v_parametros._nombre_usuario_ai,
                                                     p_id_usuario,
                                                     null,
-                                                    null
+                                                    null,
+                                                    v_id_gestion,
+                                                    v_parametros.id_gconsultivo
                                                     )RETURNING id_aom into v_id_aom;
 
-            -- raise exception 'Entra';
 
-      if(v_id_aom > 0 and (select codigo_tpo_aom from ssom.ttipo_auditoria where id_tipo_auditoria = v_parametros.id_tipo_auditoria)='AI') then
-        --RAISE EXCEPTION 'Entra al id de insercion de EQ % %', v_parametros.id_funcionario,v_id_aom;
-        v_responsable = v_parametros.id_funcionario;
-        v_id_usuario = p_id_usuario;
-        --Sentencia de la insercion
-        insert into ssom.tequipo_responsable(
-          id_funcionario,
-          --participacion,
-          exp_tec_externo,
-          id_parametro,
-          obs_participante,
-          estado_reg,
-          id_aom,
-          id_usuario_ai,
-          id_usuario_reg,
-          usuario_ai,
-          fecha_reg,
-          id_usuario_mod,
-          fecha_mod
-        ) values(
-                  v_responsable,
-                  null,
-                  (select id_parametro from ssom.tparametro where codigo_parametro = 'RESP'),
-                  '',
-                  'activo',
-                  v_id_aom,
-                  v_parametros._id_usuario_ai,
-                  v_id_usuario,
-                  v_parametros._nombre_usuario_ai,
-                  now(),
-                  null,
-                  null
 
-                )RETURNING id_equipo_responsable into v_id_equipo_responsable;
+        if v_parametros.id_funcionario is not null then
+              --Sentencia de la insercion
+              insert into ssom.tequipo_responsable(   id_funcionario,
+                                                      exp_tec_externo,
+                                                      id_parametro,
+                                                      obs_participante,
+                                                      estado_reg,
+                                                      id_aom,
+                                                      id_usuario_ai,
+                                                      id_usuario_reg,
+                                                      usuario_ai,
+                                                      fecha_reg,
+                                                      id_usuario_mod,
+                                                      fecha_mod
+                                                     ) values(
+                                                      v_parametros.id_funcionario,
+                                                      (select id_parametro from ssom.tparametro where codigo_parametro = 'RESP'),
+                                                      '',
+                                                      'activo',
+                                                      v_id_aom,
+                                                      v_parametros._id_usuario_ai,
+                                                      insercion,
+                                                      v_parametros._nombre_usuario_ai,
+                                                      now(),
+                                                      null,
+                                                      null);
+         end if;
 
-      end if;
 
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria - Oportunidad Mejora almacenado(a) con exito (id_aom'||v_id_aom||')');
@@ -268,11 +237,12 @@ BEGIN
     /*********************************
      #TRANSACCION:  'SSOM_AOM_MOD'
      #DESCRIPCION:	Modificacion de registros
-     #AUTOR:		max.camacho
+     #AUTOR:		MMV
      #FECHA:		17-07-2019 17:41:55
     ***********************************/
 
   elsif(p_transaccion='SSOM_AOM_MOD')then
+
     begin
       --Sentencia de la modificacion
 
@@ -280,15 +250,14 @@ BEGIN
       id_funcionario = v_parametros.id_funcionario,
       fecha_prog_inicio = v_parametros.fecha_prog_inicio,
       id_uo = v_parametros.id_uo,
-      -- fecha_prev_inicio = v_parametros.fecha_prev_inicio,
-      -- fecha_prev_fin = v_parametros.fecha_prev_fin,
+      fecha_prev_inicio = v_parametros.fecha_prev_inicio,
+      fecha_prev_fin = v_parametros.fecha_prev_fin,
       fecha_prog_fin = v_parametros.fecha_prog_fin,
       nombre_aom1 = v_parametros.nombre_aom1,
       id_tobjeto = v_parametros.id_tobjeto,
       id_tnorma = v_parametros.id_tnorma,
-      -- fecha_eje_inicio = v_parametros.fecha_eje_inicio,
-      -- fecha_eje_fin = v_parametros.fecha_eje_fin,
-      id_tipo_auditoria = v_parametros.id_tipo_auditoria,
+      fecha_eje_inicio = v_parametros.fecha_eje_inicio,
+      fecha_eje_fin = v_parametros.fecha_eje_fin,
       descrip_aom1 = v_parametros.descrip_aom1,
       lugar = v_parametros.lugar,
       id_tipo_om = v_parametros.id_tipo_om,
@@ -314,11 +283,12 @@ BEGIN
     #FECHA:
     ***********************************/
 	 elsif(p_transaccion='SSOM_AOMSR_MOD')then
-     begin
+    	 begin
 
-      update ssom.tauditoria_oportunidad_mejora set
-      recomendacion = v_parametros.recomendacion
-      where id_aom = v_parametros.id_aom;
+
+          update ssom.tauditoria_oportunidad_mejora set
+          recomendacion = v_parametros.recomendacion
+          where id_aom = v_parametros.id_aom;
 
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria - Oportunidad Mejora modificado(a)');
@@ -332,20 +302,213 @@ BEGIN
     /*********************************
     #TRANSACCION:  'SSOM_AOM_ELI'
     #DESCRIPCION:	Eliminacion de registros
-    #AUTOR:		max.camacho
+    #AUTOR:		MMV
     #FECHA:		17-07-2019 17:41:55
     ***********************************/
 
-  elsif(p_transaccion='SSOM_AOM_ELI')then
+      elsif(p_transaccion='SSOM_AOM_ELI')then
+
+        begin
+
+
+            delete from ssom.tauditoria_proceso pr
+            where pr.id_aom = v_parametros.id_aom;
+
+            delete from ssom.tauditoria_npn nk
+            where nk.id_aom = v_parametros.id_aom;
+
+            delete from ssom.taom_riesgo_oportunidad oa
+            where oa.id_aom = v_parametros.id_aom;
+
+            delete from ssom.tdestinatario de
+            where de.id_aom = v_parametros.id_aom;
+
+
+          --Sentencia de la eliminacion
+          delete from ssom.tauditoria_oportunidad_mejora
+          where id_aom = v_parametros.id_aom;
+
+          --Definicion de la respuesta
+          v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria - Oportunidad Mejora eliminado(a)');
+          v_resp = pxp.f_agrega_clave(v_resp,'id_aom',v_parametros.id_aom::varchar);
+
+          --Devuelve la respuesta
+          return v_resp;
+
+        end;
+
+    /****************************************************
+    #TRANSACCION:     'SSOM_WFAPRO_IME'
+    #DESCRIPCION:     Retrocede el estado proyectos
+    #AUTOR:           MMV
+    #FECHA:			  8/7/2020
+    ***************************************************/
+
+    elseif( p_transaccion='SSOM_WFAPRO_IME') then
 
     begin
-      --Sentencia de la eliminacion
-      delete from ssom.tauditoria_oportunidad_mejora
-      where id_aom = v_parametros.id_aom;
+
+    -- Validar estado
+	select  pw.id_proceso_wf,
+            ew.id_estado_wf,
+            te.codigo,
+            pw.fecha_ini,
+            te.id_tipo_estado,
+            te.pedir_obs,
+            pw.nro_tramite
+          into
+            v_registro_estado
+          from wf.tproceso_wf pw
+          inner join wf.testado_wf ew  on ew.id_proceso_wf = pw.id_proceso_wf and ew.estado_reg = 'activo'
+          inner join wf.ttipo_estado te on ew.id_tipo_estado = te.id_tipo_estado
+          where pw.id_proceso_wf =  v_parametros.id_proceso_wf;
+
+    --- obtener
+
+         select  ps_id_tipo_estado,
+                 ps_codigo_estado,
+                 ps_disparador,
+                 ps_regla,
+                 ps_prioridad
+             into
+                va_id_tipo_estado,
+                va_codigo_estado,
+                va_disparador,
+                va_regla,
+                va_prioridad
+            from wf.f_obtener_estado_wf(
+            v_registro_estado.id_proceso_wf,
+             null,
+             v_registro_estado.id_tipo_estado,
+             'siguiente',
+             p_id_usuario);
+
+                v_acceso_directo = '';
+                v_clase = '';
+                v_parametros_ad = '';
+                v_tipo_noti = 'notificacion';
+                v_titulo  = 'Aprobado';
+
+
+                 v_id_estado_actual = wf.f_registra_estado_wf(  va_id_tipo_estado[1]::integer,
+                                                                null,--v_parametros.id_funcionario_wf,
+                                                                v_registro_estado.id_estado_wf,
+                                                                v_registro_estado.id_proceso_wf,
+                                                                p_id_usuario,
+                                                                v_parametros._id_usuario_ai,
+                                                                v_parametros._nombre_usuario_ai,
+                                                                null,--v_id_depto,                       --depto del estado anterior
+                                                                'Aprobado', --obt
+                                                                v_acceso_directo,
+                                                                v_clase,
+                                                                v_parametros_ad,
+                                                                v_tipo_noti,
+                                                                v_titulo);
+
+       	 if va_codigo_estado[1] = 'ejecutada' then
+         	select  ao.id_aom,
+            		ao.fecha_prog_inicio,
+                    ao.nombre_aom1,
+                    ao.resumen
+                   into
+                   v_registros_proc
+            from ssom.tauditoria_oportunidad_mejora ao
+            where ao.id_proceso_wf = v_parametros.id_proceso_wf;
+
+            if (v_registros_proc.resumen is null or v_registros_proc.resumen = '') then
+            v_equipo := '';
+            for v_equipo_record in (select fun.desc_funcionario1
+                                from ssom.tequipo_responsable re
+                                inner join orga.vfuncionario fun on fun.id_funcionario = re.id_funcionario
+                                where re.id_aom = v_registros_proc.id_aom)loop
+
+               v_equipo := v_equipo || '<li>'||v_equipo_record.desc_funcionario1||'</li> ' ;
+
+              end loop;
+
+     --- raise exception '%',v_equipo;
+  v_resumen = '<div>
+                <p>En fecha '||to_char( v_registros_proc.fecha_prog_inicio,'DD/MM/YYYY')||', conforme al Programa Anual de Auditorias Internas de la Empresa se realizó la auditoria:</p>
+                <p>"'||v_registros_proc.nombre_aom1||'"</p>
+                <p>El Equipo auditor estuvo conformado por:</p>
+                <ul>
+                    '||v_equipo||'
+                </ul>
+                <p>El equipo auditor pondera el compromiso y responsabilidad del personal del Area y Proceso Auditados, Asi como el personal de la Gerencia y Administración. </p>
+                <p>Como resultado de la auditoria se encontraron oportunidades de mejora que se presentan en el Informe de No Conformidades 4-R-010 anexo.</p>
+              </div>';
+  				update ssom.tauditoria_oportunidad_mejora set
+                      id_estado_wf =  v_id_estado_actual,
+                      estado_wf = va_codigo_estado[1],
+                      id_usuario_mod=p_id_usuario,
+                      fecha_mod=now(),
+                      id_usuario_ai = p_id_usuario_ai,
+                      resumen = v_resumen,
+                      usuario_ai = p_usuario_ai
+                     where id_proceso_wf  = v_parametros.id_proceso_wf;
+
+        	end if;
+       end if;
+
+       if va_codigo_estado[1] = 'notificar' then
+
+       		select  ao.id_aom,
+            		ao.fecha_prog_inicio,
+                    ao.nombre_aom1,
+                    ao.resumen
+                   into
+                   v_registros_proc
+            from ssom.tauditoria_oportunidad_mejora ao
+            where ao.id_proceso_wf = v_parametros.id_proceso_wf;
+
+
+
+       	for v_no_conformindad in (select  nc.id_nc,
+                                          nc.id_proceso_wf,
+                                          nc.id_estado_wf,
+                                          nc.revisar,
+                                          nc.rechazar
+                                  from ssom.tno_conformidad nc
+                                  where nc.id_aom = v_registros_proc.id_aom)loop
+
+
+        			if (v_no_conformindad.revisar = 'si')then
+
+                    	if ssom.f_cambiar_estado_no_conformidad(v_no_conformindad.id_proceso_wf,
+                                                                  v_no_conformindad.id_estado_wf,
+                                                                  p_id_usuario ,
+                                                                  'revisar') then
+
+     			 		end if;
+
+                    end if;
+        			if (v_no_conformindad.rechazar = 'si')then
+
+                    	if ssom.f_cambiar_estado_no_conformidad(v_no_conformindad.id_proceso_wf,
+                                                                v_no_conformindad.id_estado_wf,
+                                                                p_id_usuario ,
+                                                                'rechazar') then
+
+     			 		end if;
+
+                    end if;
+
+       	end loop;
+
+       end if;
+
+       update ssom.tauditoria_oportunidad_mejora set
+        id_estado_wf =  v_id_estado_actual,
+        estado_wf = va_codigo_estado[1],
+        id_usuario_mod=p_id_usuario,
+        fecha_mod=now(),
+        id_usuario_ai = p_id_usuario_ai,
+        usuario_ai = p_usuario_ai
+       where id_proceso_wf  = v_parametros.id_proceso_wf;
 
       --Definicion de la respuesta
-      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria - Oportunidad Mejora eliminado(a)');
-      v_resp = pxp.f_agrega_clave(v_resp,'id_aom',v_parametros.id_aom::varchar);
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Exito');
+      v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_wf',v_parametros.id_proceso_wf::varchar);
 
       --Devuelve la respuesta
       return v_resp;
@@ -355,7 +518,7 @@ BEGIN
     #TRANSACCION:      'SSOM_WFBACK_IME'
     #DESCRIPCION:     Retrocede el estado proyectos
     #AUTOR:           EGS
-    #FECHA:
+    #FECHA:			  8/7/2020
     ***************************************************/
 
   elseif( p_transaccion='SSOM_WFBACK_IME')then
@@ -449,7 +612,7 @@ BEGIN
       #TRANSACCION:      'SSOM_WFNEXT_INS'
       #DESCRIPCION:      Controla el cambio al siguiente estado
       #AUTOR:           EGS
-      #FECHA:
+      #FECHA:			 8/7/2020
       ***********************************/
 
   elseif(p_transaccion='SSOM_WFNEXT_INS')then
@@ -582,6 +745,161 @@ BEGIN
       -- Devuelve la respuesta
       return v_resp;
     end;
+
+    /*********************************
+     #TRANSACCION:  'SSOM_PLA_IME'
+     #DESCRIPCION:	Modificacion de registros
+     #AUTOR:		MMV
+     #FECHA:		17-07-2019 17:41:55
+    ***********************************/
+
+  elsif(p_transaccion='SSOM_PLA_IME')then
+    begin
+
+      --Sentencia de la modificacion
+
+       select 	au.id_aom,
+       			au.id_estado_wf,
+                au.id_proceso_wf,
+                au.estado_wf
+                into
+                v_registros_proc
+       from ssom.tauditoria_oportunidad_mejora au
+       where au.id_aom = v_parametros.id_aom;
+
+       v_json_formularion =  v_parametros.arratFormulario::json;
+
+       if (exists(select 1
+                   from ssom.tauditoria_oportunidad_mejora au
+                   where au.id_aom = v_parametros.id_aom))then
+
+
+       for v_json_formulario_record in (select json_array_elements(v_json_formularion))loop
+
+        v_fecha_prog_inicio  = v_json_formulario_record.json_array_elements::json->>'fecha_prog_inicio';
+        v_fecha_prev_inicio  = v_json_formulario_record.json_array_elements::json->>'fecha_prev_inicio';
+        v_fecha_prev_fin =  v_json_formulario_record.json_array_elements::json->>'fecha_prev_fin';
+        v_fecha_prog_fin = v_json_formulario_record.json_array_elements::json->>'fecha_prog_fin';
+        v_id_tobjeto = v_json_formulario_record.json_array_elements::json->>'id_tobjeto';
+        v_id_tnorma  = v_json_formulario_record.json_array_elements::json->>'id_tnorma';
+        v_lugar  = v_json_formulario_record.json_array_elements::json->>'lugar';
+
+		v_id_destinatario = null;
+        v_resumen  = null;
+		v_recomendacion  = null;
+
+
+			 if v_parametros.informe = 'si' then
+
+             		v_id_destinatario = v_json_formulario_record.json_array_elements::json->>'id_destinatario';
+                    v_recomendacion  = v_json_formulario_record.json_array_elements::json->>'recomendacion';
+        			v_id_destinatarios =   v_json_formulario_record.json_array_elements::json->>'id_destinatarios';
+
+             		update ssom.tauditoria_oportunidad_mejora set
+                    id_destinatario =  v_id_destinatario,
+                    resumen = v_parametros.resumen,
+                    recomendacion = v_recomendacion,
+                    id_usuario_mod = p_id_usuario,
+                    fecha_mod = now()
+                    where id_aom=v_parametros.id_aom;
+
+             		delete from ssom.tdestinatario  dd
+                    where dd.id_aom = v_parametros.id_aom;
+
+             foreach v_id_funcionario IN  array (string_to_array(v_id_destinatarios,','))  loop
+
+                --Sentencia de la insercion
+               	insert into ssom.tdestinatario(
+				id_aom,
+				id_funcionario,
+				estado_reg,
+				id_usuario_ai,
+				fecha_reg,
+				usuario_ai,
+				id_usuario_reg,
+				fecha_mod,
+				id_usuario_mod
+                ) values(
+                  v_parametros.id_aom,
+                  v_id_funcionario,
+                  'activo',
+                  v_parametros._id_usuario_ai,
+                  now(),
+                  v_parametros._nombre_usuario_ai,
+                  p_id_usuario,
+                  null,
+                  null
+         		  );
+            end loop;
+
+             else
+             		update ssom.tauditoria_oportunidad_mejora set
+                      fecha_prog_inicio = v_fecha_prog_inicio ,
+                      fecha_prev_inicio = v_fecha_prev_inicio,
+                      fecha_prev_fin = v_fecha_prev_fin,
+                      fecha_prog_fin = v_fecha_prog_fin,
+                      id_tobjeto = v_id_tobjeto,
+                      id_tnorma = v_id_tnorma,
+                      lugar = v_lugar,
+                      id_usuario_mod = p_id_usuario,
+                      fecha_mod = now()
+                    where id_aom=v_parametros.id_aom;
+             end if;
+
+
+
+       end loop;
+
+       if (v_registros_proc.estado_wf = 'aprobado_responsable') then
+
+       			 if ssom.f_cambiar_estado(v_registros_proc.id_proceso_wf,
+             						  v_registros_proc.id_estado_wf,
+                                      p_id_usuario ) then
+
+     			 end if;
+
+       end if;
+
+       else
+
+       	raise exception 'Huvo un error Wen...!';
+
+       end if;
+
+
+
+      --Definicion de la respuesta
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria - Oportunidad Mejora modificado(a)');
+      v_resp = pxp.f_agrega_clave(v_resp,'id_aom',v_parametros.id_aom::varchar);
+
+      --Devuelve la respuesta
+      return v_resp;
+
+    end;
+    /*********************************
+ 	#TRANSACCION:  'SSOM_GETPRO_IME'
+ 	#DESCRIPCION:	Recuperar datos proceso
+ 	#AUTOR:		MMV
+ 	#FECHA:		13/7/2020
+	***********************************/
+
+	elsif(p_transaccion='SSOM_GETPRO_IME')then
+
+		begin
+
+            select pr.id_proceso into v_registros
+            from ssom.tauditoria_proceso pr
+            where pr.id_aom = v_parametros.id_aom;
+
+            -- raise exception '%',v_registros.id_proceso;
+            --Definicion de la respuesta
+             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de decuentos recuperados con exito');
+             v_resp = pxp.f_agrega_clave(v_resp,'id_proceso',v_registros.id_proceso::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
 
   else
 
