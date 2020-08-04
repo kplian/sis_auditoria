@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_auditoria_npn_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -17,7 +17,7 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				25-07-2019 21:19:37								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tauditoria_npn'
-   #
+   #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
    ***************************************************************************/
 
 DECLARE
@@ -60,18 +60,20 @@ BEGIN
 						usu2.cuenta as usr_mod,
                         nor.sigla_norma,
                         nor.nombre_norma,
-                        ''[''||pnor.codigo_pn::varchar||'']''||''.-''||'' ''||pnor.nombre_pn as desc_punto_norma
+                        pnor.nombre_pn,
+                        pnor.codigo_pn,
+                        ''(''||pnor.codigo_pn||'') ''|| pnor.nombre_pn as nombre_descrip
 						from ssom.tauditoria_npn anpn
 						inner join segu.tusuario usu1 on usu1.id_usuario = anpn.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = anpn.id_usuario_mod
-                        join ssom.tauditoria_oportunidad_mejora aom on anpn.id_aom = aom.id_aom
-                        join ssom.tnorma nor on anpn.id_norma = nor.id_norma
-                        join ssom.tpunto_norma pnor on anpn.id_pn = pnor.id_pn
+                        inner join ssom.tauditoria_oportunidad_mejora aom on anpn.id_aom = aom.id_aom
+                        inner join ssom.tnorma nor on anpn.id_norma = nor.id_norma
+                        inner join ssom.tpunto_norma pnor on anpn.id_pn = pnor.id_pn
 				        where  ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			v_consulta:=v_consulta||' order by sigla_norma, ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			raise notice 'v_consulta %',v_consulta;
 			--Devuelve la respuesta
 			--raise EXCEPTION 'resultado de la consulta %', v_consulta;
@@ -94,9 +96,9 @@ BEGIN
 					    from ssom.tauditoria_npn anpn
 					    inner join segu.tusuario usu1 on usu1.id_usuario = anpn.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = anpn.id_usuario_mod
-                        join ssom.tauditoria_oportunidad_mejora aom on anpn.id_aom = aom.id_aom
-                        join ssom.tnorma nor on anpn.id_norma = nor.id_norma
-                        join ssom.tpunto_norma pnor on anpn.id_pn = pnor.id_pn
+                        inner join ssom.tauditoria_oportunidad_mejora aom on anpn.id_aom = aom.id_aom
+                        inner join ssom.tnorma nor on anpn.id_norma = nor.id_norma
+                        inner join ssom.tpunto_norma pnor on anpn.id_pn = pnor.id_pn
 					    where ';
 
 			--Definicion de la respuesta
@@ -123,8 +125,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_auditoria_npn_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

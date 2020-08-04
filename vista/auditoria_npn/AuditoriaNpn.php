@@ -2,7 +2,7 @@
 /**
 *@package pXP
 *@file gen-AuditoriaNpn.php
-*@author  (max.camacho)
+*@author  MMV
 *@date 25-07-2019 21:19:37
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
@@ -25,7 +25,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
             this.bloquearMenus();
         }
 	},
-			
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -35,7 +35,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_anpn'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
         {
             //configuracion del componente
@@ -53,6 +53,16 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
                 labelSeparator:'',
                 inputType:'hidden',
                 name: 'codigo_parametro'
+            },
+            type:'Field',
+            form:true
+        },
+        {
+            //configuracion del componente
+            config:{
+                labelSeparator:'',
+                inputType:'hidden',
+                name: 'obs_apn'
             },
             type:'Field',
             form:true
@@ -76,14 +86,10 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
                     remoteSort: true,
                     baseParams: {par_filtro: 'nor.sigla_norma'}
                 }),
-                tpl:'<tpl for=".">'+
-                    '<div class="x-combo-list-item" >'+
-                        '<div class=""><p> Sigla: <b>{sigla_norma}</b></p></div>'+
-                        '<div><p style="padding-left: 0px;">Nombre: <b>{nombre_norma}</b></p></div>'+
-                    '</div></tpl>',
                 valueField: 'id_norma',
                 displayField: 'sigla_norma',
                 gdisplayField: 'sigla_norma',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color:#01010a">{sigla_norma} - {nombre_norma}</p></div></tpl>',
                 hiddenName: 'id_norma',
                 forceSelection: true,
                 typeAhead: false,
@@ -92,7 +98,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
                 mode: 'remote',
                 pageSize: 15,
                 queryDelay: 1000,
-                anchor: '100%',
+                anchor: '90%',
                 gwidth: 150,
                 minChars: 2,
                 renderer : function(value, p, record) {
@@ -109,7 +115,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
             type: 'ComboBox',
             id_grupo: 0,
             filters: {pfiltro: 'nor.sigla_norma',type: 'string'},
-            grid: true,
+            grid: false,
             form: true
         },
         {
@@ -119,7 +125,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 emptyText: 'Elija una opción...',
                 store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNorma',
+                    url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNormaMulti',
                     id: 'id_pn',
                     root: 'datos',
                     sortInfo: {
@@ -127,17 +133,14 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_pn', 'codigo_pn', 'nro_pn', 'nombre_pn', 'descrip_pn'],
+                    fields: ['id_pn', 'nombre_pn', 'codigo_pn'],
                     remoteSort: true,
-                    baseParams: {par_filtro: 'pnor.nombre_pn'}
+                    baseParams: {par_filtro: 'ptonor.codigo_pn#ptonor.nombre_pn'}
                 }),
-                tpl:'<tpl for=".">'+
-                    '<div class="x-combo-list-item" >'+
-                        '<div class=""><p> Punto: <b>{codigo_pn}</b></p> <p>Nombre: <b>{nombre_pn}</b></p></div>'+
-                    '</div></tpl>',
                 valueField: 'id_pn',
                 displayField: 'nombre_pn',
-                gdisplayField: 'nombre_pn',
+                gdisplayField: 'desc_pn',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><div class="awesomecombo-item {checked}"><p>{codigo_pn} - {nombre_pn}</p></div></div></tpl>',
                 hiddenName: 'id_pn',
                 forceSelection: true,
                 typeAhead: false,
@@ -146,33 +149,33 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
                 mode: 'remote',
                 pageSize: 15,
                 queryDelay: 1000,
-                anchor: '100%',
-                gwidth: 150,
+                anchor: '90%',
+                gwidth: 500,
                 minChars: 2,
+                enableMultiSelect: true,
                 renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['desc_punto_norma']);
+                    return String.format('{0}', record.data['nombre_pn']);
                 }
             },
-            type: 'ComboBox',
+            type: 'AwesomeCombo',
             id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
+            filters: {pfiltro: 'pnorm.nombre_pn',type: 'string'},
             grid: true,
             form: true
         },
         {
             config:{
-                name: 'obs_apn',
-                fieldLabel: 'Observacion',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:1000
+                name: 'sigla_norma',
+                fieldLabel: 'Norma',
+                allowBlank: false,
+                anchor: '10%',
+                gwidth: 150
             },
-            type:'TextArea',
-            filters:{pfiltro:'anpn.obs_apn',type:'string'},
+            type:'TextField',
+            // filters:{pfiltro:'aro.accion_ro',type:'string'},
             id_grupo:1,
             grid:true,
-            form:true
+            form:false
         },
 		{
 			config:{
@@ -196,7 +199,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -272,7 +275,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -282,7 +285,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
-	tam_pag:50,	
+	tam_pag:50,
 	title:'Auditoria Norma Punto de Norma',
 	ActSave:'../../sis_auditoria/control/AuditoriaNpn/insertarAuditoriaNpn',
 	ActDel:'../../sis_auditoria/control/AuditoriaNpn/eliminarAuditoriaNpn',
@@ -292,7 +295,7 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_anpn', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
         {name:'id_aom', type: 'numeric'}, //
-		{name:'id_pn', type: 'numeric'},
+		{name:'id_pn', type: 'string'},
 		{name:'id_norma', type: 'numeric'},
         {name:'obs_apn', type: 'string'},//
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
@@ -305,11 +308,11 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
         {name:'sigla_norma', type: 'string'},
         {name:'nombre_norma', type: 'string'},
-		{name:'desc_punto_norma', type: 'string'},
+		{name:'nombre_pn', type: 'string'},
 
 	],
 	sortInfo:{
-		field: 'id_anpn',
+		field: 'sigla_norma',
 		direction: 'ASC'
 	},
     tipoStore: 'GroupingStore',//GroupingStore o JsonStore #
@@ -320,70 +323,53 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
     }),
 	bdel:true,
 	bsave:false,
+    fwidth: '40%',
+    fheight: '30%',
     onReloadPage:function(m){
         this.maestro = m;
         this.store.baseParams = {id_aom: this.maestro.id_aom};
         this.load({params:{start:0, limit:50}});
     },
     loadValoresIniciales: function () {
-       Phx.vista.AuditoriaNpn.superclass.loadValoresIniciales.call(this);
-       this.Cmp.id_aom.setValue(this.maestro.id_aom);
-    },
-    onButtonNew :function () {
-        Phx.vista.AuditoriaNpn.superclass.onButtonNew.call(this);
-        this.Cmp.id_norma.store.baseParams.p_id_parametro = this.maestro.id_tnorma;
-        this.Cmp.id_norma.store.load({params:{p_codigo_parametro:this.maestro.codigo_parametro,start:0,limit:this.tam_pag},
-            callback : function (r) {
-                if (r.length > 0 ) {
-                    this.Cmp.id_norma.setValue(r[0].data.id_norma);
-                    this.Cmp.id_norma.modificado = true;
-                }
-            }, scope : this
-        });
-        this.Cmp.id_norma.on('select', function(combo, record, index){
-            this.Cmp.id_pn.store.baseParams ={par_filtro: 'nor.sigla_norma#nor.nombre_norma',id_norma: record.data.id_norma};
-            this.Cmp.id_pn.modificado = true;
-        },this);
+        Phx.vista.AuditoriaNpn.superclass.loadValoresIniciales.call(this);
+        this.Cmp.id_aom.setValue(this.maestro.id_aom);
     },
     preparaMenu:function(n){
         var tb =this.tbar;
         Phx.vista.AuditoriaNpn.superclass.preparaMenu.call(this,n);
-
-        if (this.maestro.estado_wf ==='programada') {
-            this.getBoton('new').disable();
-            this.getBoton('edit').disable();
-            this.getBoton('del').disable();
-        }else{
-            this.getBoton('new').enable();
-            this.getBoton('edit').enable();
-            this.getBoton('del').enable();
-        }
-
         return tb
     },
     liberaMenu:function(){
         var tb = Phx.vista.AuditoriaNpn.superclass.liberaMenu.call(this);
         if(tb){
-            if (this.maestro.estado_wf ==='programada'){
-                this.getBoton('new').disable();
-                this.getBoton('edit').disable();
-                this.getBoton('del').disable();
-            }else{
-                this.getBoton('new').enable();
-                this.getBoton('edit').enable();
-                this.getBoton('del').enable();
-            }
+            console.log(tb)
         }
         return tb
     },
-    south:{
+    onButtonNew :function () {
+        Phx.vista.AuditoriaNpn.superclass.onButtonNew.call(this);
+        this.Cmp.id_pn.enableMultiSelect=true;
+        this.eventoFrom();
+    },
+    onButtonEdit:function () {
+        Phx.vista.AuditoriaNpn.superclass.onButtonEdit.call(this);
+        this.Cmp.id_pn.enableMultiSelect=false;
+        this.Cmp.id_pn.type='ComboBox';
+        this.eventoFrom();
+    },
+    eventoFrom:function(){
+        this.Cmp.id_norma.on('select', function(combo, record, index){
+            this.Cmp.id_pn.store.baseParams ={par_filtro: 'ptonor.codigo_pn#ptonor.nombre_pn',id_norma: record.data.id_norma};
+            this.Cmp.id_pn.modificado = true;
+            this.Cmp.id_pn.reset();
+        },this);
+    },
+    east:{
         url:'../../../sis_auditoria/vista/auditoria_npnpg/AuditoriaNpnpg.php',
         title:'Pregunta(s)',
-        height:'40%',
+        width:'30%',
         cls:'AuditoriaNpnpg'
     }
 	}
 )
 </script>
-		
-		

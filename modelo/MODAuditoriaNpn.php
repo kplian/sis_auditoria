@@ -8,17 +8,17 @@
 */
 
 class MODAuditoriaNpn extends MODbase{
-	
+
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
-			
+
 	function listarAuditoriaNpn(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='ssom.ft_auditoria_npn_sel';
 		$this->transaccion='SSOM_ANPN_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-				
+
 		//Definicion de la lista del resultado del query
 		$this->captura('id_anpn','int4');
 		$this->captura('estado_reg','varchar');
@@ -36,7 +36,9 @@ class MODAuditoriaNpn extends MODbase{
 		$this->captura('usr_mod','varchar');
         $this->captura('sigla_norma','varchar');
         $this->captura('nombre_norma','varchar');
-		$this->captura('desc_punto_norma','text');
+		$this->captura('nombre_pn','varchar');
+		$this->captura('codigo_pn','varchar');
+		$this->captura('nombre_descrip','text');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -45,17 +47,16 @@ class MODAuditoriaNpn extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function insertarAuditoriaNpn(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_auditoria_npn_ime';
 		$this->transaccion='SSOM_ANPN_INS';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
-		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('id_aom','id_aom','int4');
-		$this->setParametro('id_pn','id_pn','int4');
+		$this->setParametro('id_pn','id_pn','varchar');
 		$this->setParametro('id_norma','id_norma','int4');
         $this->setParametro('obs_apn','obs_apn','text');
 
@@ -66,13 +67,13 @@ class MODAuditoriaNpn extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function modificarAuditoriaNpn(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_auditoria_npn_ime';
 		$this->transaccion='SSOM_ANPN_MOD';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_anpn','id_anpn','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
@@ -88,13 +89,13 @@ class MODAuditoriaNpn extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function eliminarAuditoriaNpn(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_auditoria_npn_ime';
 		$this->transaccion='SSOM_ANPN_ELI';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_anpn','id_anpn','int4');
 
@@ -105,6 +106,25 @@ class MODAuditoriaNpn extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
+	function insertarItemAuditoriaNpn(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='ssom.ft_auditoria_npn_ime';
+		$this->transaccion='SSOM_PNIN_INS';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_aom','id_aom','int4');
+		$this->setParametro('id_norma','id_norma','int4');
+		$this->setParametro('id_pn','id_pn','text');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 }
 ?>

@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_auditoria_npn_ime (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -17,7 +17,7 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				25-07-2019 21:19:37								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tauditoria_npn'
-   #
+   #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
    ***************************************************************************/
 
 DECLARE
@@ -28,9 +28,10 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_anpn	integer;
+	v_id_anpn				integer;
 
 	v_cantidad              integer = 0;
+    v_id_pn					integer;
 
 BEGIN
 
@@ -44,44 +45,40 @@ BEGIN
  	#FECHA:		25-07-2019 21:19:37
 	***********************************/
 
-	select count(id_anpn) into v_cantidad from ssom.tauditoria_npn where id_aom = v_parametros.id_aom and id_norma = v_parametros.id_norma and id_pn = v_parametros.id_pn;
-
-	if(v_cantidad > 0) then
-		RAISE EXCEPTION ' Ya tiene Registrado la Punto de Norma no es posible asignar mas de una ves a una Norma...!!! ';
-	end if;
 
 	if(p_transaccion='SSOM_ANPN_INS')then
 
 		begin
-			--Sentencia de la insercion
-			insert into ssom.tauditoria_npn(
-				estado_reg,
-				id_aom,--
-				id_pn,
-				id_norma,
-				obs_apn,--
-				fecha_reg,
-				usuario_ai,
-				id_usuario_reg,
-				id_usuario_ai,
-				id_usuario_mod,
-				fecha_mod
-			) values(
-								'activo',
-								v_parametros.id_aom,
-								v_parametros.id_pn,
-								v_parametros.id_norma,
-								v_parametros.obs_apn,
-								now(),
-								v_parametros._nombre_usuario_ai,
-								p_id_usuario,
-								v_parametros._id_usuario_ai,
-								null,
-								null
 
 
+            foreach v_id_pn IN  array (string_to_array(v_parametros.id_pn::varchar,','))  loop
 
-							)RETURNING id_anpn into v_id_anpn;
+                --Sentencia de la insercion
+                insert into ssom.tauditoria_npn(
+                    estado_reg,
+                    id_aom,--
+                    id_pn,
+                    id_norma,
+                    fecha_reg,
+                    usuario_ai,
+                    id_usuario_reg,
+                    id_usuario_ai,
+                    id_usuario_mod,
+                    fecha_mod
+                ) values(
+                    'activo',
+                    v_parametros.id_aom,
+                    v_id_pn, --v_parametros.id_pn,
+                    v_parametros.id_norma,
+                    now(),
+                    v_parametros._nombre_usuario_ai,
+                    p_id_usuario,
+                    v_parametros._id_usuario_ai,
+                    null,
+                    null
+                )RETURNING id_anpn into v_id_anpn;
+
+            end loop;
 
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria Norma Punto de Norma almacenado(a) con exito (id_anpn'||v_id_anpn||')');
@@ -104,14 +101,13 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update ssom.tauditoria_npn set
-																	 id_aom = v_parametros.id_aom,---
-																	 id_pn = v_parametros.id_pn,
-																	 id_norma = v_parametros.id_norma,
-																	 obs_apn= v_parametros.obs_apn,---
-																	 id_usuario_mod = p_id_usuario,
-																	 fecha_mod = now(),
-																	 id_usuario_ai = v_parametros._id_usuario_ai,
-																	 usuario_ai = v_parametros._nombre_usuario_ai
+             id_aom = v_parametros.id_aom,---
+             id_pn = v_parametros.id_pn::integer,
+             id_norma = v_parametros.id_norma,
+             id_usuario_mod = p_id_usuario,
+             fecha_mod = now(),
+             id_usuario_ai = v_parametros._id_usuario_ai,
+             usuario_ai = v_parametros._nombre_usuario_ai
 			where id_anpn=v_parametros.id_anpn;
 
 			--Definicion de la respuesta
@@ -123,7 +119,7 @@ BEGIN
 
 		end;
 
-		/*********************************
+	/*********************************
      #TRANSACCION:  'SSOM_ANPN_ELI'
      #DESCRIPCION:	Eliminacion de registros
      #AUTOR:		max.camacho
@@ -140,6 +136,60 @@ BEGIN
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria Norma Punto de Norma eliminado(a)');
 			v_resp = pxp.f_agrega_clave(v_resp,'id_anpn',v_parametros.id_anpn::varchar);
+
+			--Devuelve la respuesta
+			return v_resp;
+
+		end;
+
+    /*********************************
+     #TRANSACCION:  'SSOM_PNIN_INS'
+     #DESCRIPCION:	Eliminacion de registros
+     #AUTOR:		MMV
+     #FECHA:		25-07-2019 21:19:37
+    ***********************************/
+
+	elsif(p_transaccion='SSOM_PNIN_INS')then
+
+		begin
+			--Sentencia de la eliminacion
+			delete from ssom.tauditoria_npn
+			where  id_aom = v_parametros.id_aom
+            		and id_norma = v_parametros.id_norma;
+
+             foreach v_id_pn IN  array (string_to_array(v_parametros.id_pn::varchar,','))  loop
+
+                --Sentencia de la insercion
+                insert into ssom.tauditoria_npn(
+                    estado_reg,
+                    id_aom,--
+                    id_pn,
+                    id_norma,
+                    fecha_reg,
+                    usuario_ai,
+                    id_usuario_reg,
+                    id_usuario_ai,
+                    id_usuario_mod,
+                    fecha_mod
+                ) values(
+                    'activo',
+                    v_parametros.id_aom,
+                    v_id_pn, --v_parametros.id_pn,
+                    v_parametros.id_norma,
+                    now(),
+                    v_parametros._nombre_usuario_ai,
+                    p_id_usuario,
+                    v_parametros._id_usuario_ai,
+                    null,
+                    null
+                );
+
+            end loop;
+
+
+			--Definicion de la respuesta
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria Norma Punto de Norma eliminado(a)');
+			v_resp = pxp.f_agrega_clave(v_resp,'id_anpn',v_parametros.id_aom::varchar);
 
 			--Devuelve la respuesta
 			return v_resp;
@@ -163,8 +213,12 @@ BEGIN
 
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_auditoria_npn_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
