@@ -11,7 +11,6 @@ class ACTParametro extends ACTbase{
 	function listarParametro(){
 		$this->objParam->defecto('ordenacion','id_parametro');
 		$this->objParam->defecto('dir_ordenacion','asc');
-		//************SSSS
         if($this->objParam->getParametro('tipo_norma') != '') {
             $this->objParam->addFiltro("tpp.tipo_parametro =  ''" .$this->objParam->getParametro('tipo_norma')."'' ");
         }
@@ -26,15 +25,17 @@ class ACTParametro extends ACTbase{
 
         }
         if($this->objParam->getParametro('tipo_parametro_ed') != '') {
-            //var_dump($this->objParam->getParametro('p_codigo_tipo_aom'));exit;
             if($this->objParam->getParametro('p_codigo_tipo_aom_ed') == 'AI'){
                 $this->objParam->addFiltro("tpp.tipo_parametro = ''" .$this->objParam->getParametro('tipo_parametro_ed')."'' and prm.codigo_parametro not in (".$this->objParam->getParametro('p_codigo_parametro_ed').")");
             }
             else{
                 $this->objParam->addFiltro("tpp.tipo_parametro = ''" .$this->objParam->getParametro('tipo_parametro_ed')."'' and prm.codigo_parametro not in (".$this->objParam->getParametro('p_codigo_parametro_ed').")");
             }
-
         }
+        if($this->objParam->getParametro('tipo_no') != '') {
+            $this->objParam->addFiltro("tpp.tipo_parametro = ''" .$this->objParam->getParametro('tipo_no')."''");
+        }
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODParametro','listarParametro');

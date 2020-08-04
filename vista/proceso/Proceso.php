@@ -37,8 +37,7 @@ Phx.vista.Proceso=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Codigo Proceso',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 100,
-                maxLength:50
+                gwidth: 500,
             },
             type:'TextField',
             filters:{pfiltro:'pcs.codigo_proceso',type:'string'},
@@ -52,8 +51,7 @@ Phx.vista.Proceso=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Proceso',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
+				gwidth: 300
 			},
 				type:'TextField',
 				filters:{pfiltro:'pcs.proceso',type:'string'},

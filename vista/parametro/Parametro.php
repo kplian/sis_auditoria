@@ -70,10 +70,11 @@ Phx.vista.Parametro=Ext.extend(Phx.gridInterfaz,{
 			},
 			type: 'ComboBox',
 			id_grupo: 0,
-			filters: {pfiltro: 'tpr.tipo_parametro',type: 'string'},
+			filters: {pfiltro: 'tpp.descrip_parametro',type: 'string'},
 			grid: true,
-			form: true
-		},
+			form: true,
+            bottom_filter:true
+        },
         {
             config:{
                 name: 'valor_parametro',
@@ -246,11 +247,11 @@ Phx.vista.Parametro=Ext.extend(Phx.gridInterfaz,{
     onButtonNew:function () {
         Phx.vista.Parametro.superclass.onButtonNew.call(this);
         this.mostrarComponente(this.Cmp.codigo_parametro);
-        this.Cmp.codigo_parametro.enable();
+    //    this.Cmp.codigo_parametro.enable();
     },
     onButtonEdit:function () {
         Phx.vista.Parametro.superclass.onButtonEdit.call(this);
-        this.Cmp.codigo_parametro.disable(true);
+     //   this.Cmp.codigo_parametro.disable(true);
     }
 	}
 )

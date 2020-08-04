@@ -60,7 +60,7 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
 
 
         if($this->objParam->getParametro('v_tipo_auditoria_nc')!=''){
-            $this->objParam->addFiltro("aom.id_tipo_auditoria= ".$this->objParam->getParametro('v_tipo_auditoria_nc')." and aom.estado_wf in (''notificar'') ");
+            $this->objParam->addFiltro("aom.id_tipo_auditoria= ".$this->objParam->getParametro('v_tipo_auditoria_nc')." and aom.estado_wf in (''acciones_propuestas'') ");
         }
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
