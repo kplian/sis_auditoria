@@ -8,11 +8,11 @@
 */
 
 class MODEquipoResponsable extends MODbase{
-	
+
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
-			
+
 	function listarEquipoResponsable(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='ssom.ft_equipo_responsable_sel';
@@ -44,7 +44,7 @@ class MODEquipoResponsable extends MODbase{
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
@@ -72,19 +72,19 @@ class MODEquipoResponsable extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function modificarEquipoResponsable(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_equipo_responsable_ime';
 		$this->transaccion='SSOM_EQRE_MOD';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_equipo_responsable','id_equipo_responsable','int4');
 		$this->setParametro('id_funcionario','id_funcionario','int4');
-        $this->setParametro('exp_tec_externo','exp_tec_externo','varchar');
-        $this->setParametro('id_parametro','id_parametro','int4');
-        $this->setParametro('obs_participante','obs_participante','varchar');
+    $this->setParametro('exp_tec_externo','exp_tec_externo','varchar');
+    $this->setParametro('id_parametro','id_parametro','int4');
+    $this->setParametro('obs_participante','obs_participante','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('id_aom','id_aom','int4');
 
@@ -95,13 +95,13 @@ class MODEquipoResponsable extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function eliminarEquipoResponsable(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_equipo_responsable_ime';
 		$this->transaccion='SSOM_EQRE_ELI';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_equipo_responsable','id_equipo_responsable','int4');
 
@@ -112,6 +112,26 @@ class MODEquipoResponsable extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
+	function insertarItemEquipoResponsable(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='ssom.ft_equipo_responsable_ime';
+		$this->transaccion='SSOM_EQIS_INS';
+		$this->tipo_procedimiento='IME';
+
+		$this->setParametro('id_aom','id_aom','int4');
+		$this->setParametro('id_responsable','id_responsable','int4');
+		$this->setParametro('id_interno','id_interno','int4');
+		$this->setParametro('id_equipo_auditor','id_equipo_auditor','text');
+
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 }
 ?>

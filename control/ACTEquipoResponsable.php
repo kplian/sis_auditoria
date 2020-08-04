@@ -7,17 +7,29 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 
-class ACTEquipoResponsable extends ACTbase{    
-			
+class ACTEquipoResponsable extends ACTbase{
+
 	function listarEquipoResponsable(){
 		$this->objParam->defecto('ordenacion','id_equipo_responsable');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
-        /* Metodo que filtra Responsables (funcionarios) en base al id padre (id_aom) */
-        //var_dump(id_aom);
+
         if($this->objParam->getParametro('id_aom')!=''){
             $this->objParam->addFiltro("eqre.id_aom = ".$this->objParam->getParametro('id_aom'));
-        }// Fin*****
+        }
+				if($this->objParam->getParametro('item')!=''){
+						$this->objParam->addFiltro("eqre.id_funcionario not in (select crer.id_funcionario
+                                                          from ssom.tcronograma_equipo_responsable crer
+                                                          where crer.id_cronograma = ".$this->objParam->getParametro('item').")");
+				}
+
+        if($this->objParam->getParametro('codigo_parametro')!=''){
+            $this->objParam->addFiltro("par.codigo_parametro=  ''".$this->objParam->getParametro('codigo_parametro')."''");
+        }
+
+
+
+				// Fin*****
 
         if($this->objParam->getParametro('v_id_aom')!='' && $this->objParam->getParametro('v_codigo_parametro')!=''){
             $this->objParam->addFiltro("eqre.id_aom = ".$this->objParam->getParametro('v_id_aom')." and "."par.codigo_parametro = ''".$this->objParam->getParametro('v_codigo_parametro')."''");
@@ -43,7 +55,7 @@ class ACTEquipoResponsable extends ACTbase{
 			$this->res = $this->objReporte->generarReporteListado('MODEquipoResponsable','listarEquipoResponsable');
 		} else{
 			$this->objFunc=$this->create('MODEquipoResponsable');
-			
+
 			$this->res=$this->objFunc->listarEquipoResponsable($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
@@ -92,23 +104,27 @@ class ACTEquipoResponsable extends ACTbase{
         $this->res=$this->objFunc->listarEquipoResponsable($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-				
+
 	function insertarEquipoResponsable(){
-		$this->objFunc=$this->create('MODEquipoResponsable');	
+		$this->objFunc=$this->create('MODEquipoResponsable');
 		if($this->objParam->insertar('id_equipo_responsable')){
-			$this->res=$this->objFunc->insertarEquipoResponsable($this->objParam);			
-		} else{			
+			$this->res=$this->objFunc->insertarEquipoResponsable($this->objParam);
+		} else{
 			$this->res=$this->objFunc->modificarEquipoResponsable($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-						
+
 	function eliminarEquipoResponsable(){
-			$this->objFunc=$this->create('MODEquipoResponsable');	
+			$this->objFunc=$this->create('MODEquipoResponsable');
 		$this->res=$this->objFunc->eliminarEquipoResponsable($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-			
+	function insertarItemEquipoResponsable(){
+		$this->objFunc=$this->create('MODEquipoResponsable');
+		$this->res=$this->objFunc->insertarItemEquipoResponsable($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 }
 
 ?>

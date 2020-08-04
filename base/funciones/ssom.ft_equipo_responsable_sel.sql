@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION ssom.ft_equipo_responsable_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -19,7 +17,7 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				02-08-2019 14:03:25								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tequipo_responsable'
-   #
+   #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
    ***************************************************************************/
 
 DECLARE
@@ -64,22 +62,21 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         aom.nombre_aom1,
-                        vfc.desc_funcionario1,
+                        initcap(vfc.desc_funcionario1) as desc_funcionario1,
                         par.valor_parametro,
                         par.codigo_parametro
 						from ssom.tequipo_responsable eqre
 						inner join segu.tusuario usu1 on usu1.id_usuario = eqre.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = eqre.id_usuario_mod
-
                         join ssom.tauditoria_oportunidad_mejora aom on eqre.id_aom = aom.id_aom
-                        join orga.vfuncionario_cargo vfc on eqre.id_funcionario = vfc.id_funcionario
+                        join orga.vfuncionario vfc on eqre.id_funcionario = vfc.id_funcionario
             			inner join ssom.tparametro par on eqre.id_parametro = par.id_parametro
-				        where /*vfc.fecha_finalizacion is null and*/ ';
+				        where  ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro; --=addFiltro
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			--raise notice '%',v_consulta;
+			raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -101,9 +98,9 @@ BEGIN
 						inner join segu.tusuario usu1 on usu1.id_usuario = eqre.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = eqre.id_usuario_mod
                         join ssom.tauditoria_oportunidad_mejora aom on eqre.id_aom = aom.id_aom
-                        join orga.vfuncionario_cargo vfc on eqre.id_funcionario = vfc.id_funcionario
+                        join orga.vfuncionario vfc on eqre.id_funcionario = vfc.id_funcionario
             			inner join ssom.tparametro par on eqre.id_parametro = par.id_parametro
-					    where vfc.fecha_finalizacion is null and ';
+					    where ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -292,4 +289,8 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
+
+ALTER FUNCTION ssom.ft_equipo_responsable_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

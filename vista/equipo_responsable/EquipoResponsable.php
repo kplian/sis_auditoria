@@ -16,7 +16,8 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
 		Phx.vista.EquipoResponsable.superclass.constructor.call(this,config);
 		this.init();
-        var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
+        this.iniciarEvento();
+		var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
         if(dataPadre){
             this.onEnablePanel(this, dataPadre);
         }
@@ -24,7 +25,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
             this.bloquearMenus();
         }
 	},
-			
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -34,7 +35,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_equipo_responsable'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
         {
             //configuracion del componente
@@ -75,7 +76,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
                     fields: ['id_parametro', 'tipo_parametro', 'valor_parametro','codigo_parametro'],
                     remoteSort: true,
                     baseParams: { par_filtro: 'prm.id_parametro',
-                                  tipo_parametro:'TIPO_PARTICIPACION'
+                                  tipo_parametro:'TIPO_PARTICIPACION'}
                 }),
                 valueField: 'id_parametro',
                 displayField: 'valor_parametro',
@@ -88,7 +89,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
                 mode: 'remote',
                 pageSize: 15,
                 queryDelay: 1000,
-                anchor: '60%',
+                anchor: '70%',
                 gwidth: 150,
                 minChars: 2,
                 renderer : function(value, p, record) {
@@ -101,24 +102,6 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
             grid: true,
             form: true
         },
-      /*  {
-            config:{
-                name:'id_funcionario',
-                origen:'FUNCIONARIOCAR',
-                fieldLabel:'Responsable',
-                gdisplayField:'desc_funcionario', //mapea al store del grid
-                valueField:'id_funcionario',
-                width:300,
-                gwidth:250,
-                renderer:function(value, p, record) {
-                    return String.format('{0}', record.data['desc_funcionario1']);
-                }
-            },
-            type:'ComboRec',
-            id_grupo:2,
-            grid:true,
-            form:true
-        },*/
 		{
 			config: {
 				name: 'id_funcionario',
@@ -136,7 +119,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 					totalProperty: 'total',
 					fields: ['id_funcionario', 'desc_funcionario1'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'fun.desc_funcionario1'}
+					baseParams: {par_filtro: 'fu.desc_funcionario1'}
 				}),
 				valueField: 'id_funcionario',
 				displayField: 'desc_funcionario1',
@@ -149,7 +132,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 				mode: 'remote',
 				pageSize: 15,
 				queryDelay: 1000,
-				anchor: '80%',
+				anchor: '70%',
 				gwidth: 150,
 				minChars: 2,
 				renderer : function(value, p, record) {
@@ -165,9 +148,9 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'exp_tec_externo',
-                fieldLabel: 'Exp. Tecnico Externo',
-                allowBlank: true,
-                anchor: '80%',
+                fieldLabel: 'Nombre completo',
+                allowBlank: false,
+                anchor: '70%',
                 gwidth: 100,
                 maxLength:50
             },
@@ -188,8 +171,8 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 				type:'TextField',
 				filters:{pfiltro:'eqre.obs_participante',type:'string'},
 				id_grupo:1,
-				grid:true,
-				form:true
+				grid:false,
+				form:false
 		},
 		{
 			config:{
@@ -258,7 +241,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -289,7 +272,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -299,7 +282,7 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
-	tam_pag:50,	
+	tam_pag:50,
 	title:'Equipo Responsable',
 	ActSave:'../../sis_auditoria/control/EquipoResponsable/insertarEquipoResponsable',
 	ActDel:'../../sis_auditoria/control/EquipoResponsable/eliminarEquipoResponsable',
@@ -333,6 +316,8 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:false,
+    fwidth: '40%',
+    fheight: '30%',
     onReloadPage:function(m){
         this.maestro=m;
         this.store.baseParams = {id_aom: this.maestro.id_aom};
@@ -344,22 +329,17 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
     },
     onButtonNew: function () {
         Phx.vista.EquipoResponsable.superclass.onButtonNew.call(this);
-        this.Cmp.id_parametro.on('select', function( combo, record, index){
-            this.Cmp.id_funcionario.store.baseParams ={
-                codigo: record.data.codigo_parametro,
-                id_uo: this.maestro.id_uo,
-                par_filtro:'fun.desc_funcionario1'}; 
-            this.Cmp.id_funcionario.modificado = true;
-        },this);
+        this.eventoFrom();
     },
     onButtonEdit:function(){
         Phx.vista.EquipoResponsable.superclass.onButtonEdit.call(this);
+        this.eventoFrom();
     },
     preparaMenu:function(n){
         var tb =this.tbar;
         Phx.vista.EquipoResponsable.superclass.preparaMenu.call(this,n);
-        
-        if (this.maestro.estado_wf ==='programada') {
+
+       /* if (this.maestro.estado_wf ==='programada') {
             this.getBoton('new').disable();
             this.getBoton('edit').disable();
             this.getBoton('del').disable();
@@ -367,14 +347,14 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('new').enable();
             this.getBoton('edit').enable();
             this.getBoton('del').enable();
-        }
+        }*/
 
         return tb
     },
     liberaMenu:function(){
         var tb = Phx.vista.EquipoResponsable.superclass.liberaMenu.call(this);
         if(tb){
-            if (this.maestro.estado_wf ==='programada'){
+           /* if (this.maestro.estado_wf ==='programada'){
                 this.getBoton('new').disable();
                 this.getBoton('edit').disable();
                 this.getBoton('del').disable();
@@ -382,12 +362,30 @@ Phx.vista.EquipoResponsable=Ext.extend(Phx.gridInterfaz,{
                 this.getBoton('new').enable();
                 this.getBoton('edit').enable();
                 this.getBoton('del').enable();
-            }
+            }*/
         }
         return tb
+    },
+    iniciarEvento:function () {
+        this.ocultarComponente(this.Cmp.exp_tec_externo);
+    },
+    eventoFrom:function () {
+        this.Cmp.id_parametro.on('select', function( combo, record, index){
+					console.log(record.data.codigo_parametro);
+            if(record.data.codigo_parametro ==='ETE'){
+                this.ocultarComponente(this.Cmp.id_funcionario);
+                this.mostrarComponente(this.Cmp.exp_tec_externo);
+            }else {
+                this.ocultarComponente(this.Cmp.exp_tec_externo);
+                this.mostrarComponente(this.Cmp.id_funcionario);
+            }
+            this.Cmp.id_funcionario.store.baseParams ={ codigo: record.data.codigo_parametro,id_uo: this.maestro.id_uo ,par_filtro:'fu.desc_funcionario1'};
+            this.Cmp.id_funcionario.reset();
+            this.Cmp.exp_tec_externo.reset();
+            this.Cmp.id_funcionario.modificado = true;
+        },this);
     }
+
 	}
 )
 </script>
-		
-		
