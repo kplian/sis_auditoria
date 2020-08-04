@@ -11,8 +11,8 @@
 
 */
 
-class ACTCronograma extends ACTbase{    
-			
+class ACTCronograma extends ACTbase{
+
 	function listarCronograma(){
 		$this->objParam->defecto('ordenacion','id_cronograma');
 
@@ -26,28 +26,40 @@ class ACTCronograma extends ACTbase{
 			$this->res = $this->objReporte->generarReporteListado('MODCronograma','listarCronograma');
 		} else{
 			$this->objFunc=$this->create('MODCronograma');
-			
+
 			$this->res=$this->objFunc->listarCronograma($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-				
+
 	function insertarCronograma(){
-		$this->objFunc=$this->create('MODCronograma');	
+		$this->objFunc=$this->create('MODCronograma');
 		if($this->objParam->insertar('id_cronograma')){
-			$this->res=$this->objFunc->insertarCronograma($this->objParam);			
-		} else{			
+			$this->res=$this->objFunc->insertarCronograma($this->objParam);
+		} else{
 			$this->res=$this->objFunc->modificarCronograma($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-						
+
 	function eliminarCronograma(){
-			$this->objFunc=$this->create('MODCronograma');	
+			$this->objFunc=$this->create('MODCronograma');
 		$this->res=$this->objFunc->eliminarCronograma($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-			
+    function insertarCronogramaRecord(){
+        $this->objFunc=$this->create('MODCronograma');
+        if($this->objParam->insertar('id_cronograma')){
+            $this->res=$this->objFunc->insertarCronogramaRecord($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+		function itemCronograma(){
+			$this->objFunc=$this->create('MODCronograma');
+			$this->res=$this->objFunc->itemCronograma($this->objParam);
+			$this->res->imprimirRespuesta($this->res->generarJson());
+		}
+
 }
 
 ?>

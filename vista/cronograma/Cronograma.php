@@ -181,21 +181,6 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
         },
 		{
 			config:{
-				name: 'obs_actividad',
-				fieldLabel: 'Obs. Actividad',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:1000
-			},
-				type:'TextArea',
-				filters:{pfiltro:'cronog.obs_actividad',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:true
-		},
-		{
-			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
@@ -313,7 +298,6 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
 		{name:'nueva_actividad', type: 'string'},
 		{name:'obs_actividad', type: 'string'},
 		{name:'estado_reg', type: 'string'},
-		//{name:'hora_ini_activ', type: 'string'},
 		{name:'hora_ini_activ', type: 'date',dateFormat:'H:i:s'},
 		{name:'fecha_ini_activ', type: 'date',dateFormat:'Y-m-d'},
 		{name:'fecha_fin_activ', type: 'date',dateFormat:'Y-m-d'},
@@ -338,10 +322,12 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:false,
-    south:{
+    fwidth: '40%',
+    fheight: '30%',
+    east:{
         url:'../../../sis_auditoria/vista/cronograma_equipo_responsable/CronogramaEquipoResponsable.php',
         title:'Participantes en la Actividad',
-        height:'40%',
+        width:'30%',
         cls:'CronogramaEquipoResponsable'
     },
     onReloadPage:function(m){
@@ -353,34 +339,34 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.Cronograma.superclass.loadValoresIniciales.call(this);
         this.Cmp.id_aom.setValue(this.maestro.id_aom);
     },
+    onButtonNew:function(){
+        var me = this;
+        me.objSolForm = Phx.CP.loadWindows('../../../sis_auditoria/vista/cronograma/FromCrorograma.php',
+            'Registro Crorograma',
+            {
+                modal:true,
+                width:'60%',
+                height:'65%'
+            }, this.maestro,this.idContenedor,
+            'FromCrorograma',
+            {
+                config:[{
+                    event:'successsave'
+                }],
+
+                scope:this
+            });
+
+    },
     preparaMenu:function(n){
         var tb =this.tbar;
         Phx.vista.Cronograma.superclass.preparaMenu.call(this,n);
-
-        if (this.maestro.estado_wf ==='programada') {
-            this.getBoton('new').disable();
-            this.getBoton('edit').disable();
-            this.getBoton('del').disable();
-        }else{
-            this.getBoton('new').enable();
-            this.getBoton('edit').enable();
-            this.getBoton('del').enable();
-        }
-
         return tb
     },
     liberaMenu:function(){
         var tb = Phx.vista.Cronograma.superclass.liberaMenu.call(this);
         if(tb){
-            if (this.maestro.estado_wf ==='programada'){
-                this.getBoton('new').disable();
-                this.getBoton('edit').disable();
-                this.getBoton('del').disable();
-            }else{
-                this.getBoton('new').enable();
-                this.getBoton('edit').enable();
-                this.getBoton('del').enable();
-            }
+            console.log(tb)
         }
         return tb
     }

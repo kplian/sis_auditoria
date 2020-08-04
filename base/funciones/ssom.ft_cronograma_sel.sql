@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_cronograma_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Seguimiento de Oportunidades de Mejora
@@ -17,7 +17,7 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				12-12-2019 15:50:53								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tcronograma'
-   #
+   #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
    ***************************************************************************/
 
 DECLARE
@@ -62,7 +62,11 @@ BEGIN
 						cronog.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        atv.actividad
+                        atv.actividad,
+                         (select pxp.list(initcap (fu.desc_funcionario1))
+                        from ssom.tcronograma_equipo_responsable cc
+                        inner join orga.vfuncionario fu on fu.id_funcionario = cc.id_funcionario
+                        where cc.id_cronograma = cronog.id_cronograma) as lista_funcionario
 						from ssom.tcronograma cronog
 						inner join segu.tusuario usu1 on usu1.id_usuario = cronog.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cronog.id_usuario_mod
@@ -120,8 +124,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_cronograma_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
