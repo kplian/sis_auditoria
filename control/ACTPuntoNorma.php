@@ -7,8 +7,8 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 
-class ACTPuntoNorma extends ACTbase{    
-			
+class ACTPuntoNorma extends ACTbase{
+
 	function listarPuntoNorma(){
 		$this->objParam->defecto('ordenacion','id_pn');
 		$this->objParam->defecto('dir_ordenacion','asc');
@@ -27,50 +27,55 @@ class ACTPuntoNorma extends ACTbase{
 			$this->res = $this->objReporte->generarReporteListado('MODPuntoNorma','listarPuntoNorma');
 		}else{
 			$this->objFunc=$this->create('MODPuntoNorma');
-			
+
 			$this->res=$this->objFunc->listarPuntoNorma($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-				
+
 	function insertarPuntoNorma(){
-		$this->objFunc=$this->create('MODPuntoNorma');	
+		$this->objFunc=$this->create('MODPuntoNorma');
 		if($this->objParam->insertar('id_pn')){
-			$this->res=$this->objFunc->insertarPuntoNorma($this->objParam);			
-		} else{			
+			$this->res=$this->objFunc->insertarPuntoNorma($this->objParam);
+		} else{
 			$this->res=$this->objFunc->modificarPuntoNorma($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-						
+
 	function eliminarPuntoNorma(){
-			$this->objFunc=$this->create('MODPuntoNorma');	
+			$this->objFunc=$this->create('MODPuntoNorma');
 		$this->res=$this->objFunc->eliminarPuntoNorma($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-	
-	//funcion para la seleccion multiple	
+
+
 	function listarPuntoNormaMulti(){
 		$this->objParam->defecto('ordenacion','id_pn');
 		$this->objParam->defecto('dir_ordenacion','asc');
 
-        //*************filtro combo
-        /*if($this->objParam->getParametro('id_norma')!=''){
-            $this->objParam->addFiltro("ptonor.id_norma = ".$this->objParam->getParametro('id_norma'));
-        }*/
-		
+    if($this->objParam->getParametro('id_norma')!=''){
+        $this->objParam->addFiltro("ptonor.id_norma = ".$this->objParam->getParametro('id_norma'));
+    }
+
 		if($this->objParam->getParametro('fill')!=''){
 			  $this->objParam->addFiltro("ptonor.id_norma = ".$this->objParam->getParametro('id_norma'));
 			  $this->objParam->addFiltro("ptonor.id_pn not in (select pnnc.id_pn
                                                     from ssom.tpnorma_noconformidad pnnc
                                                     where pnnc.id_nc = ".$this->objParam->getParametro('id_nc')." and pnnc.id_norma = ".$this->objParam->getParametro('id_norma')." )");
-		}    
-		$this->objFunc=$this->create('MODPuntoNorma');	
+		}
+
+		if($this->objParam->getParametro('item') != ''){
+        $this->objParam->addFiltro("ptonor.id_pn not  in (select anpn.id_pn
+					                                                from ssom.tauditoria_npn anpn
+					                                                where anpn.id_aom = ".$this->objParam->getParametro('item') .")");
+    }
+		$this->objFunc=$this->create('MODPuntoNorma');
 		$this->res=$this->objFunc->listarPuntoNormaMulti($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
-	}	
-	
-			
+	}
+
+
 }
 
 ?>

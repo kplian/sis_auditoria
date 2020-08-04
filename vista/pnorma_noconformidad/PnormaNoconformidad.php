@@ -13,9 +13,12 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
-		this.maestro=config.maestro;
+        this.idContenedor = config.idContenedor;
+        this.maestro = config;
 		Phx.vista.PnormaNoconformidad.superclass.constructor.call(this,config);
 		this.init();
+        this.store.baseParams={ id_nc: this.maestro.id_nc };
+        this.load({params:{start:0, limit:this.tam_pag}})
 	},
 			
 	Atributos:[
@@ -94,7 +97,7 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
                 pageSize: 15,
                 queryDelay: 1000,
                 anchor: '50%',
-                gwidth: 150,
+                gwidth: 250,
                 minChars: 2,
                 renderer : function(value, p, record) {
                     return String.format('{0}', record.data['desc_norma']);
@@ -106,7 +109,21 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
             grid: true,
             form: true
         },
-
+        {
+            config:{
+                name: 'codigo_pn',
+                fieldLabel: 'Codigo',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:50
+            },
+            type:'TextField',
+            filters:{pfiltro:'pnorm.codigo_pn',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
 		{
 			config: {
 				name: 'id_pn',
@@ -124,13 +141,11 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
 					totalProperty: 'total',
 					fields: ['id_pn', 'nombre_pn', 'codigo_pn'],
 					remoteSort: true
-					//baseParams: {par_filtro: 'pnorm.nombre_pn#pnorm.codigo_pn'}
 				}),
 				valueField: 'id_pn',
 				displayField: 'nombre_pn',
-				gdisplayField: 'desc_pn',
+				gdisplayField: 'nombre_pn',
 				hiddenName: 'id_pn',
-                //tpl:'<tpl for="."><div class="x-combo-list-item"><p> <b>Codigo: </b>{codigo_pn}</p><p style="color: blue"><b>Nombre: </b>{{nombre_pn}</p></div></tpl>',
                 forceSelection: true,
 				typeAhead: false,
 				triggerAction: 'all',
@@ -139,12 +154,11 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
 				pageSize: 15,
 				queryDelay: 1000,
 				anchor: '50%',
-				gwidth: 150,
+				gwidth: 250,
 				minChars: 2,
 				enableMultiSelect: true,
 				renderer : function(value, p, record) {
-					//return String.format('{0}', record.data['desc_pn']);
-					return String.format('{0}', record.data['codigo_pn','desc_pn']);
+					return String.format('{0}', record.data['nombre_pn']);
 				}
 			},
 			type: 'AwesomeCombo',
@@ -252,11 +266,8 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-        //**********SSS
         {name:'desc_norma', type: 'string'},
-        {name:'desc_pn', type: 'string'},
-        //**********
-		
+        {name:'nombre_pn', type: 'string'}, {name:'codigo_pn', type: 'string'},
 	],
 	sortInfo:{
 		field: 'id_pnnc',
@@ -266,8 +277,11 @@ Phx.vista.PnormaNoconformidad=Ext.extend(Phx.gridInterfaz,{
 	bsave:false,
     onButtonNew :function () {
         Phx.vista.PnormaNoconformidad.superclass.onButtonNew.call(this);
-        this.Cmp.id_nc.setValue(this.maestro.id_nc);
-        this.Cmp.id_norma.on('select', function(combo, record, index){
+
+             console.log(this.maestro);
+            this.Cmp.id_nc.setValue(this.maestro.id_nc);
+
+            this.Cmp.id_norma.on('select', function(combo, record, index){
             this.Cmp.id_pn.store.baseParams ={	par_filtro: 'ptonor.nombre_pn#ptonor.codigo_pn',
 											    id_norma : record.data.id_norma,
 												id_nc: this.maestro.id_nc,

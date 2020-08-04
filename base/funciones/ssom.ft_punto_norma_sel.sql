@@ -1,13 +1,3 @@
---------------- SQL ---------------
-
-CREATE OR REPLACE FUNCTION ssom.ft_punto_norma_sel (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS varchar AS
-$body$
 /**************************************************************************
  SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
  FUNCION: 		ssom.ft_punto_norma_sel
@@ -19,7 +9,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
  #0				01-07-2019 18:45:10								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tpunto_norma'
- #
+   #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
  ***************************************************************************/
 
 DECLARE
@@ -123,7 +113,8 @@ BEGIN
 						ptonor.fecha_mod,
 						ptonor.id_usuario_mod,
 						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod
+						usu2.cuenta as usr_mod,
+                         ''(''||ptonor.codigo_pn||'') ''|| ptonor.nombre_pn as nombre_descrip
 						from ssom.tpunto_norma ptonor
 						inner join segu.tusuario usu1 on usu1.id_usuario = ptonor.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ptonor.id_usuario_mod
@@ -151,9 +142,3 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;

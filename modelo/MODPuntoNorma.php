@@ -126,8 +126,9 @@ class MODPuntoNorma extends MODbase{
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-		
-		//Ejecuta la instruccion
+        $this->captura('nombre_descrip','text');
+
+        //Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 		
