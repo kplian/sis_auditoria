@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_cronograma_equipo_responsable_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Seguimiento de Oportunidades de Mejora
@@ -17,7 +17,8 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				12-12-2019 20:16:51								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tcronograma_equipo_responsable'
-   #
+      #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
+
    ***************************************************************************/
 
 DECLARE
@@ -58,15 +59,13 @@ BEGIN
 						crer.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
+                        crer.id_funcionario,
                         vfc.desc_funcionario1
 						from ssom.tcronograma_equipo_responsable crer
 						inner join segu.tusuario usu1 on usu1.id_usuario = crer.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = crer.id_usuario_mod
-
-                        join ssom.tcronograma cronog on crer.id_cronograma = cronog.id_cronograma
-                        join ssom.tequipo_responsable eqr on crer.id_equipo_responsable = eqr.id_equipo_responsable
-                        join orga.vfuncionario_cargo vfc on eqr.id_funcionario = vfc.id_funcionario
-
+                        inner join ssom.tcronograma cronog on crer.id_cronograma = cronog.id_cronograma
+                        inner join orga.vfuncionario vfc on vfc.id_funcionario = crer.id_funcionario
 				        where  ';
 
 			--Definicion de la respuesta
@@ -93,10 +92,8 @@ BEGIN
 					    from ssom.tcronograma_equipo_responsable crer
 					    inner join segu.tusuario usu1 on usu1.id_usuario = crer.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = crer.id_usuario_mod
-
-                        join ssom.tcronograma cronog on crer.id_cronograma = cronog.id_cronograma
-                        join ssom.tequipo_responsable eqr on crer.id_equipo_responsable = eqr.id_equipo_responsable
-                        join orga.vfuncionario_cargo vfc on eqr.id_funcionario = vfc.id_funcionario
+                        inner join ssom.tcronograma cronog on crer.id_cronograma = cronog.id_cronograma
+                        inner join orga.vfuncionario vfc on vfc.id_funcionario = crer.id_funcionario
 					    where ';
 
 			--Definicion de la respuesta
@@ -123,8 +120,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_cronograma_equipo_responsable_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

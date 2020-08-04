@@ -12,17 +12,17 @@
 */
 
 class MODCronogramaEquipoResponsable extends MODbase{
-	
+
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
-			
+
 	function listarCronogramaEquipoResponsable(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='ssom.ft_cronograma_equipo_responsable_sel';
 		$this->transaccion='SSOM_CRER_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-				
+
 		//Definicion de la lista del resultado del query
 		$this->captura('id_cronog_eq_resp','int4');
 		$this->captura('estado_reg','varchar');
@@ -38,22 +38,23 @@ class MODCronogramaEquipoResponsable extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-        $this->captura('desc_funcionario1','text');
+		$this->captura('id_funcionario','int4');
+    $this->captura('desc_funcionario1','text');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function insertarCronogramaEquipoResponsable(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_cronograma_equipo_responsable_ime';
 		$this->transaccion='SSOM_CRER_INS';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('v_participacion','v_participacion','varchar');
@@ -68,13 +69,13 @@ class MODCronogramaEquipoResponsable extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function modificarCronogramaEquipoResponsable(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_cronograma_equipo_responsable_ime';
 		$this->transaccion='SSOM_CRER_MOD';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_cronog_eq_resp','id_cronog_eq_resp','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
@@ -90,13 +91,13 @@ class MODCronogramaEquipoResponsable extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function eliminarCronogramaEquipoResponsable(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='ssom.ft_cronograma_equipo_responsable_ime';
 		$this->transaccion='SSOM_CRER_ELI';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_cronog_eq_resp','id_cronog_eq_resp','int4');
 
@@ -107,6 +108,6 @@ class MODCronogramaEquipoResponsable extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 }
 ?>

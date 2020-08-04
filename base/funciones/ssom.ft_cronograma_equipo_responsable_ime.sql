@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_cronograma_equipo_responsable_ime (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Seguimiento de Oportunidades de Mejora
@@ -17,7 +17,7 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				12-12-2019 20:16:51								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tcronograma_equipo_responsable'
-   #
+   #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
    ***************************************************************************/
 
 DECLARE
@@ -36,6 +36,8 @@ DECLARE
 	v_indice 				integer = 0;
 	v_i						integer;
 
+    v_id_funcionario		integer;
+
 BEGIN
 
 	v_nombre_funcion = 'ssom.ft_cronograma_equipo_responsable_ime';
@@ -44,35 +46,23 @@ BEGIN
 	/*********************************
  	#TRANSACCION:  'SSOM_CRER_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		max.camacho
+ 	#AUTOR:		MMV
  	#FECHA:		12-12-2019 20:16:51
 	***********************************/
 
 	if(p_transaccion='SSOM_CRER_INS')then
 
 		begin
-			--Sentencia de la insercion
-			--raise EXCEPTION 'Holaaaaaaa   %',v_parametros.id_equipo_responsable;
-			--raise EXCEPTION ' Holsssssssssssss % ', string_to_array(v_parametros.id_equipo_responsable,',');
+
 			v_ids_responsable = string_to_array(v_parametros.id_equipo_responsable,',');
 
-			--raise EXCEPTION ' Holsssssssssssss %',v_ids_responsable;
-			--raise EXCEPTION ' size --> % ',array_length(v_ids_responsable,1);
 
-			FOR v_i IN 1..array_length(v_ids_responsable,1) LOOP
-				select count(id_cronog_eq_resp) into v_cantidad from ssom.tcronograma_equipo_responsable where id_cronograma = v_parametros.id_cronograma and id_equipo_responsable = v_ids_responsable[v_i]::integer;--v_parametros.id_equipo_responsable::integer;
 
-				if(v_cantidad > 0) then
-					RAISE EXCEPTION ' Ya tiene Registrado el Auditor no es posible asignar mas de una ves a una Actividad...!!! ';
-				end if;
+            FOREACH v_id_funcionario in ARRAY (v_ids_responsable) LOOP
 
-				--raise exception 'id i %',v_ids_responsable[v_i];
-				v_id_equipo_responsable = v_ids_responsable[v_i]::integer;
-
-				insert into ssom.tcronograma_equipo_responsable(
+            insert into ssom.tcronograma_equipo_responsable(
 					estado_reg,
-					v_participacion,
-					obs_participacion,
+					--obs_participacion,
 					id_equipo_responsable,
 					id_cronograma,
 					fecha_reg,
@@ -82,24 +72,22 @@ BEGIN
 					id_usuario_mod,
 					fecha_mod
 				) values(
-									'activo',
-									v_parametros.v_participacion,
-									v_parametros.obs_participacion,
-									--v_parametros.id_equipo_responsable,
-									v_id_equipo_responsable,
-									v_parametros.id_cronograma,
-									now(),
-									v_parametros._nombre_usuario_ai,
-									p_id_usuario,
-									v_parametros._id_usuario_ai,
-									null,
-									null
+                    'activo',
+                   -- v_parametros.obs_participacion,
+                    v_id_funcionario,
+                    v_parametros.id_cronograma,
+                    now(),
+                    v_parametros._nombre_usuario_ai,
+                    p_id_usuario,
+                    v_parametros._id_usuario_ai,
+                    null,
+                    null
+                    )RETURNING id_cronog_eq_resp into v_id_cronog_eq_resp;
+
+            END LOOP;
 
 
 
-								)RETURNING id_cronog_eq_resp into v_id_cronog_eq_resp;
-
-			END LOOP;
 
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Cronograma Equipo Responsable almacenado(a) con exito (id_cronog_eq_resp'||v_id_cronog_eq_resp||')');
@@ -128,14 +116,14 @@ BEGIN
 			end if;
 
 			update ssom.tcronograma_equipo_responsable set
-																									 v_participacion = v_parametros.v_participacion,
-																									 obs_participacion = v_parametros.obs_participacion,
-																									 id_equipo_responsable = v_parametros.id_equipo_responsable,
-																									 id_cronograma = v_parametros.id_cronograma,
-																									 id_usuario_mod = p_id_usuario,
-																									 fecha_mod = now(),
-																									 id_usuario_ai = v_parametros._id_usuario_ai,
-																									 usuario_ai = v_parametros._nombre_usuario_ai
+             v_participacion = v_parametros.v_participacion,
+           --  obs_participacion = v_parametros.obs_participacion,
+             id_equipo_responsable = v_parametros.id_equipo_responsable,
+             id_cronograma = v_parametros.id_cronograma,
+             id_usuario_mod = p_id_usuario,
+             fecha_mod = now(),
+             id_usuario_ai = v_parametros._id_usuario_ai,
+             usuario_ai = v_parametros._nombre_usuario_ai
 			where id_cronog_eq_resp=v_parametros.id_cronog_eq_resp;
 
 			--Definicion de la respuesta
@@ -187,8 +175,12 @@ BEGIN
 
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_cronograma_equipo_responsable_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

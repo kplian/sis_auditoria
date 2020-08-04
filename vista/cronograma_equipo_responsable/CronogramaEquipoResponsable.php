@@ -103,8 +103,8 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
             type:'TextField',
             filters:{pfiltro:'crer.v_participacion',type:'string'},
             id_grupo:1,
-            grid:true,
-            form:true
+            grid:false,
+            form:false
         },
         {
             config:{
@@ -118,8 +118,8 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
             type:'TextArea',
             filters:{pfiltro:'crer.obs_participacion',type:'string'},
             id_grupo:1,
-            grid:true,
-            form:true
+            grid:false,
+            form:false
         },
 		{
 			config:{
@@ -258,6 +258,7 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:false,
+    bedit:false,
     onReloadPage:function(m){
         this.maestro=m;
         this.store.baseParams = {id_cronograma: this.maestro.id_cronograma};
@@ -270,7 +271,7 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
     onButtonNew:function(){
         this.Cmp.id_equipo_responsable.enableMultiSelect = true;
         this.Cmp.id_equipo_responsable.type = 'AwesomeCombo';
-        this.ocultarComponente(this.Cmp.v_participacion);
+        // this.ocultarComponente(this.Cmp.v_participacion);
         Phx.vista.CronogramaEquipoResponsable.superclass.onButtonNew.call(this);
         this.Cmp.id_equipo_responsable.on('select', function(c, r, i){
             var aux=this.store.data.length;
@@ -290,7 +291,7 @@ Phx.vista.CronogramaEquipoResponsable=Ext.extend(Phx.gridInterfaz,{
         var data = this.getSelectedData();
         this.Cmp.id_equipo_responsable.enableMultiSelect = false;
         this.Cmp.id_equipo_responsable.type = 'ComboBox';
-        this.ocultarComponente(this.Cmp.v_participacion);
+       // this.ocultarComponente(this.Cmp.v_participacion);
         Phx.vista.CronogramaEquipoResponsable.superclass.onButtonEdit.call(this);
         this.Cmp.id_equipo_responsable.on('select', function(c, r, i){
             var aux=this.store.data.length;
