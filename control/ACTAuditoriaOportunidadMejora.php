@@ -9,11 +9,13 @@
 require_once(dirname(__FILE__).'/../reportes/RResumen.php');
 require_once(dirname(__FILE__).'/../reportes/RReporteGeneralAuditoria.php');
 require_once(dirname(__FILE__).'/../reportes/RAuditoriaAnual.php');
+require_once(dirname(__FILE__).'/../reportes/RAccione.php');
 class ACTAuditoriaOportunidadMejora extends ACTbase{
 
 	function listarAuditoriaOportunidadMejora(){
 		$this->objParam->defecto('ordenacion','id_aom');
 		$this->objParam->defecto('dir_ordenacion','ASC');
+
         if($this->objParam->getParametro('interfaz')== 'ProgramarAuditoria'){
             $this->objParam->addFiltro("aom.estado_wf in (''programada'',''aprobado_responsable'') and tau.codigo_tpo_aom = ''AI''");
 
@@ -58,10 +60,30 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
             $this->objParam->addFiltro("aom.estado_wf = ''ejecutada'' and tau.codigo_tpo_aom = ''OM''");
         }
 
-
         if($this->objParam->getParametro('v_tipo_auditoria_nc')!=''){
             $this->objParam->addFiltro("aom.id_tipo_auditoria= ".$this->objParam->getParametro('v_tipo_auditoria_nc')." and aom.estado_wf in (''acciones_propuestas'') ");
         }
+
+        if($this->objParam->getParametro('interfaz') == 'Auditoria'){
+            if($this->objParam->getParametro('id_gestion') != ''){
+                $this->objParam->addFiltro("aom.id_gestion =".$this->objParam->getParametro('id_gestion') );
+            }
+            if($this->objParam->getParametro('id_tipo_auditoria') != ''){
+                $this->objParam->addFiltro("aom.id_tipo_auditoria =".$this->objParam->getParametro('id_tipo_auditoria') );
+            }
+            if($this->objParam->getParametro('id_uo') != ''){
+                $this->objParam->addFiltro("aom.id_uo =".$this->objParam->getParametro('id_uo') );
+            }
+            if($this->objParam->getParametro('tipo_estado') != ''){
+                $this->objParam->addFiltro("aom.estado_wf = ''".$this->objParam->getParametro('tipo_estado')."''" );
+            }
+            if ($this->objParam->getParametro('desde') != ''  && $this->objParam->getParametro('hasta') != ''){
+                $this->objParam->addFiltro("aom.fecha_prog_inicio >= '' ".$this->objParam->getParametro('desde')."'' and aom.fecha_prog_fin <= ''". $this->objParam->getParametro('hasta')."''");
+            }
+        }
+
+
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODAuditoriaOportunidadMejora','listarAuditoriaOportunidadMejora');
@@ -288,13 +310,36 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
         $this->res=$this->objFunc->getProceso($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-		function listarEstados(){
-			$this->objParam->defecto('ordenacion','id_aom');
-			$this->objParam->defecto('dir_ordenacion','ASC');
-			$this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
-			$this->res=$this->objFunc->listarEstados($this->objParam);
-			$this->res->imprimirRespuesta($this->res->generarJson());
-		}
+    function listarEstados(){
+        $this->objParam->defecto('ordenacion','id_aom');
+        $this->objParam->defecto('dir_ordenacion','ASC');
+        $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
+        $this->res=$this->objFunc->listarEstados($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function reporteAcciones(){
+        $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
+        $this->res=$this->objFunc->reporteAcciones($this->objParam);
+        $titulo = 'Acciones';
+
+        // Genera el nombre del archivo (aleatorio + titulo)
+
+        $nombreArchivo=uniqid(md5(session_id()).$titulo);
+        $nombreArchivo.='.pdf';
+        $this->objParam->addParametro('orientacion','L');
+        $this->objParam->addParametro('tamano','LETTER');
+        $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+        $this->objReporteFormato=new RAccione($this->objParam);
+        $this->objReporteFormato->setDatos($this->res->datos);
+        $this->objReporteFormato->generarReporte();
+        $this->objReporteFormato->output($this->objReporteFormato->url_archivo,'F');
+
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+            'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
 }
 
 ?>

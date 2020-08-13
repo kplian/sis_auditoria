@@ -23,6 +23,8 @@ header("content-type: text/javascript; charset=UTF-8");
         dblclickEdit: false,
         constructor: function(config) {
             Phx.vista.NoConformidadInforme.superclass.constructor.call(this,config);
+            this.getBoton('btnChequeoDocumentosWf').setVisible(false);
+
             this.init();
             this.grid.addListener('cellclick', this.oncellclick,this);
             this.addButton('btnAceptar', {
@@ -46,14 +48,12 @@ header("content-type: text/javascript; charset=UTF-8");
         preparaMenu:function(n){
             const tb =this.tbar;
             Phx.vista.NoConformidadInforme.superclass.preparaMenu.call(this,n);
-            this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('btnNoram').enable();
             return tb
         },
         liberaMenu:function(){
             const tb = Phx.vista.NoConformidadInforme.superclass.liberaMenu.call(this);
             if(tb){
-                this.getBoton('btnChequeoDocumentosWf').disable();
                 this.getBoton('btnNoram').disable();
             }
             return tb

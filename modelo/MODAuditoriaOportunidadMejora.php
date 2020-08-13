@@ -67,7 +67,7 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 		$this->captura('id_destinatario','int4');
 		$this->captura('desc_funcionario_destinatario','text');
 		$this->captura('resumen','text');
-
+        $this->captura('id_gestion','int4');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -176,7 +176,7 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         $this->tipo_procedimiento='SEL';//tipo de transaccion
         $this->setCount(false);
 
-        $this->setParametro('id_aom','id_aom','int4');
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
         //Definicion de la lista del resultado del query
         $this->captura('id_aom','int4');
         $this->captura('fecha_prev_inicio','date');
@@ -552,6 +552,40 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 
         $this->armarConsulta();
         $this->ejecutarConsulta();
+        return $this->respuesta;
+    }
+    function reporteAcciones(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_sel';
+        $this->transaccion='SSOM_VANC_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this->setCount(false);
+
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+        
+        //Definicion de la lista del resultado del query
+        $this->captura('nombre_aom1','varchar');
+        $this->captura('nro_tramite_wf','varchar');
+        $this->captura('desc_tipo_objeto','varchar');
+
+        $this->captura('fecha_prog_inicio','date');
+        $this->captura('fecha_prog_fin','date');
+        $this->captura('desc_funcionario1','text');
+        $this->captura('tipo_nc','varchar');
+        $this->captura('estado_wf','varchar');
+        $this->captura('descrip_nc','varchar');
+        $this->captura('tipo_accion','varchar');
+        $this->captura('descripcion_ap','text');
+        $this->captura('fecha_inicio_ap','date');
+        $this->captura('fecha_fin_ap','date');
+        $this->captura('funcionario_implementado','varchar');
+        $this->captura('imp','varchar');
+        $this->captura('v','varchar');
+        $this->captura('nombre_unidad','varchar');
+
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+       // var_dump($this->respuesta);exit;
         return $this->respuesta;
     }
 

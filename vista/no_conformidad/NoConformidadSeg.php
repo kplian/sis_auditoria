@@ -157,8 +157,6 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         onButtonReporte :function () {
             var rec = this.sm.getSelected();
-
-            console.log(rec)
             Ext.Ajax.request({
                 url:'../../sis_auditoria/control/NoConformidad/reporteNoConforPDF',
 

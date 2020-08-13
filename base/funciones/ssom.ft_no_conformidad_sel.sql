@@ -29,6 +29,7 @@ DECLARE
     v_id_parametro 		integer;
     v_filtro			varchar;
     v_id_uo				integer;
+    v_id_aom			integer;
 
 BEGIN
 
@@ -231,6 +232,12 @@ BEGIN
     elsif(p_transaccion='SSOM_RPT_NOCONF')then
 
 		begin
+          -- raise exception '%',v_parametros.id_proceso_wf;
+
+
+          select aom.id_aom into v_id_aom
+          from ssom.tauditoria_oportunidad_mejora aom
+          where aom.id_proceso_wf = v_parametros.id_proceso_wf;
 
             v_consulta:= 'select   au.id_aom,
                                    au.id_proceso_wf,
@@ -248,7 +255,7 @@ BEGIN
                             inner join ssom.tparametro po on po.id_parametro = au.id_tobjeto
                             inner join ssom.tno_conformidad nc on nc.id_aom = au.id_aom
                             inner join ssom.tparametro  pa on pa.id_parametro = nc.id_parametro
-                            where nc.id_aom ='||v_parametros.id_aom;
+                            where nc.id_aom ='||v_id_aom;
 
 			--Devuelve la respuesta
 			return v_consulta;

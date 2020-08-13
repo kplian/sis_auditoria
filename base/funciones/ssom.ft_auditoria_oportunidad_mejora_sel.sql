@@ -91,7 +91,8 @@ BEGIN
                             gct.requiere_formulario,
                             aom.id_destinatario,
                             initcap(df.desc_funcionario1) as desc_funcionario_destinatario,
-                            aom.resumen
+                            aom.resumen,
+                            aom.id_gestion
                             from ssom.tauditoria_oportunidad_mejora aom
                             inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
                             inner join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
@@ -157,6 +158,8 @@ BEGIN
     ***********************************/
     elsif(p_transaccion='SSOM_RESU_SEL')then
       begin
+
+
           --Sentencia de la consulta de conteo de registros
           v_consulta:='select  som.id_aom,
                                som.fecha_prev_inicio,
@@ -168,7 +171,7 @@ BEGIN
                         from ssom.tauditoria_oportunidad_mejora som
                         inner join ssom.tequipo_responsable equ on equ.id_aom = som.id_aom
                         inner join orga.vfuncionario fun on fun.id_funcionario = equ.id_funcionario
-                        where som.id_aom = '||v_parametros.id_aom;
+                        where som.id_proceso_wf = '||v_parametros.id_proceso_wf;
           --Devuelve la respuesta
           return v_consulta;
     end;
@@ -612,6 +615,45 @@ BEGIN
 			return v_consulta;
 
 		end;
+      /*********************************
+    #TRANSACCION:  'SSOM_VANC_SEL'
+    #DESCRIPCION:	Verificacion de accion
+    #AUTOR:		MMV
+    #FECHA:		1/7/2020
+    ***********************************/
+    elsif(p_transaccion='SSOM_VANC_SEL')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select   som.nombre_aom1,
+                                som.nro_tramite_wf,
+                                vpto.valor_parametro_to as desc_tipo_objeto,
+                                som.fecha_prog_inicio,
+                                som.fecha_prog_fin,
+                                fu.desc_funcionario1,
+                                pn.valor_parametro as tipo_nc,
+                                mo.estado_wf,
+                                mo.descrip_nc,
+                                acp.valor_parametro as tipo_accion,
+                                ap.descripcion_ap,
+                                ap.fecha_inicio_ap,
+                                ap.fecha_fin_ap,
+                                ''afk''::varchar as funcionario_implementado,
+                                ''IMP''::varchar as imp,
+                                ''V''::varchar as v,
+                                uo.nombre_unidad
+                                from ssom.tauditoria_oportunidad_mejora som
+                                inner join orga.vfuncionario fu on fu.id_funcionario = som.id_funcionario
+                                inner join ssom.tno_conformidad mo on mo.id_aom = som.id_aom
+                                inner join ssom.tparametro pn on pn.id_parametro = mo.id_parametro
+                                inner join ssom.taccion_propuesta ap on ap.id_nc = mo.id_nc
+                                inner join ssom.tparametro acp on acp.id_parametro = ap.id_parametro
+                                inner join orga.tuo uo on uo.id_uo = som.id_uo
+                                left join ssom.vparametro_tobjeto vpto on som.id_tobjeto = vpto.id_parametro_to
+                                where som.id_proceso_wf ='||v_parametros.id_proceso_wf;
+          --Devuelve la respuesta
+          return v_consulta;
+    end;
+
 
 	else
 

@@ -27,6 +27,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('revisar')].grid=false;
             this.Atributos[this.getIndAtributo('rechazar')].grid=false;
             Phx.vista.NoConformidadAceptada.superclass.constructor.call(this,config);
+            this.getBoton('btnChequeoDocumentosWf').setVisible(false);
+
             this.init();
         },
         onReloadPage:function(m){
@@ -41,14 +43,12 @@ header("content-type: text/javascript; charset=UTF-8");
         preparaMenu:function(n){
             const tb =this.tbar;
             Phx.vista.NoConformidadAceptada.superclass.preparaMenu.call(this,n);
-            this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('btnNoram').enable();
             return tb
         },
         liberaMenu:function(){
             const tb = Phx.vista.NoConformidadAceptada.superclass.liberaMenu.call(this);
             if(tb){
-                this.getBoton('btnChequeoDocumentosWf').disable();
                 this.getBoton('btnNoram').disable();
             }
             return tb

@@ -291,7 +291,7 @@ class MODNoConformidad extends MODbase{
         $this->setCount(false);
 
         //Define los parametros para la funcion
-        $this->setParametro('id_aom', 'id_aom', 'int4');
+        $this->setParametro('id_proceso_wf', 'id_proceso_wf', 'int4');
 
         $this->captura('id_aom','int4');
         $this->captura('id_proceso_wf', 'int4');
