@@ -430,3 +430,7 @@ select pxp.f_insert_tgui ('Propuestas/Aceptadas/Rechazadas', 'Propuestas/Aceptad
 select pxp.f_insert_tgui ('Acciones Pendientes', 'Acciones Pendientes', 'APD', 'si', 3, 'sis_auditoria/vista/no_conformidad/NoConformidadAccion.php', 4, '', 'NoConformidadAccion', 'SSOM');
 select pxp.f_insert_tgui ('Acciones Implementadas', 'Acciones Implementadas', 'AID', 'si', 4, 'sis_auditoria/vista/no_conformidad/NoConformidadImplementar.php', 4, '', 'NoConformidadImplementar', 'SSOM');
 /********************************************F-DAT-MMV-SSOM-6-4/9/2020********************************************/
+/********************************************I-DAT-MMV-SSOM-6-13/8/2020********************************************/
+select pxp.f_insert_tgui ('Filtro Auditoria', 'Auditoria', 'AUDI', 'si', 3, 'sis_auditoria/vista/auditoria_oportunidad_mejora/FiltroAuditoria.php', 4, '', 'FiltroAuditoria', 'SSOM');
+
+/********************************************F-DAT-MMV-SSOM-6-13/8/2020********************************************/
