@@ -44,7 +44,11 @@ class ACTPnormaNoconformidad extends ACTbase{
 		$this->res=$this->objFunc->eliminarPnormaNoconformidad($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-
+	function insertarItemAuditoriaNpn(){
+		$this->objFunc=$this->create('MODPnormaNoconformidad');
+		$this->res=$this->objFunc->insertarItemAuditoriaNpn($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 }
 
 ?>

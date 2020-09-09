@@ -17,17 +17,29 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
 		$this->objParam->defecto('dir_ordenacion','ASC');
 
         if($this->objParam->getParametro('interfaz')== 'ProgramarAuditoria'){
-            $this->objParam->addFiltro("aom.estado_wf in (''programada'',''aprobado_responsable'') and tau.codigo_tpo_aom = ''AI''");
 
-            if($this->objParam->getParametro('pes_estado')== 'programada'){
-                $this->objParam->addFiltro("aom.estado_wf = ''programada''");
+             $filtroInit = "aom.estado_wf in (''programada'',''aprobado_responsable'') and tau.codigo_tpo_aom = ''AETR''";
+
+            if ($this->objParam->getParametro('id_gestion') != '' ){
+                $filtroInit = "aom.id_gestion = ".$this->objParam->getParametro('id_gestion')."and tau.codigo_tpo_aom = ''AETR''";
             }
-            if($this->objParam->getParametro('pes_estado')== 'aprobado_responsable'){
-                $this->objParam->addFiltro("aom.estado_wf = ''aprobado_responsable''");
+            if ($this->objParam->getParametro('id_gestion') != ''and $this->objParam->getParametro('tipo_estado') != '' ){
+                $filtroInit = "aom.estado_wf = ''".$this->objParam->getParametro('tipo_estado')."'' and aom.id_gestion =".$this->objParam->getParametro('id_gestion');
             }
+            if($this->objParam->getParametro('id_gestion') != '' and $this->objParam->getParametro('id_uo') != ''){
+                $filtroInit = "aom.id_gestion = ".$this->objParam->getParametro('id_gestion')."and tau.codigo_tpo_aom = ''AETR''and aom.id_uo =".$this->objParam->getParametro('id_uo');
+            }
+            if($this->objParam->getParametro('id_gestion') != '' and $this->objParam->getParametro('id_uo') != '' and $this->objParam->getParametro('tipo_estado') != ''){
+                $filtroInit = "aom.id_gestion = ".$this->objParam->getParametro('id_gestion')."and tau.codigo_tpo_aom = ''AETR''and aom.id_uo =".
+                    $this->objParam->getParametro('id_uo'). "and aom.estado_wf = ''".$this->objParam->getParametro('tipo_estado')."''";
+            }
+
+            $this->objParam->addFiltro($filtroInit);
         }
+
+
         if($this->objParam->getParametro('interfaz')== 'PlanificarAuditoria'){
-            $this->objParam->addFiltro("aom.estado_wf in (''planificacion'',''aprobado_responsable'') and tau.codigo_tpo_aom = ''AI''");
+            $this->objParam->addFiltro("aom.estado_wf in (''planificacion'',''aprobado_responsable'') and tau.codigo_tpo_aom = ''AETR''");
         }
 
         if($this->objParam->getParametro('interfaz')== 'OportunidadMejora'){
@@ -43,7 +55,7 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
             $this->objParam->addFiltro("aom.estado_wf in (''notificar_responsable'')");
         }
         if($this->objParam->getParametro('interfaz')== 'AuditorioAportunidadAcepRech'){
-            $this->objParam->addFiltro("aom.estado_wf = ''notificar'' and tau.codigo_tpo_aom = ''AI'' ");
+            $this->objParam->addFiltro("aom.estado_wf = ''notificar'' and tau.codigo_tpo_aom = ''AETR'' ");
         }
         if($this->objParam->getParametro('interfaz')== 'OportunidadMejoraAcepRech'){
             $this->objParam->addFiltro("aom.estado_wf = ''notificar'' and tau.codigo_tpo_aom = ''OM''");
@@ -99,14 +111,14 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
         $this->objParam->defecto('dir_ordenacion','desc');
 
 				if($this->objParam->getParametro('item') != ''){
-						$this->objParam->addFiltro(" fu.id_funcionario not in
+						$this->objParam->addFiltro(" fun.id_funcionario not in
                                                         (select  eqre.id_funcionario
                                                 from ssom.tequipo_responsable eqre
                                                 inner join ssom.tparametro par on eqre.id_parametro = par.id_parametro
                                                 where eqre.id_aom = ".$this->objParam->getParametro('item') ." and  par.codigo_parametro = ''MEQ'')");
                 }
 				if($this->objParam->getParametro('destinatario') != ''){
-                    $this->objParam->addFiltro(" fu.id_funcionario not in
+                    $this->objParam->addFiltro(" fun.id_funcionario not in
                                                         (select de.id_funcionario
                                                         from ssom.tdestinatario de
                                                         where de.id_aom = ".$this->objParam->getParametro('destinatario') .")");
@@ -339,6 +351,13 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
             'Se generó con éxito el reporte: '.$nombreArchivo,'control');
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
+    function listarFuncionarioVigentes(){
+        $this->objParam->defecto('ordenacion','id_funcionario');
+        $this->objParam->defecto('dir_ordenacion','ASC');
+        $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
+        $this->res=$this->objFunc->listarFuncionarioVigentes($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
     }
 }
 

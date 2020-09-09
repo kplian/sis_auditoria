@@ -45,7 +45,7 @@ BEGIN
 		--Sentencia de la consulta
 	    v_consulta:='select	aom.id_aom,
                             aom.id_proceso_wf,
-                            aom.nro_tramite_wf,
+                            replace(aom.nro_tramite_wf, ''AUD'', tau.codigo_tpo_aom)::varchar as nro_tramite_wf,
                             aom.id_funcionario,
                             aom.id_uo,
                             aom.id_gconsultivo,
@@ -186,16 +186,15 @@ BEGIN
 
 	elsif(p_transaccion='SSOM_AOMX2_SEL')then
 		begin
-			v_consulta:='select   fu.id_funcionario,
-                                  fu.desc_funcionario1,
-                                  fu.descripcion_cargo,
-                                  dep.cargo  as cargo_equipo
-                          from param.tdepto_usuario dep
-                          inner join segu.vusuario us on us.id_usuario = dep.id_usuario
-                          inner join orga.vfuncionario_cargo_xtra fu on fu.id_persona = us.id_persona
-                          inner join param.tdepto de on de.id_depto = dep.id_depto
-                          where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()) and
-                                dep.cargo in (''administrador'',''responsable'') and de.codigo = ''SAOM_CENTRAL'' and ';
+			v_consulta:='select  eus.id_funcionario,
+                                  fun.desc_funcionario1,
+                                  fun.descripcion_cargo,
+                                  pa.valor_parametro as cargo_equipo
+                        from ssom.tequipo_auditores eus
+                        inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
+                        inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
+                        where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                        and pa.valor_parametro = ''Responsable'' and ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -214,13 +213,12 @@ BEGIN
 	elsif(p_transaccion='SSOM_AOMX2_CONT')then
 		begin
 
-			v_consulta:='select count(fu.id_funcionario)
-                         from param.tdepto_usuario dep
-                                inner join segu.vusuario us on us.id_usuario = dep.id_usuario
-                                inner join orga.vfuncionario_cargo_xtra fu on fu.id_persona = us.id_persona
-                                inner join param.tdepto de on de.id_depto = dep.id_depto
-                                where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()) and
-                                dep.cargo in (''administrador'',''responsable'') and de.codigo = ''SAOM_CENTRAL'' and';
+			v_consulta:='select count(eus.id_funcionario)
+                          from ssom.tequipo_auditores eus
+                          inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
+                          inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
+                          where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                          and pa.valor_parametro = ''Responsable'' and';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -242,21 +240,20 @@ BEGIN
         if(v_parametros.codigo = 'RESP' or v_parametros.codigo = 'MEQ' )then
 
         	if (v_parametros.codigo = 'RESP')then
-        		v_filtro = 'in (''administrador'',''responsable'')';
+        		v_filtro = ' pa.valor_parametro = ''Responsable'' and ';
             else
-                v_filtro = 'in (''auxiliar'')';
+                v_filtro = ' pa.valor_parametro = ''Equipo Auditor'' and';
         	end if;
 
-        	v_consulta:='select   fu.id_funcionario,
-                                  fu.desc_funcionario1,
-                                  fu.descripcion_cargo,
-                                  dep.cargo as cargo_equipo
-                          from param.tdepto_usuario dep
-                          inner join segu.vusuario us on us.id_usuario = dep.id_usuario
-                          inner join orga.vfuncionario_cargo_xtra fu on fu.id_persona = us.id_persona
-                          inner join param.tdepto de on de.id_depto = dep.id_depto
-                          where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()) and
-                                dep.cargo '|| v_filtro ||' and de.codigo = ''SAOM_CENTRAL'' and ';
+        	v_consulta:='select  eus.id_funcionario,
+                                  initcap(fun.desc_funcionario1) as desc_funcionario1,
+                                  fun.descripcion_cargo,
+                                  pa.valor_parametro as cargo_equipo
+                        from ssom.tequipo_auditores eus
+                        inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
+                        inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
+                        where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                        and '||v_filtro;
 
        	else
 
@@ -272,7 +269,7 @@ BEGIN
                                                      inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
                                                      and e.estado_reg = ''activo''
                                                   )select fu.id_funcionario,
-                                                          fu.desc_funcionario1,
+                                                          initcap(fun.desc_funcionario1) as desc_funcionario1,
                                                           fu.descripcion_cargo,
                                                           ''''::varchar as cargo_equipo
                                                    from uo_mas_subordinados suo
@@ -285,7 +282,8 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			return v_consulta;
+			raise notice '%',v_consulta;
+            return v_consulta;
 
 		end;
 	/*********************************
@@ -300,19 +298,20 @@ BEGIN
 
             if(v_parametros.codigo = 'RESP' or v_parametros.codigo = 'MEQ' )then
 
-                if (v_parametros.codigo = 'RESP')then
-                    v_filtro = 'in (''administrador'',''responsable'')';
-                else
-                    v_filtro = 'in (''auxiliar'')';
-                end if;
+               	if (v_parametros.codigo = 'RESP')then
+        				v_filtro = ' pa.valor_parametro = ''Responsable'' and ';
+           		 else
+                	v_filtro = ' pa.valor_parametro = ''Equipo Auditor'' and';
+        		end if;
 
-                v_consulta:='select count(fu.id_funcionario)
-                                    from param.tdepto_usuario dep
-                                    inner join segu.vusuario us on us.id_usuario = dep.id_usuario
-                                    inner join orga.vfuncionario_cargo_xtra fu on fu.id_persona = us.id_persona
-                                    inner join param.tdepto de on de.id_depto = dep.id_depto
-                                    where (fu.fecha_finalizacion is null or fu.fecha_finalizacion >= now()) and
-                                         dep.cargo '||v_filtro||'and de.codigo = ''SAOM_CENTRAL'' and ';
+
+                v_consulta:='select count(eus.id_funcionario)
+                            from ssom.tequipo_auditores eus
+                            inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
+                            inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
+                            where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                            and '||v_filtro;
+
                 else
 
              	        v_consulta:= 'with recursive uo_mas_subordinados(id_uo_hijo,id_uo_padre) as (
@@ -653,6 +652,46 @@ BEGIN
           --Devuelve la respuesta
           return v_consulta;
     end;
+    /*********************************
+    #TRANSACCION:  'SSOM_FUN_SEL'
+    #DESCRIPCION:	Lista Funcionarios vigentes
+    #AUTOR:		MMV
+    #FECHA:		3/9/2020
+    ***********************************/
+    elsif(p_transaccion='SSOM_FUN_SEL')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select   fc.id_funcionario,
+                                fc.desc_funcionario1,
+                                fc.codigo,
+                                fc.descripcion_cargo
+                        from orga.vfuncionario_cargo fc
+                        where (fc.fecha_finalizacion is null
+                                    or fc.fecha_finalizacion >= now()::date) and';
+          --Devuelve la respuesta
+         v_consulta:=v_consulta||v_parametros.filtro;
+		 v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			return v_consulta;
+    	end;
+
+    /*********************************
+    #TRANSACCION:  'SSOM_FUN_CONT'
+    #DESCRIPCION:	Lista Funcionarios vigentes
+    #AUTOR:		MMV
+    #FECHA:		3/9/2020
+    ***********************************/
+    elsif(p_transaccion='SSOM_FUN_CONT')then
+      begin
+          --Sentencia de la consulta de conteo de registros
+          v_consulta:='select  count(fc.id_funcionario)
+                              from orga.vfuncionario_cargo fc
+                              where (fc.fecha_finalizacion is null
+                                          or fc.fecha_finalizacion >= now()::date) and';
+            --Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			--Devuelve la respuesta
+			return v_consulta;
+    	end;
 
 
 	else

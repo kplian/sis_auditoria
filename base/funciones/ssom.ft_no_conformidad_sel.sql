@@ -12,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tno_conformidad'
  AUTOR: 		 (szambrana)
  FECHA:	        04-07-2019 19:53:16
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				04-07-2019 19:53:16								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tno_conformidad'	
+ #0				04-07-2019 19:53:16								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tno_conformidad'
  #3				04-08-2020 19:53:16								Refactorización No Conformidad
  ***************************************************************************/
 
@@ -274,25 +274,12 @@ BEGIN
 		begin
 
         	--listado de funcionarios de una UO
-			v_consulta:='WITH RECURSIVE uo_mas_subordinados(id_uo_hijo,id_uo_padre) AS (
-                                   SELECT
-                                      euo.id_uo_hijo,	--id
-                                      id_uo_padre		---padre
-                                   FROM orga.testructura_uo euo
-                                   WHERE euo.id_uo_hijo = '||v_parametros.id_uo||' and euo.estado_reg = ''activo''
-                                   UNION
-                                      SELECT
-                                         e.id_uo_hijo,
-                                         e.id_uo_padre
-                                      FROM
-                                         orga.testructura_uo e
-                                      INNER JOIN uo_mas_subordinados s ON s.id_uo_hijo = e.id_uo_padre and e.estado_reg = ''activo'')
-                                SELECT
-                                    vfc.id_funcionario,
-                                    vfc.desc_funcionario1 as desc_funcionario
-                                FROM uo_mas_subordinados ss
-                                inner join orga.vfuncionario_cargo vfc on ss.id_uo_hijo = vfc.id_uo
-                                where( vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date) and ';
+			v_consulta:=' SELECT  vfc.id_funcionario,
+    	vfc.desc_funcionario1 as desc_funcionario
+FROM orga.vfuncionario_cargo vfc
+WHERE( vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date)
+	and
+ ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -311,24 +298,10 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='WITH RECURSIVE uo_mas_subordinados(id_uo_hijo,id_uo_padre) AS (
-                                   SELECT
-                                      euo.id_uo_hijo,	--id
-                                      id_uo_padre		---padre
-                                   FROM orga.testructura_uo euo
-                                   WHERE euo.id_uo_hijo = '||v_parametros.id_uo||' and euo.estado_reg = ''activo''
-                                   UNION
-                                      SELECT
-                                         e.id_uo_hijo,
-                                         e.id_uo_padre
-                                      FROM
-                                         orga.testructura_uo e
-                                      INNER JOIN uo_mas_subordinados s ON s.id_uo_hijo = e.id_uo_padre and e.estado_reg = ''activo'')
-                                SELECT
-                                    count(vfc.id_funcionario)
-                                FROM uo_mas_subordinados ss
-                                inner join orga.vfuncionario_cargo vfc on ss.id_uo_hijo = vfc.id_uo
-                                where( vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date) and ';
+			v_consulta:='SELECT  count(vfc.id_funcionario)
+FROM orga.vfuncionario_cargo vfc
+WHERE( vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date)
+and ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;

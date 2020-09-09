@@ -70,7 +70,7 @@ BEGIN
 						left join segu.tusuario usu2 on usu2.id_usuario = eqre.id_usuario_mod
                         join ssom.tauditoria_oportunidad_mejora aom on eqre.id_aom = aom.id_aom
                         join orga.vfuncionario vfc on eqre.id_funcionario = vfc.id_funcionario
-            			inner join ssom.tparametro par on eqre.id_parametro = par.id_parametro
+            			left join ssom.tparametro par on eqre.id_parametro = par.id_parametro
 				        where  ';
 
 			--Definicion de la respuesta
@@ -99,7 +99,7 @@ BEGIN
 						left join segu.tusuario usu2 on usu2.id_usuario = eqre.id_usuario_mod
                         join ssom.tauditoria_oportunidad_mejora aom on eqre.id_aom = aom.id_aom
                         join orga.vfuncionario vfc on eqre.id_funcionario = vfc.id_funcionario
-            			inner join ssom.tparametro par on eqre.id_parametro = par.id_parametro
+            			left join ssom.tparametro par on eqre.id_parametro = par.id_parametro
 					    where ';
 
 			--Definicion de la respuesta

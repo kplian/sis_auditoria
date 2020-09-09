@@ -142,7 +142,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 type:'TextField',
                 filters:{pfiltro:'aom.nro_tramite_wf',type:'string'},
                 id_grupo:0,
-                grid:true,
+                grid:false,
                 form:false,
             },
             {
@@ -496,7 +496,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
             {
                 config: {
                     name: 'id_tnorma',
-                    fieldLabel: 'Tipo Norma',
+                    fieldLabel: 'Tipo de auditoria',
                     allowBlank: false,
                     resizable:true,
                     emptyText: 'Elija una opción...',

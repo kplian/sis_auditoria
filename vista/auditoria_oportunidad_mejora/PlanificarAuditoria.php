@@ -24,6 +24,7 @@ Phx.vista.PlanificarAuditoria = {
     storeEquipo:{},
     storePuntoNorma:{},
     storeCronograma:{},
+    storePregunta:{},
     constructor: function(config) {
         this.Atributos[this.getIndAtributo('id_destinatario')].grid=false;
         this.Atributos[this.getIndAtributo('recomendacion')].grid=false;
@@ -72,6 +73,15 @@ Phx.vista.PlanificarAuditoria = {
         Phx.CP.loadingHide();
         alert('La auditoria esta en modo EJUCUCION');
         this.reload();
+        Phx.CP.loadWindows('../../../sis_auditoria/vista/auditoria_oportunidad_mejora/InformeAuditoria.php',
+            'Informe Auditoria',
+            {
+                width:'90%',
+                height:'90%'
+            },
+            {},
+            this.idContenedor, 'InformeAuditoria');
+
     },
     onButtonEdit:function(){
       this.onCrearFormulario();
@@ -112,17 +122,34 @@ Phx.vista.PlanificarAuditoria = {
               url: '../../sis_auditoria/control/AuditoriaNpn/listarAuditoriaNpn',
               id: 'id_anpn',
               root: 'datos',
-              sortInfo: {
+              /*sortInfo: {
                   field: 'codigo_pn',
                   direction: 'ASC'
-              },
+              },*/
               totalProperty: 'total',
               fields: ['id_aom','id_anpn','id_norma','sigla_norma',
                   'id_pn','nombre_pn','codigo_pn','desc_punto_norma',
                   'usr_reg','estado_reg','fecha_reg','nombre_descrip'],
+              // groupField:'sigla_norma',
+              // remoteGroup:true,
               remoteSort: true,
               baseParams: {dir:'ASC',sort:'id_anpn',limit:'100',start:'0'}
           });
+
+          this.storePregunta = new Ext.data.GroupingStore({
+              url: '../../sis_auditoria/control/AuditoriaNpnpg/listarAuditoriaNpnpg',
+              id: 'id_anpnpg',
+              root: 'datos',
+              sortInfo: {
+                  field: 'id_anpnpg',
+                  direction: 'ASC'
+              },
+              totalProperty: 'total',
+              fields: ['id_anpnpg','descrip_pregunta','estado_reg','usr_reg','fecha_reg'
+              ],remoteSort: true,
+              baseParams: {dir:'ASC',sort:'id_anpnpg',limit:'100',start:'0'}
+          });
+
           const detalleCronograma = new Ext.ux.grid.RowEditor({
               saveText: 'Aceptar',
               name: 'btn_editor'
@@ -154,7 +181,7 @@ Phx.vista.PlanificarAuditoria = {
                     trackMouseOver: false,
                     stripeRows: true,
                     tbar: [{
-                        text: '<i class="fa fa-plus fa-lg">&nbsp;&nbsp;Asignar</i>',
+                        text:'<button class="btn"><i class="fa fa-plus fa-lg"></i>&nbsp;&nbsp;<b>Asignar</b></button>',
                         scope: this,
                         width: '100',
                         handler: function() {
@@ -164,7 +191,7 @@ Phx.vista.PlanificarAuditoria = {
 
                     },
                     {
-                        text: '<i class="fa fa-edit fa-lg">&nbsp;&nbsp;Editar</i>',
+                        text:'<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Editar</b></button>',
                         scope:this,
                         width: '100',
                         handler: function(){
@@ -177,7 +204,7 @@ Phx.vista.PlanificarAuditoria = {
                         }
                     },
                     {
-                        text: '<i class="fa fa-trash fa-lg">&nbsp;&nbsp;Eliminar</i>',
+                        text: '<button class="btn"><i class="fa fa-trash fa-lg"></i>&nbsp;&nbsp;<b>Eliminar</b></button>',
                         scope:this,
                         width: '100',
                         handler: function(){
@@ -223,12 +250,20 @@ Phx.vista.PlanificarAuditoria = {
                              dataIndex: 'fecha_ini_activ',
                              align: 'center',
                              width: 100,
+                             renderer:function (value,p,record){
+                                 const fecha = value.split("-");
+                                 return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
+                             }
                          },
                          {
                              header: 'Fecha Fin',
                              dataIndex: 'fecha_fin_activ',
                              align: 'center',
                              width: 100,
+                             renderer:function (value,p,record){
+                                 const fecha = value.split("-");
+                                 return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
+                             }
                          },
                          {
                              header: 'Hora Inicio',
@@ -340,7 +375,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         },
                                                         {
                                                             xtype: 'combo',
-                                                            fieldLabel: 'Tipo Norma',
+                                                            fieldLabel: 'Tipo de Auditoria',
                                                             name: 'id_tnorma',
                                                             allowBlank: false,
                                                             id: this.idContenedor+'_id_tnorma',
@@ -405,7 +440,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         },
                                                         {
                                                             xtype: 'datefield',
-                                                            fieldLabel: 'Inicio Real',
+                                                            fieldLabel: 'Fecha Inicio',
                                                             name: 'fecha_prog_inicio',
                                                             disabled: false,
                                                             anchor: '100%',
@@ -413,7 +448,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         },
                                                         {
                                                             xtype: 'datefield',
-                                                            fieldLabel: 'Fin Real',
+                                                            fieldLabel: 'Fecha Fin',
                                                             name: 'fecha_prog_fin',
                                                             disabled: false,
                                                             anchor: '100%',
@@ -458,7 +493,7 @@ Phx.vista.PlanificarAuditoria = {
                                                stripeRows: true,
                                                loadMask: true,
                                                tbar: [{
-                                                 text: '<i class="fa fa-edit fa-lg">&nbsp;&nbsp;Asignar / Desasignar</i>',
+                                                 text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar / Designar Procesos Auditables</b></button>',
                                                    scope: this,
                                                    width: '100',
                                                    handler: function() {
@@ -520,7 +555,7 @@ Phx.vista.PlanificarAuditoria = {
                                                stripeRows: true,
                                                trackMouseOver: false,
                                                tbar: [{
-                                                 text: '<i class="fa fa-edit fa-lg">&nbsp;&nbsp;Asignar / Desasignar</i>',
+                                                 text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar / Designar</b></button>',
                                                    scope: this,
                                                    width: '100',
                                                    handler: function() {
@@ -586,20 +621,12 @@ Phx.vista.PlanificarAuditoria = {
                                    new Ext.grid.GridPanel({
                                                layout: 'fit',
                                                store:  this.storePuntoNorma,
-                                               region: 'center',
-                                               split: true,
-                                               plain: true,
-                                               stripeRows: true,
+                                               region:  'center',
+                                               margins: '3 3 3 0',
+                                               // split: true,
+                                               // plain: true,
+                                               // stripeRows: true,
                                                 trackMouseOver: false,
-                                              tbar: [{
-                                                   text: '<i class="fa fa-edit fa-lg">&nbsp;&nbsp;Asignar / Desasignar</i>',
-                                                   scope: this,
-                                                   width: '100',
-                                                   handler: function() {
-                                                      me.formularioPuntoNorma();
-                                                      me.ventanaPuntoNorma.show();
-                                                   }
-                                              }],
                                                columns: [
                                                    new Ext.grid.RowNumberer(),
                                                    {
@@ -640,10 +667,88 @@ Phx.vista.PlanificarAuditoria = {
                                                        align: 'center',
                                                        width: 110
                                                    }
-                                               ]
-                                           })
+                                               ],
+                                                 /*  view: new Ext.grid.GroupingView({
+                                                       forceFit:true,
+                                                   }),*/
+                                                   tbar: [{
+                                                       text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar / Designar</b></button>',
+                                                       scope: this,
+                                                       width: '100',
+                                                       handler: function() {
+                                                           me.formularioPuntoNorma();
+                                                           me.ventanaPuntoNorma.show();
+                                                       }
+                                                   }]
+                                   })
                                  ]
                              },
+                                 {
+                                     title: 'Lista de Verificación',
+                                     layout: 'fit',
+                                     region:'center',
+                                     items: [
+                                         new Ext.grid.GridPanel({
+                                             layout: 'fit',
+                                             store:  this.storePregunta,
+                                             region:  'center',
+                                             margins: '3 3 3 0',
+                                             trackMouseOver: false,
+                                             columns: [
+                                                 new Ext.grid.RowNumberer(),
+                                                 {
+                                                     header: 'Norma',
+                                                     dataIndex: 'id_norma',
+                                                     width: 150,
+                                                     sortable: false,
+                                                     renderer:function(value, p, record){return String.format('{0}', record.data['sigla_norma'])},
+                                                 },
+                                                 {
+                                                     header: 'Punto de Norma',
+                                                     dataIndex: 'id_pn',
+                                                     width: 300,
+                                                     sortable: false,
+                                                     renderer:function(value, p, record){return String.format('{0}', record.data['nombre_pn'])},
+                                                 },
+                                                 {
+                                                     header: 'Pregunta',
+                                                     dataIndex: 'id_pregunta',
+                                                     width: 300,
+                                                     sortable: false,
+                                                     renderer:function(value, p, record){return String.format('{0}', record.data['descrip_pregunta'])},
+                                                 },
+                                                 {
+                                                     header: 'Estado Reg.',
+                                                     dataIndex: 'estado_reg',
+                                                     width: 100,
+                                                     sortable: false
+                                                 },
+                                                 {
+                                                     header: 'Creado por.',
+                                                     dataIndex: 'usr_reg',
+                                                     width: 100,
+                                                     sortable: false
+                                                 },
+                                                 {
+                                                     header: 'Fecha creación',
+                                                     dataIndex: 'fecha_reg',
+                                                     align: 'center',
+                                                     width: 110
+                                                 }
+                                             ],
+
+                                             tbar: [{
+                                                 text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar / Designar</b></button>',
+                                                 scope: this,
+                                                 width: '100',
+                                                 handler: function() {
+                                                     me.formularioPregunta();
+                                                     me.ventanaPregunta.show();
+                                                 }
+                                             }]
+                                         })
+                                     ]
+                                 },
                              {
                                  title: 'Cronograma',
                                  layout: 'fit',
@@ -651,15 +756,7 @@ Phx.vista.PlanificarAuditoria = {
                                  items: [
                                    crorograma
                                  ]
-                             },
-                             /*{
-                                 title: 'Riesgo Oportunidad',
-                                 layout: 'fit',
-                                 region:'center',
-                                 items: [
-
-                                 ]
-                             }*/
+                             }
                            ]
                          }]
                      }],
@@ -673,7 +770,7 @@ Phx.vista.PlanificarAuditoria = {
         });
         this.formularioVentana = new Ext.Window({
             width: 860,
-            height: 700,
+            height: 580,
            modal: true,
            closeAction: 'hide',
            labelAlign: 'top',
@@ -812,6 +909,19 @@ Phx.vista.PlanificarAuditoria = {
                                                       item : maestro.id_aom
                                                     }
                                     }),
+                                    tbar:[{
+                                        text: 'Todo',
+                                        handler:function(){
+                                            const toStore  = isForm.getForm().findField('id_proceso').multiselects[0].store;
+                                            const fromStore   = isForm.getForm().findField('id_proceso').multiselects[1].store;
+                                            for(var i = toStore.getCount()-1; i >= 0; i--)
+                                            {
+                                                const record = toStore.getAt(i);
+                                                toStore.remove(record);
+                                                fromStore.add(record);
+                                            }
+                                        }
+                                    }],
                                     displayField: 'proceso',
                                     valueField: 'id_proceso',
                                 },{
@@ -832,24 +942,15 @@ Phx.vista.PlanificarAuditoria = {
                                                       id_aom: maestro.id_aom
                                                     }
                                     }),
+                                    tbar:[{
+                                        text: 'Limpiar',
+                                        handler:function(){
+                                            isForm.getForm().findField('id_proceso').reset();
+                                        }
+                                    }],
                                     displayField: 'proceso',
                                     valueField: 'id_proceso',
-                                }],
-                                listeners: {
-                                          added:function(obj,event){
-                                                console.log("added");
-                                           },change:function(obj,event){
-                                                console.log("change",event);
-                                           },removed:function(obj,event){
-                                                console.log("removed");
-                                           }, blur:function(obj,event){
-                                                console.log("blur");
-                                           }, click: function( obj) {
-                                                console.log('click');
-                                           }, select: function( obj) {
-                                                 console.log('select');
-                                           }
-                                 }
+                                }]
                         }],
                         }
                     ],
@@ -864,7 +965,7 @@ Phx.vista.PlanificarAuditoria = {
        });
         this.procesoVentana = new Ext.Window({
          width: 700,
-         height: 500,
+         height: 400,
          modal: true,
          closeAction: 'hide',
          labelAlign: 'bottom',
@@ -953,7 +1054,6 @@ Phx.vista.PlanificarAuditoria = {
                                fieldLabel: 'Responsable',
                                name: 'id_responsable',
                                allowBlank: false,
-                              // id: this.idContenedor+'_id_responsable',
                                emptyText: 'Elija una opción...',
                                store: new Ext.data.JsonStore({
                                        url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListAuditores',
@@ -988,7 +1088,7 @@ Phx.vista.PlanificarAuditoria = {
                                 xtype: 'itemselector',
                                 name: 'id_equipo_auditor',
                                 fieldLabel: 'ItemSelector',
-                                  imagePath: '../../../pxp/lib/ux/images/',
+                                imagePath: '../../../pxp/lib/ux/images/',
                                 drawUpIcon:false,
                                 drawDownIcon:false,
                                 drawTopIcon:false,
@@ -1008,16 +1108,21 @@ Phx.vista.PlanificarAuditoria = {
                                         fields: ['id_funcionario', 'desc_funcionario1'],
                                         remoteSort: true,
                                         autoLoad: true,
-                                        baseParams: {
-                                                      dir:'ASC',
-                                                      sort:'id_aom',
-                                                      limit:'100',
-                                                      start:'0',
-                                                      codigo:'MEQ',
-                                                      id_uo: maestro.id_uo,
-                                                      item: maestro.id_aom
-                                                   }
+                                        baseParams: { dir:'ASC', sort:'id_funcionario', limit:'100', start:'0', codigo:'MEQ', item: maestro.id_aom}
                                     }),
+                                    tbar:[{
+                                        text: 'Todo',
+                                        handler:function(){
+                                            const toStore  = isForm.getForm().findField('id_equipo_auditor').multiselects[0].store;
+                                            const fromStore   = isForm.getForm().findField('id_equipo_auditor').multiselects[1].store;
+                                            for(var i = toStore.getCount()-1; i >= 0; i--)
+                                            {
+                                                const record = toStore.getAt(i);
+                                                toStore.remove(record);
+                                                fromStore.add(record);
+                                            }
+                                        }
+                                    }],
                                     displayField: 'desc_funcionario1',
                                     valueField: 'id_funcionario',
                                 },
@@ -1032,32 +1137,17 @@ Phx.vista.PlanificarAuditoria = {
                                         fields: ['id_funcionario', 'desc_funcionario1'],
                                         remoteSort: true,
                                         autoLoad: true,
-                                        baseParams: { dir:'ASC',
-                                                      sort:'id_aom',
-                                                      limit:'100',
-                                                      start:'0',
-                                                      id_aom:maestro.id_aom,
-                                                      codigo_parametro : 'MEQ'
-                                                    }
+                                        baseParams: { dir:'ASC', sort:'id_funcionario', limit:'100', start:'0', id_aom:maestro.id_aom, codigo_parametro : 'MEQ'}
                                     }),
+                                    tbar:[{
+                                        text: 'Limpiar',
+                                        handler:function(){
+                                            isForm.getForm().findField('id_equipo_auditor').reset();
+                                        }
+                                    }],
                                     displayField: 'desc_funcionario1',
                                     valueField: 'id_funcionario',
-                                }],
-                                listeners: {
-                                          added:function(obj,event){
-                                                console.log("added");
-                                           },change:function(obj,event){
-                                                console.log("change",event);
-                                           },removed:function(obj,event){
-                                                console.log("removed");
-                                           }, blur:function(obj,event){
-                                                console.log("blur");
-                                           }, click: function( obj) {
-                                                console.log('click');
-                                           }, select: function( obj) {
-                                                 console.log('select');
-                                           }
-                                 }
+                                }]
                             }]
                         },
                         {
@@ -1065,7 +1155,6 @@ Phx.vista.PlanificarAuditoria = {
                                    fieldLabel: 'Interno',
                                    name: 'id_interno',
                                    allowBlank: false,
-                                //   id: this.idContenedor+'_id_interno',
                                    emptyText: 'Elija una opción...',
                                    store: new Ext.data.JsonStore({
                                            url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListAuditores',
@@ -1092,16 +1181,7 @@ Phx.vista.PlanificarAuditoria = {
                                    lazyRender: true,
                                    pageSize: 15,
                                    minChars: 2
-                          }/*,
-                          {
-                                xtype: 'field',
-                                fieldLabel: 'Externo',
-                                name: 'exp_tec_externo',
-                                anchor: '100%',
-                                value: maestro.nombre_aom1,
-                                readOnly :true,
-                                style: 'background-color: #F2F1F0; background-image: none;'
-                          }*/
+                          }
                     ],
           padding: this.paddingForm,
           bodyStyle: this.bodyStyleForm,
@@ -1147,7 +1227,6 @@ Phx.vista.PlanificarAuditoria = {
          buttons: [{
              text: 'Guardar',
              handler: function(){
-               const arratFormulario = [];
                        const submit={};
                        Ext.each(isForm.getForm().items.keys, function(element, index){
                            obj = Ext.getCmp(element);
@@ -1159,25 +1238,22 @@ Phx.vista.PlanificarAuditoria = {
                                submit[obj.name]=obj.getValue();
                            }
                        },this);
-                       arratFormulario.push(submit);
-                       console.log(arratFormulario);
+
+                       console.log(submit);
                        Phx.CP.loadingShow();
                        Ext.Ajax.request({
                            url: '../../sis_auditoria/control/EquipoResponsable/insertarItemEquipoResponsable',
                            params: {
                                id_aom :maestro.id_aom,
-                               id_equipo_auditor: arratFormulario[0].id_equipo_auditor,
-                               id_interno: arratFormulario[0].id_interno,
-                               id_responsable: arratFormulario[0].id_responsable
+                               id_equipo_auditor: submit.id_equipo_auditor,
+                               id_interno: submit.id_interno,
+                               id_responsable: submit.id_responsable
                            },
                            isUpload: false,
                            success: function(a,b,c){
-                              //  this.store.rejectChanges();
                                Phx.CP.loadingHide();
-                               this.ventanaEquipo.hide();
-                               this.storeEquipo.load();
-                              //  this.ventanaEquipo.destroy();
-
+                               me.ventanaEquipo.hide();
+                               me.storeEquipo.load();
                            },
                            argument: this.argumentSave,
                            failure: this.conexionFailure,
@@ -1198,7 +1274,7 @@ Phx.vista.PlanificarAuditoria = {
     formularioPuntoNorma:function(){
       const maestro = this.sm.getSelected().data;
       const me = this;
-        var isForm = new Ext.form.FormPanel({
+        const isForm = new Ext.form.FormPanel({
           id: this.idContenedor + '_formulario_punto_norm',
             items: [{
                         xtype: 'field',
@@ -1279,6 +1355,19 @@ Phx.vista.PlanificarAuditoria = {
                                       remoteSort: true,
                                       baseParams: {dir:'ASC',sort:'id_pn',limit:'100',start:'0'}
                                   }),
+                                    tbar:[{
+                                        text: 'Todo',
+                                        handler:function(){
+                                            const toStore  = isForm.getForm().findField('id_pn').multiselects[0].store;
+                                            const fromStore   = isForm.getForm().findField('id_pn').multiselects[1].store;
+                                            for(var i = toStore.getCount()-1; i >= 0; i--)
+                                            {
+                                                const record = toStore.getAt(i);
+                                                toStore.remove(record);
+                                                fromStore.add(record);
+                                            }
+                                        }
+                                    }],
                                     displayField: 'nombre_descrip',
                                     valueField: 'id_pn',
                                 },{
@@ -1293,6 +1382,12 @@ Phx.vista.PlanificarAuditoria = {
                                         remoteSort: true,
                                         baseParams: {dir:'ASC',sort:'id_aom',limit:'100',start:'0', id_aom: maestro.id_aom}
                                     }),
+                                    tbar:[{
+                                        text: 'Limpiar',
+                                        handler:function(){
+                                            isForm.getForm().findField('id_pn').reset();
+                                        }
+                                    }],
                                      displayField: 'nombre_descrip',
                                      valueField: 'id_pn',
                                 }]
@@ -1341,7 +1436,6 @@ Phx.vista.PlanificarAuditoria = {
                                submit[obj.name]=obj.getValue();
                            }
                        },this);
-                       console.log(submit);
                        Phx.CP.loadingShow();
                        Ext.Ajax.request({
                            url: '../../sis_auditoria/control/AuditoriaNpn/insertarItemAuditoriaNpn',
@@ -1364,10 +1458,208 @@ Phx.vista.PlanificarAuditoria = {
                        });
              },
              scope: this
-             }, {
+             },
+             {
              text: 'Declinar',
              handler: function() {
                  this.ventanaPuntoNorma.hide();
+             },
+             scope: this
+         }]
+      });
+    },
+
+    formularioPregunta:function(){
+      const maestro = this.sm.getSelected().data;
+      const me = this;
+        const isForm = new Ext.form.FormPanel({
+          id: this.idContenedor + '_formulario_pregunta',
+            items: [{
+                        xtype: 'field',
+                        fieldLabel: 'Código Auditoria',
+                        name: 'nro_tramite_wf',
+                        anchor: '100%',
+                        value: maestro.nro_tramite_wf,
+                        readOnly :true,
+                        style: 'background-color: #F2F1F0; background-image: none;'
+                    },
+                    {
+                          xtype: 'field',
+                          fieldLabel: 'Nombre Auditoria',
+                          name: 'nombre_aom1',
+                          anchor: '100%',
+                          value: maestro.nombre_aom1,
+                          readOnly :true,
+                          style: 'background-color: #F2F1F0; background-image: none;'
+                    },
+                    {
+                               xtype: 'combo',
+                               name: 'id_norma',
+                               fieldLabel: 'Norma',
+                               allowBlank: false,
+                               emptyText: 'Elija una opción...',
+                               store: new Ext.data.JsonStore({
+                                   url: '../../sis_auditoria/control/Norma/listarNorma',
+                                   id: 'id_norma',
+                                   root: 'datos',
+                                   sortInfo: {
+                                       field: 'nombre_norma',
+                                       direction: 'ASC'
+                                   },
+                                   totalProperty: 'total',
+                                   fields: ['id_norma', 'id_tipo_norma','nombre_norma','sigla_norma','descrip_norma'],
+                                   remoteSort: true,
+                                   baseParams: {par_filtro: 'nor.sigla_norma'}
+                               }),
+                               valueField: 'id_norma',
+                               displayField: 'sigla_norma',
+                               gdisplayField: 'sigla_norma',
+                               tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color:#01010a">{sigla_norma} - {nombre_norma}</p></div></tpl>',
+                               hiddenName: 'id_norma',
+                               mode: 'remote',
+                                anchor: '100%',
+                               triggerAction: 'all',
+                               lazyRender: true,
+                               pageSize: 15,
+                               minChars: 2
+                      },
+                      {
+                            anchor: '100%',
+                            bodyStyle: 'padding:10px;',
+                            items:[{
+                                xtype: 'itemselector',
+                                name: 'id_pregunta',
+                                fieldLabel: 'Pregunta',
+                                imagePath: '../../../pxp/lib/ux/images/',
+                                drawUpIcon:false,
+                                drawDownIcon:false,
+                                drawTopIcon:false,
+                                drawBotIcon:false,
+                                multiselects: [{
+                                  width: 300,
+                                  height: 250,
+                                  store: new Ext.data.JsonStore({
+                                      url: '../../sis_auditoria/control/Pregunta/listarPregunta',
+                                      id: 'id_pregunta',
+                                      root: 'datos',
+                                      sortInfo: {
+                                          field: 'nro_pregunta',
+                                          direction: 'ASC'
+                                      },
+                                      totalProperty: 'total',
+                                      fields: ['id_pregunta', 'nro_pregunta','descrip_pregunta'],
+                                      remoteSort: true,
+                                      baseParams: {dir:'ASC',sort:'id_pregunta',limit:'100',start:'0'}
+                                  }),
+                                    tbar:[{
+                                        text: 'Todo',
+                                        handler:function(){
+                                            const toStore  = isForm.getForm().findField('id_pregunta').multiselects[0].store;
+                                            const fromStore   = isForm.getForm().findField('id_pregunta').multiselects[1].store;
+                                            for(var i = toStore.getCount()-1; i >= 0; i--)
+                                            {
+                                                const record = toStore.getAt(i);
+                                                toStore.remove(record);
+                                                fromStore.add(record);
+                                            }
+                                        }
+                                    }],
+                                    displayField: 'descrip_pregunta',
+                                    valueField: 'id_pregunta',
+                                },{
+                                    width: 300,
+                                    height: 250,
+                                    store: new Ext.data.JsonStore({
+                                        url: '../../sis_auditoria/control/AuditoriaNpnpg/listarAuditoriaNpnpg',
+                                        id: 'id_pregunta',
+                                        root: 'datos',
+                                        totalProperty: 'total',
+                                        fields: ['id_pregunta', 'descrip_pregunta'],
+                                        remoteSort: true,
+                                        baseParams: {dir:'ASC',sort:'id_aom',limit:'100',start:'0', id_aom: maestro.id_aom}
+                                    }),
+                                    tbar:[{
+                                        text: 'Limpiar',
+                                        handler:function(){
+                                            isForm.getForm().findField('id_pregunta').reset();
+                                        }
+                                    }],
+                                     displayField: 'descrip_pregunta',
+                                     valueField: 'id_pregunta',
+                                }]
+                            }]
+                        }
+                    ],
+          padding: this.paddingForm,
+          bodyStyle: this.bodyStyleForm,
+          border: this.borderForm,
+          frame: this.frameForm,
+          autoDestroy: true,
+          autoScroll: true,
+          region: 'center'
+       });
+        isForm.getForm().findField('id_norma').on('select', function(combo, record, index){
+              // isForm.getForm().items.items[3].multiselects[0].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_norma: record.data.id_norma,item :maestro.id_aom};
+              // isForm.getForm().items.items[3].multiselects[1].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_aom: maestro.id_aom,id_norma: record.data.id_norma};
+              // isForm.getForm().items.items[3].multiselects[1].store.load();
+               isForm.getForm().findField('id_pregunta').modificado = true;
+               isForm.getForm().findField('id_pregunta').reset();
+         },this);
+
+      this.ventanaPregunta = new Ext.Window({
+         width: 700,
+         height: 500,
+         modal: true,
+         closeAction: 'hide',
+         labelAlign: 'bottom',
+         title: 'Selección de punto de norma',
+         bodyStyle: 'padding:5px',
+         layout: 'form',
+         items: [
+          isForm
+         ],
+         buttons: [{
+             text: 'Guardar',
+             handler: function(){
+                       const submit={};
+                       Ext.each(isForm.getForm().items.keys, function(element, index){
+                           obj = Ext.getCmp(element);
+                           if(obj.items){
+                               Ext.each(obj.items.items, function(elm, ind){
+                                   submit[elm.name]=elm.getValue();
+                               },this)
+                           } else {
+                               submit[obj.name]=obj.getValue();
+                           }
+                       },this);
+                 /* Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                     url: '../../sis_auditoria/control/AuditoriaNpn/insertarItemAuditoriaNpn',
+                     params: {
+                         id_aom :maestro.id_aom,
+                         id_norma:  submit.id_norma,
+                         id_pn: submit.id_pn
+                     },
+                     isUpload: false,
+                     success: function(a,b,c){
+                         Phx.CP.loadingHide();
+                         me.ventanaPregunta.hide();
+                         me.storePuntoNorma.load();
+
+                     },
+                     argument: this.argumentSave,
+                     failure: this.conexionFailure,
+                     timeout: this.timeout,
+                     scope: this
+                 });*/
+                 me.ventanaPregunta.hide();
+             },
+             scope: this
+             },
+             {
+             text: 'Declinar',
+             handler: function() {
+                 this.ventanaPregunta.hide();
              },
              scope: this
          }]
@@ -1385,7 +1677,7 @@ Phx.vista.PlanificarAuditoria = {
              id: 'id_cronograma',
              root: 'datos',
              totalProperty: 'total',
-             fields: ['id_aom','id_actividad',
+             fields: ['id_cronograma','id_aom','id_actividad',
                      'nueva_actividad','fecha_ini_activ','actividad',
                          'fecha_fin_activ','hora_ini_activ','hora_fin_activ','lista_funcionario'],
                          remoteSort: true,
@@ -1397,13 +1689,14 @@ Phx.vista.PlanificarAuditoria = {
             layout: 'fit',
             store: tienda,
             region: 'center',
-            height: 250,
+            height: 150,
             title:'Actividades Programadas',
             anchor: '100%',
             split: true,
             border: true,
             plain: true,
             stripeRows: true,
+            trackMouseOver: false,
             columns: [
                 new Ext.grid.RowNumberer(),
                 {
@@ -1425,12 +1718,20 @@ Phx.vista.PlanificarAuditoria = {
                     dataIndex: 'fecha_ini_activ',
                     align: 'center',
                     width: 110,
+                    renderer:function (value,p,record){
+                        const fecha = value.split("-");
+                        return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
+                    }
                 },
                 {
                     header: 'Fecha Fin',
                     dataIndex: 'fecha_fin_activ',
                     align: 'center',
                     width: 110,
+                    renderer:function (value,p,record){
+                        const fecha = value.split("-");
+                        return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
+                    }
                 },
                 {
                     header: 'Hora Inicio',
@@ -1444,7 +1745,34 @@ Phx.vista.PlanificarAuditoria = {
                     align: 'center',
                     width: 110,
                 }
-            ]
+            ],
+            tbar: [
+                {
+                    text: '<button class="btn"><i class="fa fa-trash fa-lg"></i>&nbsp;&nbsp;<b>Eliminar</b></button>',
+                    scope:this,
+                    width: '100',
+                    handler: function(){
+                        const  s =  table.getSelectionModel().getSelections();
+                        // console.log(s[0].data)
+                        Phx.CP.loadingShow();
+                        Ext.Ajax.request({
+                            url: '../../sis_auditoria/control/Cronograma/eliminarCronograma',
+                            params: {
+                                id_cronograma : s[0].data.id_cronograma
+                            },
+                            isUpload: false,
+                            success: function(a,b,c){
+                                Phx.CP.loadingHide();
+                                tienda.load();
+                            },
+                            argument: this.argumentSave,
+                            failure: this.conexionFailure,
+                            timeout: this.timeout,
+                            scope: this
+                        })
+                    }
+                }
+            ],
         });
         const isForm = new Ext.form.FormPanel({
             id: this.idContenedor + '_formulario_crorogrma',
@@ -1546,13 +1874,21 @@ Phx.vista.PlanificarAuditoria = {
                                         fields: ['id_funcionario', 'desc_funcionario1'],
                                         remoteSort: true,
                                         autoLoad: true,
-                                        baseParams: { dir:'ASC',
-                                            sort:'id_aom',
-                                            limit:'100',
-                                            start:'0',
-                                            id_aom: maestro.id_aom
-                                        }
+                                        baseParams: { dir:'ASC', sort:'id_aom', limit:'100', start:'0', id_aom: maestro.id_aom}
                                     }),
+                                    tbar:[{
+                                        text: 'Todo',
+                                        handler:function(){
+                                            const toStore  = isForm.getForm().findField('itemselector').multiselects[0].store;
+                                            const fromStore   = isForm.getForm().findField('itemselector').multiselects[1].store;
+                                            for(var i = toStore.getCount()-1; i >= 0; i--)
+                                            {
+                                                const record = toStore.getAt(i);
+                                                toStore.remove(record);
+                                                fromStore.add(record);
+                                            }
+                                        }
+                                    }],
                                     valueField: 'id_funcionario',
                                     displayField: 'desc_funcionario1',
                                 },
@@ -1566,12 +1902,14 @@ Phx.vista.PlanificarAuditoria = {
                                         totalProperty: 'total',
                                         fields: ['id_funcionario', 'desc_funcionario1'],
                                         remoteSort: true,
-                                        baseParams: { dir:'ASC',
-                                            sort:'id_aom',
-                                            limit:'100',
-                                            start:'0'
-                                        }
+                                        baseParams: { dir:'ASC', sort:'id_funcionario', limit:'100', start:'0'}
                                     }),
+                                    tbar:[{
+                                        text: 'Limpiar',
+                                        handler:function(){
+                                             isForm.getForm().findField('itemselector').reset();
+                                        }
+                                    }],
                                     valueField: 'id_funcionario',
                                     displayField: 'desc_funcionario1',
                                 }]
@@ -1662,13 +2000,15 @@ Phx.vista.PlanificarAuditoria = {
           };
           isForm.getForm().items.items[5].multiselects[1].store.load();
         }
+      const auditoria = maestro.nro_tramite_wf + ' '+maestro.nombre_aom1;
+
       this.ventanaCroronograma = new Ext.Window({
          width: 850,
-         height: 700,
+         height: 600,
          modal: true,
          closeAction: 'hide',
          labelAlign: 'bottom',
-         title: 'Cronograma de Actividades por Auditoria',
+         title: 'Cronograma de Actividades de la Auditoria '+ auditoria,
          bodyStyle: 'padding:5px',
           layout: 'border',
          items: [
@@ -1764,9 +2104,9 @@ Phx.vista.PlanificarAuditoria = {
           };
           this.store.reload({ params: this.store.baseParams});
     },
-    bnew:false,
+    bnew:true,
     bdel:false,
-    bedit:false,
+    bedit:true,
     arrayDefaultColumHidden:['nombre_aom1','nombre_unidad','desc_funcionario_resp','nro_tramite','descrip_nc','lugar','desc_tipo_norma','desc_tipo_objeto'],
     rowExpander: new Ext.ux.grid.RowExpander({
         tpl : new Ext.Template(
@@ -1775,10 +2115,6 @@ Phx.vista.PlanificarAuditoria = {
             '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Area:&nbsp;&nbsp;</b> {nombre_unidad}</p>',
             '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Responsable Auditoria:&nbsp;&nbsp;</b> {desc_funcionario2}</p>',
             '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Codigo:&nbsp;&nbsp;</b> {nro_tramite_wf}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Descripcion:&nbsp;&nbsp;</b> {descrip_aom1}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Lugar:&nbsp;&nbsp;</b> {lugar}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Tipo Norma:&nbsp;&nbsp;</b> {desc_tipo_norma}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Objeto Auditoria:&nbsp;&nbsp;</b> {desc_tipo_objeto}</p>',
 
         )
     }),

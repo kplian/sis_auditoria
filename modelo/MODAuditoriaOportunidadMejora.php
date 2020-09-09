@@ -588,6 +588,23 @@ class MODAuditoriaOportunidadMejora extends MODbase{
        // var_dump($this->respuesta);exit;
         return $this->respuesta;
     }
+    function listarFuncionarioVigentes(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_sel';
+        $this->transaccion='SSOM_FUN_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
 
+        $this->captura('id_funcionario','int4');
+        $this->captura('desc_funcionario1','text');
+        $this->captura('codigo','varchar');
+        $this->captura('descripcion_cargo','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 }
 ?>

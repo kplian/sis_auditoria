@@ -150,7 +150,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'id_tipo_auditoria',
                     fieldLabel: 'Tipo Auditoria',
-                    allowBlank: true,
+                    allowBlank: false,
                     resizable:true,
                     emptyText: 'Elija una opción...',
                     store: new Ext.data.JsonStore({

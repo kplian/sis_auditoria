@@ -16,30 +16,13 @@ header("content-type: text/javascript; charset=UTF-8");
         requireclase:'Phx.vista.AuditoriaOportunidadMejora',
         nombreVista: 'ProgramarAuditoria',
         dblclickEdit: false,
-        gruposBarraTareas:[
-            {name:'programada',title:'<h1 align="center">Programadas</h1>',grupo:0,height:0},
-            {name:'aprobado_responsable',title:'<h1 align="left">Aprobado por Resp.</h1>',grupo:1,height:0}
-        ],
-        tam_pag:50,
-        actualizarSegunTab: function(name, indice){
-            if (this.finCons) {
-                this.store.baseParams.pes_estado = name;
-                this.load({params: {start: 0, limit: this.tam_pag}});
-            }
-        },
-        bnewGroups:[0],
-        bactGroups:[0,1,2],
-        bdelGroups:[0],
-        beditGroups:[0],
-        bexcelGroups:[0,1,2],
-
         constructor: function(config) {
             this.eventoGrill();
             this.idContenedor = config.idContenedor;
             Phx.vista.ProgramarAuditoria.superclass.constructor.call(this,config);
             this.getBoton('ant_estado').setVisible(false);
             this.init();
-            this.store.baseParams.pes_estado = 'programada';
+            // this.store.baseParams.pes_estado = 'programada';
             this.store.baseParams.interfaz = 'ProgramarAuditoria';
             this.iniciarEvento();
             this.load({params:{ start:0, limit:this.tam_pag}});
@@ -115,9 +98,12 @@ header("content-type: text/javascript; charset=UTF-8");
           		this.maestro = m;
           		console.log('=22222>',this);
           		this.store.baseParams = {
+                    tipo_filtro :this.maestro.tipo_filtro,
           			id_gestion:  this.maestro.id_gestion,
           			desde:  this.maestro.desde,
           			hasta:  this.maestro.hasta,
+                    tipo_estado : this.maestro.id_tipo_estado,
+                    id_uo: this.maestro.id_uo,
           			start:0,
           			limit:50,
           			sort:'id_aom',

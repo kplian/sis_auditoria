@@ -15,8 +15,8 @@ class ACTProceso extends ACTbase{
 
 		if($this->objParam->getParametro('item') != ''){
 				$this->objParam->addFiltro("pcs.id_proceso not in ( select aupc.id_proceso
-                                       from ssom.tauditoria_proceso aupc
-                                       where aupc.id_aom = ".$this->objParam->getParametro('item').")");
+										   from ssom.tauditoria_proceso aupc
+										   where aupc.id_aom = ".$this->objParam->getParametro('item').") and pcs.vigencia = ''Si'' ");
 		}
 
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){

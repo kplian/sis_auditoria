@@ -367,7 +367,7 @@ class MODNoConformidad extends MODbase{
         $this->setParametro('obs_consultor','obs_consultor','text');
 
         $this->setParametro('id_norma','id_norma','int4');
-        $this->setParametro('id_pn','id_pn','text');
+       // $this->setParametro('id_pn','id_pn','text');
         $this->setParametro('id_nc','id_nc','int4');
         //Ejecuta la instruccion
         $this->armarConsulta();

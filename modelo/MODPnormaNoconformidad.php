@@ -34,6 +34,7 @@ class MODPnormaNoconformidad extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('desc_norma','varchar');
+		$this->captura('sigla_norma','varchar');
 		$this->captura('nombre_pn','varchar');
 		$this->captura('id_aom','int4');
 		$this->captura('codigo_pn','varchar');
@@ -96,6 +97,24 @@ class MODPnormaNoconformidad extends MODbase{
 
 		//Define los parametros para la funcion
 		$this->setParametro('id_pnnc','id_pnnc','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	function insertarItemAuditoriaNpn(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='ssom.ft_pnorma_noconformidad_ime';
+		$this->transaccion='SSOM_PNPN_INS';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_nc','id_nc','int4');
+		$this->setParametro('id_norma','id_norma','int4');
+		$this->setParametro('id_pn','id_pn','text');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

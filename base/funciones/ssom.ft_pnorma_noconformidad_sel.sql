@@ -58,6 +58,7 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         norm.nombre_norma as desc_norma,
+                        norm.sigla_norma,
                         initcap(pnorm.nombre_pn)::varchar as  nombre_pn,
                         no.id_aom,
                         pnorm.codigo_pn,

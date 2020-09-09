@@ -891,16 +891,16 @@ BEGIN
 
                end if;
 
-            if (v_parametros.id_nc is not null)then
+           /* if (v_parametros.id_nc is not null)then
 
             	delete from ssom.tpnorma_noconformidad np
                 where np.id_nc = v_parametros.id_nc;
 
              	v_id_nc = v_parametros.id_nc;
 
-            end if;
+            end if;*/
 
-            foreach v_id_pn in array string_to_array(v_parametros.id_pn,',')
+            /*foreach v_id_pn in array string_to_array(v_parametros.id_pn,',')
            				 										loop
                          insert into ssom.tpnorma_noconformidad(  id_nc,
                                                                   estado_reg,
@@ -925,7 +925,7 @@ BEGIN
                                                                   null
                                                                   );
 
-        	end loop;
+        	end loop;*/
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidades modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_id_nc::varchar);

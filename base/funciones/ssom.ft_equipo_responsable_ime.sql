@@ -149,7 +149,7 @@ BEGIN
     /*********************************
      #TRANSACCION:  'SSOM_EQRE_ELI'
      #DESCRIPCION:	Eliminacion de registros
-     #AUTOR:		MMV
+     #AUTOR:		max.camacho
      #FECHA:		02-08-2019 14:03:25
     ***********************************/
 
@@ -218,6 +218,7 @@ BEGIN
                                     null);
           end if;
 
+          -- raise exception '%',v_parametros.id_aom;
 
             foreach v_id_funcionario IN  array (string_to_array(v_parametros.id_equipo_auditor::varchar,','))  loop
 

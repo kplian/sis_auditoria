@@ -61,7 +61,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
                 origen : 'GESTION',
                 fieldLabel : 'Gestion',
                 gdisplayField: 'desc_gestion',
-                allowBlank : true,
+                allowBlank : false,
                 width: 150
             },
             type : 'ComboRec',
@@ -95,7 +95,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
             config: {
                 name: 'id_tipo_estado',
                 fieldLabel: 'Estado',
-                allowBlank: false,
+                allowBlank: true,
                 resizable:true,
                 emptyText: 'Elija una opción...',
                 store: new Ext.data.JsonStore({
@@ -111,8 +111,8 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
                     remoteSort: true,
                     baseParams: {par_filtro: 'ts.codigo'}
                 }),
-                valueField: 'id_tipo_estado',
-                displayField: 'codigo',
+                valueField: 'codigo',
+                displayField: 'nombre_estado',
                 gdisplayField: 'codigo',
                 hiddenName: 'id_tipo_estado',
                 forceSelection: true,

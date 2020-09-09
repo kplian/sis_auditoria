@@ -149,6 +149,59 @@ BEGIN
             return v_resp;
 
 		end;
+    /*********************************
+ 	#TRANSACCION:  'SSOM_PNPN_INS'
+ 	#DESCRIPCION:	Modificacion de registros
+ 	#AUTOR:		szambrana
+ 	#FECHA:		19-07-2019 15:25:54
+	***********************************/
+
+	elsif(p_transaccion='SSOM_PNPN_INS')then
+
+		begin
+
+
+       -- raise exception '%',v_parametros.id_pn;
+			--Sentencia de la modificacion
+		foreach v_id_pn in array string_to_array(v_parametros.id_pn,',')
+
+        	loop
+
+           -- raise exception '%',v_id_pn;
+
+                         insert into ssom.tpnorma_noconformidad(  id_nc,
+                                                                  estado_reg,
+                                                                  id_pn,
+                                                                  id_norma,
+                                                                  usuario_ai,
+                                                                  fecha_reg,
+                                                                  id_usuario_reg,
+                                                                  id_usuario_ai,
+                                                                  fecha_mod,
+                                                                  id_usuario_mod
+                                                                  ) values(
+                                                                  v_parametros.id_nc,
+                                                                  'activo',
+                                                                  v_id_pn,
+                                                                  v_parametros.id_norma,
+                                                                  v_parametros._nombre_usuario_ai,
+                                                                  now(),
+                                                                  p_id_usuario,
+                                                                  v_parametros._id_usuario_ai,
+                                                                  null,
+                                                                  null
+                                                                  );
+
+        	end loop;
+
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Puntos de norma para No Conformidades modificado(a)');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_parametros.id_nc::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
 
 	else
 
