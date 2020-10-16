@@ -168,7 +168,9 @@ BEGIN
                                                     id_usuario_mod,
                                                     fecha_mod,
                                                     id_gestion,
-                                                    id_gconsultivo
+                                                    id_gconsultivo,
+                                                    fecha_prev_inicio,
+                                                    fecha_prev_fin
       												)values(
                                                     v_id_proceso_wf,
                                                     v_num_tramite,
@@ -191,7 +193,9 @@ BEGIN
                                                     null,
                                                     null,
                                                     v_id_gestion,
-                                                    v_parametros.id_gconsultivo
+                                                    v_parametros.id_gconsultivo,
+                                                    v_parametros.fecha_prev_inicio,
+                                                    v_parametros.fecha_prev_fin
                                                     )RETURNING id_aom into v_id_aom;
 
 
@@ -406,6 +410,9 @@ BEGIN
                                                                 v_tipo_noti,
                                                                 v_titulo);
 
+
+
+
        	 if va_codigo_estado[1] = 'ejecutada' then
          	select  ao.id_aom,
             		ao.fecha_prog_inicio,
@@ -451,6 +458,36 @@ BEGIN
         	end if;
        end if;
 
+
+              if va_codigo_estado[1] = 'notificar_responsable' then
+
+
+       		select  ao.id_aom
+                   into
+                   v_registros_proc
+            from ssom.tauditoria_oportunidad_mejora ao
+            where ao.id_proceso_wf = v_parametros.id_proceso_wf;
+
+            	for v_no_conformindad in (select  nc.id_nc,
+                                          nc.id_proceso_wf,
+                                          nc.id_estado_wf
+                                  from ssom.tno_conformidad nc
+                                  where nc.id_aom = v_registros_proc.id_aom)loop
+
+            		if ssom.f_cambiar_estado_no_conformidad(v_no_conformindad.id_proceso_wf,
+                                                                  v_no_conformindad.id_estado_wf,
+                                                                  p_id_usuario ,
+                                                                  'revisar') then
+
+     			 		end if;
+
+                end loop;
+
+
+
+              end if;
+
+
        if va_codigo_estado[1] = 'notificar' then
 
        		select  ao.id_aom,
@@ -484,13 +521,13 @@ BEGIN
 
                     end if;
         			if (v_no_conformindad.rechazar = 'si')then
-
+                   /*
                     	if ssom.f_cambiar_estado_no_conformidad(v_no_conformindad.id_proceso_wf,
                                                                 v_no_conformindad.id_estado_wf,
                                                                 p_id_usuario ,
                                                                 'rechazar') then
 
-     			 		end if;
+     			 		end if;*/
 
                     end if;
 
@@ -796,10 +833,12 @@ BEGIN
                     v_recomendacion  = v_json_formulario_record.json_array_elements::json->>'recomendacion';
         			v_id_destinatarios =   v_json_formulario_record.json_array_elements::json->>'id_destinatarios';
 
+
+
              		update ssom.tauditoria_oportunidad_mejora set
                     id_destinatario =  v_id_destinatario,
                     resumen = v_parametros.resumen,
-                    recomendacion = v_recomendacion,
+                    recomendacion = v_parametros.recomendacion,
                     id_usuario_mod = p_id_usuario,
                     fecha_mod = now()
                     where id_aom=v_parametros.id_aom;
