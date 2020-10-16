@@ -55,7 +55,15 @@ class MODAccionPropuesta extends MODbase{
         $this->captura('rechazar','varchar');
         $this->captura('implementar','varchar');
 
-		
+        $this->captura('nro_tramite_no','varchar');
+        $this->captura('descrip_nc','varchar');
+
+        $this->captura('area_noc','varchar');
+        $this->captura('funcionario_noc','text');
+        $this->captura('id_aom','int4');
+        $this->captura('auditoria','text');
+
+        
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -245,6 +253,19 @@ class MODAccionPropuesta extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-			
+
+    function aprobarEstado(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_accion_propuesta_ime';
+        $this->transaccion='SSOM_ACCNO_IME';
+        $this->tipo_procedimiento='IME';
+        //Define los parametros para la funcion
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+        $this->setParametro('id_estado_wf','id_estado_wf','int4');
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 }
 ?>

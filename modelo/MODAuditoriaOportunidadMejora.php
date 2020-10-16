@@ -515,7 +515,7 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         $this->setParametro('arratFormulario','arratFormulario','text');
         $this->setParametro('informe','informe','varchar');
         $this->setParametro('resumen','resumen','codigo_html');
-
+        $this->setParametro('recomendacion','recomendacion','varchar');
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();

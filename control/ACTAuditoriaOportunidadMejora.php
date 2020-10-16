@@ -15,7 +15,11 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
 	function listarAuditoriaOportunidadMejora(){
 		$this->objParam->defecto('ordenacion','id_aom');
 		$this->objParam->defecto('dir_ordenacion','ASC');
+		
+        if ($this->objParam->getParametro('id_aom') != '' ){
+            $this->objParam->addFiltro("aom.id_aom = ".$this->objParam->getParametro('id_aom'));
 
+        }
         if($this->objParam->getParametro('interfaz')== 'ProgramarAuditoria'){
 
              $filtroInit = "aom.estado_wf in (''programada'',''aprobado_responsable'') and tau.codigo_tpo_aom = ''AETR''";
@@ -23,6 +27,8 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
             if ($this->objParam->getParametro('id_gestion') != '' ){
                 $filtroInit = "aom.id_gestion = ".$this->objParam->getParametro('id_gestion')."and tau.codigo_tpo_aom = ''AETR''";
             }
+
+
             if ($this->objParam->getParametro('id_gestion') != ''and $this->objParam->getParametro('tipo_estado') != '' ){
                 $filtroInit = "aom.estado_wf = ''".$this->objParam->getParametro('tipo_estado')."'' and aom.id_gestion =".$this->objParam->getParametro('id_gestion');
             }

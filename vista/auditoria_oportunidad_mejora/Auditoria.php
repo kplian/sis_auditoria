@@ -79,7 +79,6 @@ header("content-type: text/javascript; charset=UTF-8");
             this.getBoton('btnNoConf').enable();
             this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('btmAccion').enable();
-            // this.getBoton('ant_estado').enable();
             return tb
         },
         liberaMenu:function(){
@@ -89,12 +88,10 @@ header("content-type: text/javascript; charset=UTF-8");
                this.getBoton('btnNoConf').disable();
                this.getBoton('btnChequeoDocumentosWf').disable();
                this.getBoton('btmAccion').disable();
-               //  this.getBoton('ant_estado').disable();
             }
             return tb
         },
         onReloadPage:function(param){
-            //Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
             var me = this;
             this.initFiltro(param);
         },

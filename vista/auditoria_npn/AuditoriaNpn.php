@@ -1,4 +1,4 @@
-<?php
+AuditoriaNpn<?php
 /**
 *@package pXP
 *@file gen-AuditoriaNpn.php
@@ -363,13 +363,13 @@ Phx.vista.AuditoriaNpn=Ext.extend(Phx.gridInterfaz,{
             this.Cmp.id_pn.modificado = true;
             this.Cmp.id_pn.reset();
         },this);
-    },
+    }/*,
     east:{
         url:'../../../sis_auditoria/vista/auditoria_npnpg/AuditoriaNpnpg.php',
         title:'Pregunta(s)',
         width:'30%',
         cls:'AuditoriaNpnpg'
-    }
+    }*/
 	}
 )
 </script>

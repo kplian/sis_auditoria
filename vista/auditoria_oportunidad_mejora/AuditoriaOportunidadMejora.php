@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
-     dblclickEdit: true,
+    dblclickEdit: true,
 	constructor:function(config){
         this.idContenedor = config.idContenedor;
         this.maestro = config.maestro;
@@ -180,6 +180,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 form:true,
                 bottom_filter:true
             },
+           
             {
                 config:{
                     name: 'fecha_prog_inicio',
@@ -358,6 +359,38 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 type:'TextArea',
                 filters:{pfiltro:'aom.descrip_aom1',type:'string'},
                 id_grupo:0,
+                grid:true,
+                form:true
+            },
+            {
+                config:{
+                    name: 'fecha_prev_inicio',
+                    fieldLabel: 'Fecha Inicio',
+                    allowBlank: true,
+                    anchor: '50%',
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_prev_inicio',type:'date'},
+                id_grupo:1,
+                grid:true,
+                form:true
+            },
+            {
+                config:{
+                    name: 'fecha_prev_fin',
+                    fieldLabel: 'Fecha Fin',
+                    allowBlank: true,
+                    anchor: '50%',
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_prev_fin',type:'date'},
+                id_grupo:1,
                 grid:true,
                 form:true
             },
@@ -581,40 +614,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 grid: true,
                 form:  true
             },
-            {
-                config:{
-                    name: 'fecha_prev_inicio',
-                    fieldLabel: 'Fecha PV-Inicio',
-                    allowBlank: true,
-                    anchor: '50%',
-                    gwidth: 100,
-                    format: 'd/m/Y',
-                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-                },
-                type:'DateField',
-                filters:{pfiltro:'aom.fecha_prev_inicio',type:'date'},
-                id_grupo:1,
-                valorInicial: (new Date().getDate()),
-                grid:true,
-                form:true
-            },
-            {
-                config:{
-                    name: 'fecha_prev_fin',
-                    fieldLabel: 'Fecha PV-Fin',
-                    allowBlank: true,
-                    anchor: '50%',
-                    gwidth: 100,
-                    format: 'd/m/Y',
-                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-                },
-                type:'DateField',
-                filters:{pfiltro:'aom.fecha_prev_fin',type:'date'},
-                id_grupo:1,
-                valorInicial: (new Date().getDate()),
-                grid:true,
-                form:true
-            },
+         
             {
                 config:{
                     name: 'fecha_eje_inicio',
@@ -809,13 +809,13 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
         this.ocultarComponente(this.Cmp.id_tnorma);
         this.ocultarComponente(this.Cmp.id_tobjeto);
         this.ocultarComponente(this.Cmp.id_gconsultivo);
-        this.ocultarComponente(this.Cmp.fecha_prev_inicio);
-        this.ocultarComponente(this.Cmp.fecha_prev_fin);
+        this.ocultarComponente(this.Cmp.fecha_prog_inicio);
+        this.ocultarComponente(this.Cmp.fecha_prog_fin);
         this.ocultarComponente(this.Cmp.fecha_eje_inicio);
         this.ocultarComponente(this.Cmp.fecha_eje_fin);
     },
     sigEstado:function(){
-        var rec = this.sm.getSelected();
+        const rec = this.sm.getSelected();
         this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
             'Estado de Wf',
             {
@@ -874,10 +874,10 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
             rec.data,
             this.idContenedor,
             'DocumentoWf'
-        )
+        );
     },
     onOpenObs:function() {
-        var rec=this.sm.getSelected();
+        const rec = this.sm.getSelected();
         var data = {
             id_proceso_wf: rec.data.id_proceso_wf,
             id_estado_wf: rec.data.id_estado_wf,
@@ -895,7 +895,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
         )
     },
     antEstado:function(res){
-        var rec=this.sm.getSelected();
+        const rec = this.sm.getSelected();
         Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/AntFormEstadoWf.php',
             'Estado de Wf',
             {
@@ -1005,13 +1005,13 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
         }
         return resultado;
     },
-    west: {
-           url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/FormFiltro.php',
-           width: '30%',
-           title:'Filtros',
-           collapsed: true,
-           cls: 'FormFiltro'
-    }
+    // west: {
+    //        url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/FormFiltro.php',
+    //        width: '30%',
+    //        title:'Filtros',
+    //        collapsed: true,
+    //        cls: 'FormFiltro'
+    // }
 }
 )
 </script>

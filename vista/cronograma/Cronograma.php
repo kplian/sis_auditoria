@@ -324,12 +324,12 @@ Phx.vista.Cronograma=Ext.extend(Phx.gridInterfaz,{
 	bsave:false,
     fwidth: '40%',
     fheight: '30%',
-    east:{
+   /* east:{
         url:'../../../sis_auditoria/vista/cronograma_equipo_responsable/CronogramaEquipoResponsable.php',
         title:'Participantes en la Actividad',
         width:'30%',
         cls:'CronogramaEquipoResponsable'
-    },
+    },*/  
     onReloadPage:function(m){
         this.maestro=m;
         this.store.baseParams = {id_aom: this.maestro.id_aom};

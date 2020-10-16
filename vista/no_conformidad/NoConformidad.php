@@ -19,6 +19,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
     	Phx.vista.NoConformidad.superclass.constructor.call(this,config);
 		this.store.baseParams = {tipo_interfaz: this.nombreVista};
 		this.init();
+
         this.addButton('btnChequeoDocumentosWf', {
             text: 'Documentos',
             iconCls: 'bchecklist',
@@ -27,6 +28,8 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
             tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.',
             scope:this
         });
+
+        
         this.addButton('btnNoram', {
                 text: 'Puntos Norma',
                 iconCls: 'bdocuments',

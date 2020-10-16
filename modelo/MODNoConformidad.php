@@ -72,7 +72,7 @@ class MODNoConformidad extends MODbase{
         $this->captura('nombre_aom1','varchar');
         $this->captura('nombre_unidad','varchar');
         $this->captura('desc_funcionario_resp','text');
-
+        $this->captura('nro_tramite_padre','varchar');
 
 
 		//Ejecuta la instruccion
@@ -401,7 +401,7 @@ class MODNoConformidad extends MODbase{
         //Define los parametros para la funcion
         $this->setParametro('id_nc','id_nc','int4');
         $this->setParametro('fieldName','fieldName','varchar');
-
+        $this->setParametro('id_funcionario_nc','id_funcionario_nc','int4');
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -453,7 +453,53 @@ class MODNoConformidad extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+    function listarNoConformidadSuper(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='ssom.ft_no_conformidad_sel';
+        $this->transaccion='SSOM_NOCF_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
 
+        $this->captura('id_nc','int4');
+        $this->captura('obs_consultor','text');
+        $this->captura('estado_reg','varchar');
+        $this->captura('evidencia','varchar');
+        $this->captura('id_funcionario','int4');
+        $this->captura('id_uo','int4');
+        $this->captura('descrip_nc','varchar');
+        $this->captura('id_parametro','int4');
+        $this->captura('obs_resp_area','text');
+        $this->captura('id_aom','int4');
+        $this->captura('fecha_reg','timestamp');
+        $this->captura('usuario_ai','varchar');
+        $this->captura('id_usuario_reg','int4');
+        $this->captura('id_usuario_ai','int4');
+        $this->captura('id_usuario_mod','int4');
+        $this->captura('fecha_mod','timestamp');
+        $this->captura('id_uo_adicional','int4');
+        $this->captura('id_proceso_wf','int4');
+        $this->captura('id_estado_wf','int4');
+        $this->captura('nro_tramite','varchar');
+        $this->captura('estado_wf','varchar');
+        $this->captura('codigo_nc','varchar');
+        $this->captura('id_funcionario_nc','int4');
+        $this->captura('usr_reg','varchar');
+        $this->captura('usr_mod','varchar');
+        $this->captura('nro_tramite_wf','varchar');
+        $this->captura('nombre_aom1','varchar');
+        $this->captura('valor_parametro','varchar');
+        $this->captura('responsable_auditoria','text');
+        $this->captura('uo_auditoria','varchar');
+        $this->captura('nof_auditoria','varchar');
+        $this->captura('auditoria','text');
+        $this->captura('funcionario_resp_nof','text');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 
 }
 ?>

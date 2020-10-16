@@ -141,12 +141,12 @@ BEGIN
                 v_codigo_tipo_proceso,
                 v_parametros.nro_tramite_padre);
                 --Condicion para fechas utilizamos la funcion overlaps
-				v_fechas_validas = (select( v_parametros.fecha_inicio_ap::date, v_parametros.fecha_inicio_ap::date) overlaps
+				/*v_fechas_validas = (select( v_parametros.fecha_inicio_ap::date, v_parametros.fecha_inicio_ap::date) overlaps
 									      ( v_parametros.fecha_inicio_ap::date, v_parametros.fecha_fin_ap::date));
 
             if not v_fechas_validas then
         		raise exception 'La fecha final debe ser igual o mayor a la fecha inicial';
-            end if;
+            end if;*/
 
 
 
@@ -680,6 +680,97 @@ BEGIN
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Exito');
       v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_parametros.id_nc::varchar);
+
+      --Devuelve la respuesta
+      return v_resp;
+
+    end;
+
+     /****************************************************
+    #TRANSACCION:     'SSOM_ACCNO_IME'
+    #DESCRIPCION:     Cambiar estado
+    #AUTOR:           MMV
+    #FECHA:			  8/7/2020
+    ***************************************************/
+
+    elseif( p_transaccion='SSOM_ACCNO_IME') then
+
+    begin
+
+      -- Validar estado
+	select  pw.id_proceso_wf,
+            ew.id_estado_wf,
+            te.codigo,
+            pw.fecha_ini,
+            te.id_tipo_estado,
+            te.pedir_obs,
+            pw.nro_tramite
+          into
+            v_registro_estado
+          from wf.tproceso_wf pw
+          inner join wf.testado_wf ew  on ew.id_proceso_wf = pw.id_proceso_wf and ew.estado_reg = 'activo'
+          inner join wf.ttipo_estado te on ew.id_tipo_estado = te.id_tipo_estado
+          where pw.id_proceso_wf =  v_parametros.id_proceso_wf;
+
+    --- obtener
+
+         select  ps_id_tipo_estado,
+                 ps_codigo_estado,
+                 ps_disparador,
+                 ps_regla,
+                 ps_prioridad
+             into
+                va_id_tipo_estado,
+                va_codigo_estado,
+                va_disparador,
+                va_regla,
+                va_prioridad
+            from wf.f_obtener_estado_wf(
+            v_registro_estado.id_proceso_wf,
+             null,
+             v_registro_estado.id_tipo_estado,
+             'siguiente',
+             p_id_usuario);
+
+            v_acceso_directo = '';
+            v_clase = '';
+            v_parametros_ad = '';
+            v_tipo_noti = 'notificacion';
+            v_titulo  = 'Aprobado';
+
+
+            	v_id_estado_new = va_id_tipo_estado[1]::integer;
+                v_estado_new =  va_codigo_estado[1]::varchar;
+
+
+
+             v_id_estado_actual = wf.f_registra_estado_wf(  v_id_estado_new,
+                                                            null,--v_parametros.id_funcionario_wf,
+                                                            v_registro_estado.id_estado_wf,
+                                                            v_registro_estado.id_proceso_wf,
+                                                            p_id_usuario,
+                                                            v_parametros._id_usuario_ai,
+                                                            v_parametros._nombre_usuario_ai,
+                                                            null,--v_id_depto,                       --depto del estado anterior
+                                                            'Aprobado', --obt
+                                                            v_acceso_directo,
+                                                            v_clase,
+                                                            v_parametros_ad,
+                                                            v_tipo_noti,
+                                                            v_titulo);
+
+
+
+          update ssom.taccion_propuesta set
+          id_estado_wf =  v_id_estado_actual,
+          estado_wf = v_estado_new,
+          id_usuario_mod = p_id_usuario,
+          fecha_mod = now()
+         where id_proceso_wf = v_parametros.id_proceso_wf;
+
+   			--Definicion de la respuesta
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Exito');
+      v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_wf',v_parametros.id_proceso_wf::varchar);
 
       --Devuelve la respuesta
       return v_resp;

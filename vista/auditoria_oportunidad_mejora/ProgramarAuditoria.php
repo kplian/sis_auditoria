@@ -22,7 +22,6 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.ProgramarAuditoria.superclass.constructor.call(this,config);
             this.getBoton('ant_estado').setVisible(false);
             this.init();
-            // this.store.baseParams.pes_estado = 'programada';
             this.store.baseParams.interfaz = 'ProgramarAuditoria';
             this.iniciarEvento();
             this.load({params:{ start:0, limit:this.tam_pag}});
@@ -58,24 +57,26 @@ header("content-type: text/javascript; charset=UTF-8");
             const rec = this.sm.getSelected();
             const id_estado_wf = rec.data.id_estado_wf;
             const id_proceso_wf = rec.data.id_proceso_wf;
-            if(confirm('¿Desea APROBAR la Auditoria')){
-                Ext.Ajax.request({
-                    url:'../../sis_auditoria/control/AuditoriaOportunidadMejora/aprobarEstado',
-                    params:{
-                        id_proceso_wf:  id_proceso_wf,
-                        id_estado_wf:   id_estado_wf
-                    },
-                    success:this.successWizard,
-                    failure: this.conexionFailure,
-                    timeout:this.timeout,
-                    scope:this
-                });
-            }else {
-                Phx.CP.loadingHide();
+            if(confirm('¿Desea APROBAR la programacion de esta auditoria? \n No podra retornar al estado actual')){
+                if(confirm('La Auditoria Programada será APROBADA. \n ¿Desea continuar?')) {
+                    Ext.Ajax.request({
+                        url:'../../sis_auditoria/control/AuditoriaOportunidadMejora/aprobarEstado',
+                        params:{
+                            id_proceso_wf:  id_proceso_wf,
+                            id_estado_wf:   id_estado_wf
+                        },
+                        success:this.successWizard,
+                        failure: this.conexionFailure,
+                        timeout:this.timeout,
+                        scope:this
+                    });
+                }
             }
+            Phx.CP.loadingHide();
         },
         successWizard:function(){
             Phx.CP.loadingHide();
+            alert('La programacion de esta auditoria ha sido APROBADA');
             this.reload();
         },
         eventoGrill:function () {
@@ -86,8 +87,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('id_tipo_om')].grid=false;
             this.Atributos[this.getIndAtributo('id_tnorma')].grid=false;
             this.Atributos[this.getIndAtributo('id_tobjeto')].grid=false;
-            this.Atributos[this.getIndAtributo('fecha_prev_inicio')].grid=false;
-            this.Atributos[this.getIndAtributo('fecha_prev_fin')].grid=false;
+            this.Atributos[this.getIndAtributo('fecha_prog_inicio')].grid=false;
+            this.Atributos[this.getIndAtributo('fecha_prog_fin')].grid=false;
             this.Atributos[this.getIndAtributo('fecha_eje_inicio')].grid=false;
             this.Atributos[this.getIndAtributo('fecha_eje_fin')].grid=false;
             this.Atributos[this.getIndAtributo('id_funcionario')].grid=false;
@@ -96,7 +97,6 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         onReloadPage : function(m){
           		this.maestro = m;
-          		console.log('=22222>',this);
           		this.store.baseParams = {
                     tipo_filtro :this.maestro.tipo_filtro,
           			id_gestion:  this.maestro.id_gestion,
@@ -115,7 +115,5 @@ header("content-type: text/javascript; charset=UTF-8");
        },
        fwidth: '45%',
        fheight: '60%',
-
-
 };
 </script>

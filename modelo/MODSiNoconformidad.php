@@ -97,6 +97,22 @@ class MODSiNoconformidad extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	function listarRespAreaGerente(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_no_conformidad_ime';
+        $this->transaccion='SSOM_REUO_IME';
+        $this->tipo_procedimiento='IME';//tipo de transaccion
+
+        //Definicion de la lista del resultado del query
+       $this->setParametro('id_uo','id_uo','int4');
+ 
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+	}
 			
 }
 ?>

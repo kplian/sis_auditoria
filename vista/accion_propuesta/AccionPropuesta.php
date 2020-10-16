@@ -19,21 +19,22 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
         this.init();
         this.grid.addListener('cellclick', this.oncellclick,this);
 
-        this.addButton('atras',{argument: { estado: 'anterior'},
-			text:'Anterior',
-			iconCls: 'batras',
-			disabled:true,
-			handler:this.onButtonAtras,
-			tooltip: '<b>Pasar al anterior Estado</b>'});		
+
 		
 		//insertamos y habilitamos el boton siguiente
 		this.addButton('siguiente',{text:'Aprobar',
 			iconCls: 'bok',
-			disabled:false,
+			disabled:true,
 			handler:this.onButtonSiguiente,   //creamos esta funcion para disparar el evento al presionar siguiente
-			tooltip: '<b>Siguiente</b><p>Pasar al siguiente estado</p>'});		
-		
-		//insertamos y habilitamos el boton Gantt			
+			tooltip: '<b>Siguiente</b><p>Pasar al siguiente estado</p>'});
+
+        this.addButton('atras',{argument: { estado: 'anterior'},
+            text:'Anterior',
+            iconCls: 'bdel',
+            disabled:true,
+            handler:this.onButtonAtras,
+            tooltip: '<b>Pasar al anterior Estado</b>'});
+        //insertamos y habilitamos el boton Gantt
 		this.addBotonesGantt();
 		
 		//insertamos y habilitamos el boton de documentos			
@@ -414,7 +415,7 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'accpro.obs_resp_area',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:false
 		},
 		{
 			config:{
@@ -429,10 +430,24 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'accpro.obs_auditor_consultor',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:false
 		},
 
 		{
+			config:{
+				name: 'nro_tramite_no',
+				fieldLabel: 'No Conformidad',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 75,
+				maxLength:10
+			},
+				type:'TextField',
+				id_grupo:1,
+				grid:true,
+				form:false
+		},
+        {
 			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
@@ -582,6 +597,14 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
         {name:'revisar', type: 'string'},
         {name:'rechazar', type: 'string'},
         {name:'implementar', type: 'string'},
+
+        {name:'nro_tramite_no', type: 'string'},
+		{name:'descrip_nc', type: 'string'},
+		
+		{name:'area_noc', type: 'string'},
+		{name:'funcionario_noc', type: 'string'},
+		{name:'id_aom', type: 'numeric'},
+        {name:'auditoria', type: 'string'},
 	],
 	sortInfo:{
 		field: 'id_ap',
@@ -606,7 +629,7 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
     },*/
 	preparaMenu:function(n){
 		Phx.vista.AccionPropuesta.superclass.preparaMenu.call(this, n);
-           // this.getBoton('siguiente').enable();
+            this.getBoton('siguiente').enable();
             this.getBoton('atras').enable(); 	//se habilita para el boton para atras
             this.getBoton('diagrama_gantt').enable();
             this.getBoton('btnChequeoDocumentosWf').enable();
@@ -616,7 +639,7 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 	liberaMenu:function() {
 		var tb = Phx.vista.AccionPropuesta.superclass.liberaMenu.call(this);
 		if (tb) {
-			//	this.getBoton('siguiente').disable();
+			 	this.getBoton('siguiente').disable();
 				this.getBoton('atras').disable();	//se habilita para el boton para atras
 				this.getBoton('diagrama_gantt').disable();
 				this.getBoton('btnChequeoDocumentosWf').disable();

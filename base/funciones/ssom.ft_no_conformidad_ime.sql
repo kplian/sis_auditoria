@@ -126,11 +126,10 @@ BEGIN
                 v_id_proceso_macro
            	from  wf.tproceso_macro pm
            	inner join wf.ttipo_proceso tp on tp.id_proceso_macro = pm.id_proceso_macro
-			where  pm.codigo='AUD' and tp.estado_reg = 'activo'
-            and tp.codigo = 'AUNC';
+			where pm.codigo='SNOC' and tp.estado_reg = 'activo'
+            and tp.codigo = 'NOCS' and tp.inicio = 'si';
 
             --- generar nro de tramite usando funcion de wf (sirve para wf)
-
          	select
                  ps_num_tramite ,
                  ps_id_proceso_wf ,
@@ -149,9 +148,8 @@ BEGIN
                  v_codigo_tipo_proceso,
                  NULL,
                  NULL,
-                 'No conformidad',
-                 v_codigo_tipo_proceso,
-                 v_parametros.nro_tramite_padre);
+                 v_parametros.nro_tramite_padre ||' No conformidad',
+                 v_codigo_tipo_proceso);
 
         	--- raise exception 'nro -> %',v_nro_tramite;
 
@@ -213,10 +211,13 @@ BEGIN
 			)RETURNING id_nc into v_id_nc;
 
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidad almacenado(a) con exito (id_nc'||v_id_nc||')');
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidad almacenado(a) con exito');
             v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_id_nc::varchar);
-
+ 		    v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_wf',v_id_proceso_wf::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'nro_tramite',v_nro_tramite::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'estado',v_codigo_estado::varchar);
             --Devuelve la respuesta
+
             return v_resp;
 
 		end;
@@ -945,7 +946,7 @@ BEGIN
 
 		begin
 			--Sentencia de la modificacion
-
+			-- raise exception '%',v_parametros.id_uo;
             select  uo.id_uo,
                     uo.nombre_unidad,
                     fu.id_funcionario,
@@ -988,6 +989,9 @@ BEGIN
 
            if( v_parametros.fieldName = 'revisar')then
 
+
+           	-- raise exception '%',v_parametros.id_funcionario_nc;
+
                   select no.revisar into v_aceptar
                   from ssom.tno_conformidad no
                   where no.id_nc = v_parametros.id_nc;
@@ -997,6 +1001,7 @@ BEGIN
 
                   	update ssom.tno_conformidad set
                     revisar = 'no',
+                    id_funcionario_nc = v_parametros.id_funcionario_nc,
                     rechazar = 'no'
                     where id_nc=v_parametros.id_nc;
 
@@ -1006,6 +1011,7 @@ BEGIN
 
                     	update ssom.tno_conformidad set
                         revisar = 'si',
+                        id_funcionario_nc = null,
                         rechazar = 'no'
                         where id_nc=v_parametros.id_nc;
 

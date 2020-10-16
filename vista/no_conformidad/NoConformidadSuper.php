@@ -1,147 +1,568 @@
 <?php
 /**
  *@package pXP
- *@file PlanificacionAOM.php
- *@author  Maximilimiano Camacho
- *@date 24-07-2019
- *@description Archivo con la interfaz de usuario que permite
- *planificar Auditoria.
- *
+ *@file gen-NoConformidadSuper.php
+ *@author  (szambrana)
+ *@date 04-07-2019 19:53:16
+ *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
  */
+
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-    Phx.vista.NoConformidadInforme = {
-
-        require:'../../../sis_auditoria/vista/no_conformidad/NoConformidad.php',
-        requireclase:'Phx.vista.NoConformidad',
-        title:'NoConformidad',
-        nombreVista: 'NoConformidadInforme',
-        bedit:false,
-        bnew:false,
-        bdel:false,
-        dblclickEdit: false,
-        columna: null,
-        ma: null,
-        descrip_nc : '',
-        constructor: function(config) {
-            Phx.vista.NoConformidadInforme.superclass.constructor.call(this,config);
-            this.getBoton('btnChequeoDocumentosWf').setVisible(false);
-
+    Phx.vista.NoConformidadSuper=Ext.extend(Phx.gridInterfaz,{
+        bodyStyleForm: 'padding:5px;',
+        borderForm: true,
+        frameForm: false,
+        paddingForm: '5 5 5 5',
+        general : {},
+        constructor:function(config){
+            this.maestro=config.maestro;
+            Phx.vista.NoConformidadSuper.superclass.constructor.call(this,config);
             this.init();
-            this.grid.addListener('cellclick', this.oncellclick,this);
-            this.addButton('btnAceptar', {
-                text: 'Aceptar Todo',
+
+            this.addButton('siguiente', {
+                text:'Aceptar',
                 iconCls: 'bok',
                 disabled: false,
-                handler: this.onAceptar,
-                tooltip: '<b>Aceptar toda las no conformidades...</b>',
-                scope:this
+                handler: this.onButtonSiguiente
             });
-        },
-        onReloadPage:function(m){
-            this.maestro=m;
-            this.store.baseParams = {id_aom: this.maestro.id_aom,interfaz : this.nombreVista};
-            this.load({params:{start:0, limit:50}})
-        },
-        loadValoresIniciales: function () {
-            Phx.vista.NoConformidadInforme.superclass.loadValoresIniciales.call(this);
-            this.Cmp.id_aom.setValue(this.maestro.id_aom);
-        },
-        preparaMenu:function(n){
-            const tb =this.tbar;
-            Phx.vista.NoConformidadInforme.superclass.preparaMenu.call(this,n);
-            this.getBoton('btnNoram').enable();
-            return tb
-        },
-        liberaMenu:function(){
-            const tb = Phx.vista.NoConformidadInforme.superclass.liberaMenu.call(this);
-            if(tb){
-                this.getBoton('btnNoram').disable();
-            }
-            return tb
-        },
-        oncellclick : function(grid, rowIndex, columnIndex, e) {
-            const record = this.store.getAt(rowIndex),
-                fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
-            if (fieldName === 'revisar' || fieldName === 'rechazar'){
-                this.cambiarAsignacion(record,fieldName);
 
-            }
+            this.addButton('atras',{argument: { estado: 'anterior'},
+                text:'Rechazar',
+                iconCls: 'bdel',
+                disabled: false,
+                handler: this.onButtonAtras
+            });
 
+            this.addBotonesGantt();
+            this.addButton('btnChequeoDocumentosWf',
+                {	text: 'Documentos',
+                    grupo:[0,1],
+                    iconCls: 'bchecklist',
+                    disabled: true,
+                    handler: this.loadCheckDocumentosRecWf,
+                    tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.'
+                });
+            this.load({params:{start:0, limit:this.tam_pag}})
         },
-        cambiarAsignacion: function(record,name){
-            this.columna = name;
-            const select = this.getSelectedData();
-            // console.log(select);
-            this.descrip_nc = select.descrip_nc;
-            this.crearFormResponsableNC(select);
-            this.crearFormObservacion(select);
-            if(name === 'revisar'){
-                if(select.revisar === 'si'){
-                    Ext.Ajax.request({
-                        url:'../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
-                        params:{
-                            id_nc: select.id_nc,
-                            fieldName: name,
-                            id_funcionario_nc : null
-                        },
-                        success: this.successWizard,
-                        failure: this.conexionFailure,
-                        timeout: this.timeout,
+        addBotonesGantt: function() {
+            this.menuAdqGantt = new Ext.Toolbar.SplitButton({
+                id: 'b-diagrama_gantt-' + this.idContenedor,
+                text: 'Gantt',
+                disabled: true,
+                grupo:[0,1,2,3,4],
+                iconCls : 'bgantt',
+                handler:this.diagramGanttDinamico,
+                scope: this,
+                menu:{
+                    items: [{
+                        id:'b-gantti-' + this.idContenedor,
+                        text: 'Gantt Imagen',
+                        tooltip: '<b>Muestra un reporte gantt en formato de imagen</b>',
+                        handler:this.diagramGantt,
                         scope: this
-                    });
-                }else{
-                    this.ventanaResponsable.show();
-                }
-            }
-            if(name === 'rechazar'){
-                if(select.rechazar === 'si'){
-                    Ext.Ajax.request({
-                        url:'../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
-                        params:{
-                            id_nc: select.id_nc,
-                            fieldName: name,
-                            id_funcionario_nc : null
-                        },
-                        success: this.successWizard,
-                        failure: this.conexionFailure,
-                        timeout: this.timeout,
+                    }, {
+                        id:'b-ganttd-' + this.idContenedor,
+                        text: 'Gantt Dinámico',
+                        tooltip: '<b>Muestra el reporte gantt facil de entender</b>',
+                        handler:this.diagramGanttDinamico,
                         scope: this
-                    });
-                }else{
-                    this.ventanaObservacion.show();
-                }
-            }
-
-
+                    }
+                    ]}
+            });
+            this.tbar.add(this.menuAdqGantt);
+            this.load({params:{start:0, limit:this.tam_pag}});
         },
-        /*onAceptar:function () {
+        diagramGantt : function (){
+            var data=this.sm.getSelected().data.id_proceso_wf;
             Phx.CP.loadingShow();
             Ext.Ajax.request({
-                url:'../../sis_auditoria/control/NoConformidad/siTodoNoConformidad',
-                params:{ id_aom: this.maestro.id_aom },
-                success: this.successRevision,
+                url: '../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+                params: { 'id_proceso_wf': data },
+                success: this.successExport,
                 failure: this.conexionFailure,
                 timeout: this.timeout,
                 scope: this
             });
-            this.reload();
         },
-        successRevision: function(resp){
-            Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+        diagramGanttDinamico : function(){
+            var data=this.sm.getSelected().data.id_proceso_wf;
+            window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)
+        },
+        Atributos:[
+            {
+                config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_nc'
+                },
+                type:'Field',
+                form:true
+            },
+            {
+                config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_aom'
+                },
+                type:'Field',
+                form:true
+            },
+            {
+                config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_estado_wf'
+                },
+                type:'Field',
+                form:true
+            },
+            {
+                config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_proceso_wf'
+                },
+                type:'Field',
+                form:true
+            },
+            {
+                config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'nro_tramite_wf'
+                },
+                type:'Field',
+                form:true
+            },
+            {
+                config:{
+                    name: 'codigo_nc',
+                    fieldLabel: 'Codigo',
+                    allowBlank: true,
+                    anchor: '75%',
+                    gwidth: 150
+                },
+                type:'Field',
+                filters:{pfiltro:'noconf.codigo_nc',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config:{
+                    name: 'descrip_nc',
+                    fieldLabel: 'Descripcion',
+                    allowBlank: true,
+                    anchor: '75%',
+                    gwidth: 1000,
+                    renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+                        metaData.css = 'multilineColumn';
+                        return String.format('<div style="font-color:blue; align-self: center" class="gridmultiline">{0}</div>', value);
+                    }
+                },
+                type:'TextArea',
+                id_grupo:1,
+                grid:true,
+                form:true
+            },
+            {
+                config: {
+                    name: 'id_parametro',
+                    fieldLabel: 'Tipo de No Conformidad (Parametro)',
+                    allowBlank: false,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/Parametro/listarParametro',
+                        id: 'id_parametro',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'valor_parametro',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_parametro', 'valor_parametro', 'id_tipo_parametro'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'prm.id_parametro#prm.valor_parametro',tipo_no:'TIPO_NO_CONFORMIDAD'}
+                    }),
+                    valueField: 'id_parametro',
+                    displayField: 'valor_parametro',
+                    gdisplayField: 'valor_parametro',
+                    hiddenName: 'id_parametro',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '75%',
+                    gwidth: 90,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['valor_parametro']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {pfiltro: 'prm.valor_parametro',type: 'string'},
+                grid: true,
+                form: true
+            },
+            {
+                config:{
+                    name: 'estado_wf',
+                    fieldLabel: 'Estado',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 180,
+                    maxLength:100, // ,
+                    renderer: function(value,p,record){
+                        return String.format('{0}', record.data['estado_wf']);
+                    }
+                },
+                type:'TextField',
+                filters:{pfiltro:'smt.estado',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config : {
+                    name : 'id_uo',
+                    baseParams : {
+                        gerencia : 'si'
+                    },
+                    origen : 'UO',
+                    allowBlank: true,
+                    fieldLabel : 'Area',
+                    gdisplayField : 'nof_auditoria', //mapea al store del grid
+                    anchor: '75%',
+                    gwidth: 200,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['nof_auditoria']);
+                    }
+                },
+                type : 'ComboRec',
+                id_grupo : 1,
+                filters : {
+                    pfiltro : 'desc_uo',
+                    type : 'string'
+                },
+                grid : true,
+                form : true
+            },
+            {
+                config : {
+                    name : 'id_funcionario',
+                    origen : 'FUNCIONARIOCAR',
+                    fieldLabel : 'Responsable',
+                    gdisplayField : 'funcionario_uo', //mapea al store del grid
+                    valueField : 'id_funcionario',
+                    anchor: '75%',
+                    gwidth: 250,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['funcionario_resp_nof']);
+                    }
+                },
+                type : 'ComboRec',
+                id_grupo : 2,
+                grid : true,
+                form : true
+            },
 
-        },*/
-        crearFormResponsableNC:function(record){
-            const me = this;
-            Phx.CP.loadingShow();
+            {
+                config:{
+                    name: 'evidencia',
+                    fieldLabel: 'Evidencia',
+                    allowBlank: true,
+                    anchor: '75%',
+                    gwidth: 150,
+                    maxLength:500,
+                    renderer: function(value, p, record) {
+                        return String.format('{0}', value);
+                    }
+                },
+                type:'TextField',
+                filters:{pfiltro:'noconf.evidencia',type:'string'},
+                id_grupo:1,
+                grid:false,
+                form:true
+            },
+            {
+                config:{
+                    name: 'obs_resp_area',
+                    fieldLabel: 'Observacion responsable de Area',
+                    allowBlank: true,
+                    anchor: '75%',
+                    gwidth: 150,
+                    renderer: function(value, p, record) {
+                        return String.format('{0}', value);
+                    }
+                },
+                type:'TextArea',
+                filters:{pfiltro:'noconf.obs_resp_area',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:true
+            },
+            {
+                config:{
+                    name: 'obs_consultor',
+                    fieldLabel: 'Observacion Consultor',
+                    allowBlank: true,
+                    anchor: '75%',
+                    gwidth: 150,
+                    //maxLength:-5
+                    renderer: function(value, p, record) {
+                        return String.format('{0}', value);
+                    }
+                },
+                type:'TextArea',
+                filters:{pfiltro:'noconf.obs_consultor',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:true
+            },
+            {
+                config:{
+                    name: 'funcionario_resp',
+                    fieldLabel: 'Resp. No Conformidad',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:10
+                },
+                type:'TextField',
+                filters:{pfiltro:'rfun.funcionario_resp',type:'string'},
+                id_grupo:1,
+                grid:false,
+                form:false
+            },
+            {
+                config:{
+                    name: 'estado_reg',
+                    fieldLabel: 'Estado Reg.',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:10
+                },
+                type:'TextField',
+                filters:{pfiltro:'noconf.estado_reg',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config:{
+                    name: 'fecha_reg',
+                    fieldLabel: 'Fecha creación',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'noconf.fecha_reg',type:'date'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config:{
+                    name: 'usuario_ai',
+                    fieldLabel: 'Funcionaro AI',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:300
+                },
+                type:'TextField',
+                filters:{pfiltro:'noconf.usuario_ai',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config:{
+                    name: 'usr_reg',
+                    fieldLabel: 'Creado por',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:4
+                },
+                type:'Field',
+                filters:{pfiltro:'usu1.cuenta',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config:{
+                    name: 'id_usuario_ai',
+                    fieldLabel: 'Creado por',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:4
+                },
+                type:'Field',
+                filters:{pfiltro:'noconf.id_usuario_ai',type:'numeric'},
+                id_grupo:1,
+                grid:false,
+                form:false
+            },
+            {
+                config:{
+                    name: 'usr_mod',
+                    fieldLabel: 'Modificado por',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:4
+                },
+                type:'Field',
+                filters:{pfiltro:'usu2.cuenta',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config:{
+                    name: 'fecha_mod',
+                    fieldLabel: 'Fecha Modif.',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'noconf.fecha_mod',type:'date'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config:{
+                    name: 'auditoria',
+                    fieldLabel: 'Auditoria',
+                    allowBlank: true,
+                    anchor: '75%',
+                    gwidth: 100
+                },
+                type:'TextField',
+                id_grupo:1,
+                grid:true,
+                form:false
+            }
+        ],
+        tam_pag:50,
+        title:'No Conformidades',
+        ActSave:'../../sis_auditoria/control/NoConformidad/insertarNoConformidad',
+        ActDel:'../../sis_auditoria/control/NoConformidad/eliminarNoConformidad',
+        ActList:'../../sis_auditoria/control/NoConformidad/listarNoConformidadSuper',
+        id_store:'id_nc',
+        fields: [
+            {name:'id_nc', type: 'numeric'},
+            {name:'obs_consultor', type: 'string'},
+            {name:'estado_reg', type: 'string'},
+            {name:'evidencia', type: 'string'},
+            {name:'id_funcionario', type: 'int4'},
+            {name:'id_uo', type: 'numeric'},
+            {name:'descrip_nc', type: 'string'},
+            {name:'id_parametro', type: 'numeric'},
+            {name:'obs_resp_area', type: 'string'},
+            {name:'id_aom', type: 'numeric'},
+            {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+            {name:'usuario_ai', type: 'string'},
+            {name:'id_usuario_reg', type: 'numeric'},
+            {name:'id_usuario_ai', type: 'numeric'},
+            {name:'id_usuario_mod', type: 'numeric'},
+            {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+            {name:'id_uo_adicional', type: 'numeric'},
+            {name:'id_proceso_wf', type: 'numeric'},
+            {name:'id_estado_wf', type: 'numeric'},
+            {name:'nro_tramite', type: 'string'},
+            {name:'estado_wf', type: 'string'},
+            {name:'codigo_nc', type: 'string'},
+            {name:'id_funcionario_nc', type: 'numeric'},
+            {name:'usr_reg', type: 'string'},
+            {name:'usr_mod', type: 'string'},
+            {name:'nro_tramite_wf', type: 'string'},
+            {name:'nombre_aom1', type: 'string'},
+            {name:'valor_parametro', type: 'string'},
+            {name:'responsable_auditoria', type: 'string'},
+            {name:'uo_auditoria', type: 'string'},
+            {name:'nof_auditoria', type: 'string'},
+            {name:'auditoria', type: 'string'},
+            {name:'funcionario_resp_nof', type: 'string'}
+        ],
+        sortInfo:{
+            field: 'id_nc',
+            direction: 'ASC'
+        },
+        bdel:false,
+        bsave:false,
+        bnew:false,
+        bedit:false,
+        dblclickEdit: true,
+        tipoStore: 'GroupingStore',//GroupingStore o JsonStore #
+        remoteGroup: true,
+        groupField: 'auditoria',
+        viewGrid: new Ext.grid.GroupingView({
+            forceFit: false,
+        }),
+        loadCheckDocumentosRecWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                'Chequear documento del WF',
+                {
+                    width:'90%',
+                    height:500
+                },
+                rec.data,
+                this.idContenedor,
+                'DocumentoWf'
+            )
+        },
+        preparaMenu:function(n){
+            const tb =this.tbar;
+            Phx.vista.NoConformidadSuper.superclass.preparaMenu.call(this,n);
+            this.getBoton('siguiente').enable();
+            this.getBoton('atras').enable();
+            this.getBoton('btnChequeoDocumentosWf').enable();
+            this.getBoton('diagrama_gantt').enable();
+            return tb
+        },
+        liberaMenu:function(){
+            const tb = Phx.vista.NoConformidadSuper.superclass.liberaMenu.call(this);
+            if(tb){
+                this.getBoton('siguiente').disable();
+                this.getBoton('atras').disable();
+                this.getBoton('btnChequeoDocumentosWf').disable();
+                this.getBoton('diagrama_gantt').disable();
+            }
+            return tb
+        },
+        onButtonSiguiente : function() {
+            const record = this.sm.getSelected().data;
+            this.onResponsable(record);
+            this.ventanaResponsable.show();
+        },
+        onResponsable: function(record){
+            me = this;
             const informe =  {
                 fieldLabel: 'Informe',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.maestro.nombre_aom1+' '+this.maestro.nro_tramite_wf,
+                    html: record.auditoria,
                 },
                 style: 'cursor:pointer;',
                 listeners: {
@@ -161,7 +582,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 readOnly :true,
                 anchor: '100%',
                 style: 'background-image: none;',
-                value: this.maestro.nombre_unidad,
+                value: record.nof_auditoria,
                 maxLength:50
             });
             const responsable_area = new Ext.form.TextField({
@@ -172,18 +593,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 readOnly :true,
                 anchor: '100%',
                 style: 'background-image: none;',
-                value: '',
+                value: record.responsable_auditoria,
                 maxLength:50
             });
-
             const no_conformidad =  {
                 fieldLabel: 'No Conformidad',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.descrip_nc
+                    html: record.descrip_nc,
                 },
-                style: 'cursor:pointer;',
+                style: 'cursor:pointer; ',
                 listeners: {
                     render: function(component) {
                         component.getEl().on('click', function(e) {
@@ -206,7 +626,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 remoteSort: true,
                 baseParams: {par_filtro: 'vfc.desc_funcionario1 '}
             });
-
             const combo = new Ext.form.ComboBox({
                 name:'id_funcionario_nc',
                 fieldLabel:'Responsable de No Conformidad',
@@ -231,21 +650,33 @@ header("content-type: text/javascript; charset=UTF-8");
                 autoHeight: true,
                 autoScroll: true,
                 region: 'center',
-                defaults: { height: 450},
                 items: [
                     new Ext.form.FieldSet({
-                            collapsible: false,
-                            title:'Datos Generales',
-                            border: true,
-                            layout: 'form',
-                                items: [
-                                        informe,
-                                        area,
-                                        responsable_area,
-                                        no_conformidad,
-                                        combo
-                                ]})
-                    ]
+                        collapsible: false,
+                        border: true,
+                        layout: 'form',
+                        defaults: {width: 490},
+                        items: [
+                            informe,
+                            area,
+                            responsable_area
+                        ]
+                    }),
+                    new Ext.form.FieldSet({
+                        collapsible: false,
+                        border: true,
+                        layout: 'form',
+                        defaults: {width: 490},
+                        items: [
+                            no_conformidad,
+                            combo
+                        ]
+                    })
+                ],
+                padding: this.paddingForm,
+                bodyStyle: this.bodyStyleForm,
+                border: this.borderForm,
+                frame: this.frameForm,
             });
             this.ventanaResponsable = new Ext.Window({
                 title: 'Asignar Responsable No Conformidad',
@@ -267,64 +698,21 @@ header("content-type: text/javascript; charset=UTF-8");
                         scope: this
                     }]
             });
-            Ext.Ajax.request({
-                url: '../../sis_auditoria/control/NoConformidad/listarRespAreaGerente',
-                params: {
-                    id_uo: this.maestro.id_uo
-                },
-                success: function(resp){
-                    const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                    this.formAuto.getForm().findField('responsable_area').setValue(reg.ROOT.datos.desc_funcionario);
-                    Phx.CP.loadingHide();
-                },
-                failure: this.conexionFailure,
-                timeout: this.timeout,
-                scope: this
-            });
             this.cmpResponsable = this.formAuto.getForm().findField('id_funcionario_nc');
-
         },
-        saveResponsable: function(){
-            Phx.CP.loadingShow();
-            const select = this.getSelectedData();
-            Ext.Ajax.request({
-                url:'../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
-                params:{
-                    id_nc: select.id_nc,
-                    fieldName: this.columna,
-                    id_funcionario_nc : this.cmpResponsable.getValue()
-                },
-                success: this.successWizard,
-                failure: this.conexionFailure,
-                timeout: this.timeout,
-                scope: this
-            });
+        onButtonAtras : function() {
+            const record = this.sm.getSelected().data;
+            this.onRechazo(record);
+            this.ventanaObservacion.show();
         },
-        successWizard:function(resp){
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-                if(this.ventanaResponsable){
-                    this.ventanaResponsable.hide();
-                }
-                if(this.ventanaObservacion){
-                    this.ventanaObservacion.hide();
-                }
-                Phx.CP.loadingHide();
-                this.reload();
-            }else{
-                alert("Error no se no se registro el funcionario")
-            }
-
-        },
-        crearFormObservacion:function(record){
+        onRechazo: function (record){
             const me = this;
-
             const informe =  {
                 fieldLabel: 'Informe',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.maestro.nombre_aom1+' '+this.maestro.nro_tramite_wf,
+                    html: record.auditoria,
                 },
                 style: 'cursor:pointer;',
                 listeners: {
@@ -342,10 +730,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 fieldLabel: 'Area',
                 allowBlank: true,
                 readOnly :true,
-                anchor: '90%',
+                anchor: '100%',
                 style: 'background-image: none;',
-                maxLength:50,
-                value: this.maestro.nombre_unidad,
+                value: record.nof_auditoria,
+                maxLength:50
             });
             const responsable_area = new Ext.form.TextField({
                 name: 'responsable_area',
@@ -353,8 +741,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 fieldLabel: 'Responsable area',
                 allowBlank: true,
                 readOnly :true,
-                anchor: '90%',
+                anchor: '100%',
                 style: 'background-image: none;',
+                value: record.responsable_auditoria,
                 maxLength:50
             });
             const no_conformidad =  {
@@ -362,9 +751,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.descrip_nc
+                    html: record.descrip_nc,
                 },
-                style: 'cursor:pointer;',
+                style: 'cursor:pointer; ',
                 listeners: {
                     render: function(component) {
                         component.getEl().on('click', function(e) {
@@ -374,72 +763,295 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 }
             };
+
             const obs_consultor = new Ext.form.TextArea({
-                    name: 'nro_tramite',
-                    msgTarget: 'title',
-                    fieldLabel: 'Causa Rechazo',
-                    allowBlank: true,
-                    anchor: '90%',
-                    style: 'background-image: none;',
-                    maxLength:50
-                });
-            this.formObs = new Ext.form.FormPanel({
+                name: 'nro_tramite',
+                msgTarget: 'title',
+                fieldLabel: 'Causa Rechazo',
+                allowBlank: true,
+                anchor: '100%',
+                style: 'background-image: none;',
+                maxLength:50
+            });
+
+
+            this.formAuto = new Ext.form.FormPanel({
                 autoDestroy: true,
                 border: false,
                 layout: 'form',
                 autoHeight: true,
                 autoScroll: true,
                 region: 'center',
-                defaults: { height: 450},
                 items: [
                     new Ext.form.FieldSet({
-                            collapsible: false,
-                            title:'Datos Generales',
-                            border: true,
-                            layout: 'form',
-                                items: [informe,
-                                        area,
-                                        responsable_area,
-                                        no_conformidad,
-                                        obs_consultor
-                                ]
-                    
+                        collapsible: false,
+                        border: true,
+                        layout: 'form',
+                        defaults: {width: 490},
+                        items: [
+                                informe,
+                                area,
+                                responsable_area
+                        ]
+                    }),
+                    new Ext.form.FieldSet({
+                        collapsible: false,
+                        border: true,
+                        layout: 'form',
+                        defaults: {width: 490},
+                        items: [
+                            no_conformidad,
+                            obs_consultor
+                        ]
                     })
-                ]
+                ],
+                padding: this.paddingForm,
+                bodyStyle: this.bodyStyleForm,
+                border: this.borderForm,
+                frame: this.frameForm,
             });
-            this.ventanaObservacion= new Ext.Window({
-                title: 'Rechazar No Conformidad',
+            this.ventanaObservacion = new Ext.Window({
+                title: 'Rechazar Responsable No Conformidad',
                 width: 600,
                 height: 530,
                 closeAction: 'hide',
                 labelAlign: 'bottom',
-                items: this.formObs,
+                items: this.formAuto,
                 modal:true,
                 bodyStyle: 'padding:5px',
                 layout: 'form',
                 buttons: [{
                     text: 'Guardar',
-                    handler: this.saveResponsable,
+                    handler: this.saveObservacion,
                     scope: this},
                     {
                         text: 'Cancelar',
-                        handler: function(){ this.ventanaObservacion.hide() },
+                        handler: function(){ this.ventanaResponsable.hide() },
                         scope: this
                     }]
             });
-            Ext.Ajax.request({
-                url: '../../sis_auditoria/control/NoConformidad/listarRespAreaGerente',
-                params: {
-                    id_uo: this.maestro.id_uo
-                },
-                success: function(resp){
-                    const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                    this.formObs.getForm().findField('responsable_area').setValue(reg.ROOT.datos.desc_funcionario);
-                    Phx.CP.loadingHide();
-                },
-                failure: this.conexionFailure,
-                timeout: this.timeout,
-                scope: this
+        },
+        onButtonEdit:function() {
+            const record = this.sm.getSelected().data;
+            this.onCrearFormulario(record);
+            this.formularioVentanaCrear.show();
+        },
+        onCrearFormulario:function(data){
+            if(this.formularioVentanaCrear){
+                this.form.destroy();
+                this.formularioVentanaCrear.destroy();
+            }
+             const punto = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/PnormaNoconformidad/listarPnormaNoconformidad',
+                id: 'id_pnnc',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_pnnc','id_nc','id_pn','id_norma','nombre_pn','desc_norma','nombre_pn','sigla_norma','codigo_pn','nombre_descrip'],
+                remoteSort: true,
+                baseParams: {dir:'ASC',sort:'id_pnnc',limit:'100',start:'0'}
+            });
+            if(data){
+                punto.baseParams.id_nc = data.id_nc;
+                punto.load();
+            }
+            const table = new Ext.grid.GridPanel({
+                store: punto,
+                height: 100,
+                layout: 'fit',
+                region:'center',
+                anchor: '100%',
+                split: true,
+                border: true,
+                plain: true,
+                stripeRows: true,
+                trackMouseOver: false,
+                columns: [
+                    new Ext.grid.RowNumberer(),
+                    {
+                        header: 'Norma',
+                        dataIndex: 'id_norma',
+                        width: 120,
+                        sortable: false,
+                        renderer:function(value, p, record){return String.format('{0}', record.data['sigla_norma'])},
+                    },
+                    {
+                        header: 'Codigo',
+                        dataIndex: 'codigo_pn',
+                        width: 90,
+                        sortable: false,
+                    },
+                    {
+                        header: 'Punto de Norma',
+                        dataIndex: 'id_pn',
+                        width: 300,
+                        sortable: false,
+                        renderer:function(value, p, record){return String.format('{0}', record.data['nombre_pn'])},
+                    },
+                ]
+            });
+            const me = this;
+            this.form = new Ext.form.FormPanel({
+                items: [
+                    new Ext.form.FieldSet({
+                        collapsible: false,
+                        border: true,
+                        layout: 'form',
+                        defaults: {width: 590},
+                        items: [
+                            {
+                                fieldLabel: 'Auditoria',
+                                xtype: 'box',
+                                autoEl: {
+                                    tag: 'a',
+                                    html: data.auditoria,
+                                },
+                                style: 'cursor:pointer;',
+                                listeners: {
+                                    render: function (component) {
+                                        component.getEl().on('click', function (e) {
+                                            me.onCrearAuditoria(data);
+                                            me.formularioVentana.show();
+                                        });
+                                    }
+                                }
+                            },
+                            {
+                                xtype: 'field',
+                                fieldLabel: 'Area',
+                                name: 'area',
+                                anchor: '100%',
+                                value: data.uo_auditoria,
+                                readOnly: true,
+                                style: 'background-image: none;'
+                            },
+                            {
+                                xtype: 'field',
+                                fieldLabel: 'Auditor resp',
+                                name: 'auditor_respo',
+                                anchor: '100%',
+                                value: data.responsable_auditoria,
+                                readOnly: true,
+                                style: 'background-image: none;'
+                            },
+                        ]
+                    }),
+                    new Ext.form.FieldSet({
+                        collapsible: false,
+                        border: true,
+                        layout: 'form',
+                        defaults: {width: 590},
+                        items: [
+                                {
+                                    xtype: 'field',
+                                    fieldLabel: 'Tipo',
+                                    name: 'tipo',
+                                    anchor: '100%',
+                                    value: data.valor_parametro,
+                                    readOnly :true,
+                                    style: 'background-image: none;'
+                                },
+                                {
+                                    fieldLabel: 'No Conformidad',
+                                    xtype: 'box',
+                                    autoEl: {
+                                        tag: 'a',
+                                        html: data.descrip_nc,
+                                    },
+                                    style: 'cursor:pointer;',
+                                    listeners: {
+                                        render: function (component) {
+                                            component.getEl().on('click', function (e) {
+                                                me.formularioNoConformidad(data);
+                                                me.ventanaNoConformidad.show();
+                                            });
+                                        }
+                                    }
+                                },
+                                {
+                                    xtype: 'field',
+                                    fieldLabel: 'Area de NC',
+                                    name: 'area_nc',
+                                    anchor: '100%',
+                                    value: data.nof_auditoria,
+                                    readOnly :true,
+                                    style: 'background-image: none;'
+                                },
+                                {
+                                    xtype: 'field',
+                                    fieldLabel: 'Resp. de Aprobar NC',
+                                    name: 'area_nc_aprobar',
+                                    anchor: '100%',
+                                    value: data.funcionario_resp_nof,
+                                    readOnly :true,
+                                    style: 'background-image: none;'
+                                },
+                                {
+                                    xtype: 'textarea',
+                                    fieldLabel: 'Evidencia',
+                                    name: 'justificacion',
+                                    anchor: '100%',
+                                    value: data.evidencia,
+                                    readOnly :true,
+                                    style: 'background-image: none;'
+                                }
+                    ]
+                    }),
+                    table,
+                    /*new Ext.form.FieldSet({
+                        collapsible: false,
+                        border: true,
+                        layout: 'form',
+                        defaults: {width: 590},
+                        items: [
+                            {
+                                xtype: 'textarea',
+                                name: 'descrip_nc',
+                                fieldLabel: 'Observacion',
+                                allowBlank: true,
+                                style: 'margin: 10px',
+                                anchor: '100%',
+                                gwidth: 210,
+                                style: 'background-image: none;'
+                            }
+                        ]
+                    }),*/
+                ],
+                padding: this.paddingForm,
+                bodyStyle: this.bodyStyleForm,
+                border: this.borderForm,
+                frame: this.frameForm,
+                autoDestroy: true,
+                autoScroll: true,
+                region: 'center'
+            });
+            this.formularioVentanaCrear = new Ext.Window({
+                    width: 600,
+                    height: 700,
+                    modal: true,
+                    closeAction: 'hide',
+                    labelAlign: 'bottom',
+                    title: 'ACEPTACIÓN/RECHAZO DE NO CONFORMIDAD',
+                    bodyStyle: 'padding:5px',
+                    layout: 'form',
+                    items: [
+                        this.form
+                    ],
+                    buttons: [{
+                        text: 'Aceptar',
+                        handler: function(){
+                            this.onResponsable(data);
+                            this.ventanaResponsable.show();
+                        },
+                        scope: this
+                    },
+                    {
+                        text: 'Rechazar',
+                        handler: function() {
+                            this.onRechazo(data);
+                            this.ventanaObservacion.show();
+                        },
+                        scope: this
+                    }]
             });
         },
         onCrearAuditoria:function(record){
@@ -1489,16 +2101,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 items: [this.isForm]
             });
         },
-        successNoConformidad: function(resp){
-            Phx.CP.loadingHide();
-            const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            console.log(reg)
-            this.cargaFormulario(reg.datos[0],this.isForm);
+        onBool:function(valor){
+            if(valor === 't'){
+                return true;
+            }
+            return  false;
         },
         successRevision: function(resp){
             Phx.CP.loadingHide();
             const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             this.cargaFormulario(reg.datos[0],this.form_auditoria);
+        },
+        successNoConformidad: function(resp){
+            Phx.CP.loadingHide();
+            const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            console.log(reg)
+            this.cargaFormulario(reg.datos[0],this.isForm);
         },
         cargaFormulario: function(data, formulario){
             var obj,key;
@@ -1531,6 +2149,35 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 }
             },this);
+        },
+        saveResponsable:function (){
+             Phx.CP.loadingShow();
+            const rec = this.sm.getSelected();
+            const id_estado_wf = rec.data.id_estado_wf;
+            const id_proceso_wf = rec.data.id_proceso_wf;
+            if(confirm(' Acciones Propuestas a Responsable')){
+                Ext.Ajax.request({
+                    url:'../../sis_auditoria/control/NoConformidad/aprobarEstado',
+                    params:{
+                        id_proceso_wf:  id_proceso_wf,
+                        id_estado_wf:   id_estado_wf
+                    },
+                    success:this.successWizard,
+                    failure: this.conexionFailure,
+                    timeout:this.timeout,
+                    scope:this
+                });
+            }else {
+                Phx.CP.loadingHide();
+            }
+        },
+        successWizard:function(){
+            Phx.CP.loadingHide();
+            this.ventanaResponsable.hide()
+            this.reload();
+        },
+        saveObservacion:function () {
+            alert('saveObservacion')
         }
-    };
+    })
 </script>

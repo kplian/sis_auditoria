@@ -39,6 +39,8 @@ header("content-type: text/javascript; charset=UTF-8");
     },
     loadValoresIniciales: function () {
         Phx.vista.NoConformidadGestion.superclass.loadValoresIniciales.call(this);
+        this.Cmp.id_aom.setValue(this.maestro.id_aom);
+
     },
     preparaMenu:function(n){
         const tb =this.tbar;

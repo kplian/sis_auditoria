@@ -76,15 +76,25 @@ BEGIN
                                where elemento = ew.id_tipo_estado)::integer  as contador_estados,
                         accpro.revisar,
                         accpro.rechazar,
-                        accpro.implementar
+                        accpro.implementar,
+                        noc.nro_tramite as nro_tramite_no,
+                        noc.descrip_nc,
+                        uon.nombre_unidad as area_noc,
+						funn.desc_funcionario1 as funcionario_noc,
+                        om.id_aom,
+                        om.nombre_aom1 ||'' ''|| om.nro_tramite_wf as auditoria
 						from ssom.taccion_propuesta accpro
 						inner join segu.tusuario usu1 on usu1.id_usuario = accpro.id_usuario_reg
+                        inner join ssom.tno_conformidad noc on noc.id_nc = accpro.id_nc
+                        inner join ssom.tauditoria_oportunidad_mejora om on om.id_aom = noc.id_aom
 						left join segu.tusuario usu2 on usu2.id_usuario = accpro.id_usuario_mod
                         left join ssom.tparametro param on param.id_parametro = accpro.id_parametro
                         left join orga.vfuncionario_cargo ofunc on ofunc.id_funcionario = accpro.id_funcionario
                         left join wf.tproceso_wf pw on pw.id_proceso_wf = accpro.id_proceso_wf  	--borrar
                         left join wf.testado_wf ew on ew.id_estado_wf = accpro.id_estado_wf 		--para integrar con nuevo wf
-				        where  ';
+				        left join orga.tuo uon on uon.id_uo = noc.id_uo
+                        left join orga.vfuncionario funn on funn.id_funcionario = noc.id_funcionario_nc
+                        where  ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -109,11 +119,15 @@ BEGIN
 			v_consulta:='select count(id_ap)
 					    from ssom.taccion_propuesta accpro
 					    inner join segu.tusuario usu1 on usu1.id_usuario = accpro.id_usuario_reg
+                        inner join ssom.tno_conformidad noc on noc.id_nc = accpro.id_nc
+                        inner join ssom.tauditoria_oportunidad_mejora om on om.id_aom = noc.id_aom
 						left join segu.tusuario usu2 on usu2.id_usuario = accpro.id_usuario_mod
                         left join ssom.tparametro param on param.id_parametro = accpro.id_parametro
                         join orga.vfuncionario_cargo ofunc on ofunc.id_funcionario = accpro.id_funcionario
                         left join wf.tproceso_wf pw on pw.id_proceso_wf = accpro.id_proceso_wf  	--borrar
                         left join wf.testado_wf ew on ew.id_estado_wf = accpro.id_estado_wf 		--para integrar con nuevo wf
+                        left join orga.tuo uon on uon.id_uo = noc.id_uo
+                        left join orga.vfuncionario funn on funn.id_funcionario = noc.id_funcionario_nc
                         where ';
 
 			--Definicion de la respuesta

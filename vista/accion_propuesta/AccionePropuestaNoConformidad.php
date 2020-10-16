@@ -23,9 +23,11 @@ header("content-type: text/javascript; charset=UTF-8");
 
             Phx.vista.AccionePropuestaNoConformidad.superclass.constructor.call(this,config);
             this.getBoton('atras').setVisible(false);
-            this.getBoton('siguiente').setVisible(false);
-            this.getBoton('diagrama_gantt').setVisible(false);
-            this.getBoton('btnChequeoDocumentosWf').setVisible(false);
+            this.getBoton('siguiente').setVisible(true);
+            this.getBoton('diagrama_gantt').setVisible(true);
+            this.getBoton('btnChequeoDocumentosWf').setVisible(true);
+            this.getBoton('btnNoram').setVisible(false);
+
             this.init();
         },
         onReloadPage:function(m){
@@ -35,14 +37,6 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         loadValoresIniciales: function () {
             Phx.vista.AccionePropuestaNoConformidad.superclass.loadValoresIniciales.call(this);
-        },
-        preparaMenu:function(n){
-            Phx.vista.AccionePropuestaNoConformidad.superclass.preparaMenu.call(this, n);
-        },
-        liberaMenu:function() {
-            var tb = Phx.vista.AccionePropuestaNoConformidad.superclass.liberaMenu.call(this);
-            if (tb) {
-            }
         }
     }
 </script>

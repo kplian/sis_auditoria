@@ -6,7 +6,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 
 <script>
-    Phx.vista.FiltroAuditoria=Ext.extend(Phx.frmInterfaz,{
+    Phx.vista.FormFiltroNoCon=Ext.extend(Phx.frmInterfaz,{
 
         constructor:function(config){
             this.panelResumen = new Ext.Panel({html:''});
@@ -25,7 +25,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.panelResumen
                 ];
 
-            Phx.vista.FiltroAuditoria.superclass.constructor.call(this,config);
+            Phx.vista.FormFiltroNoCon.superclass.constructor.call(this,config);
             this.init();
             this.onEvento();
             if(config.detalle){
@@ -186,7 +186,7 @@ header("content-type: text/javascript; charset=UTF-8");
             },
         ],
         labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
-       // fwidth:200,
+        // fwidth:200,
         east: {
             url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/Auditoria.php',
             title: 'Procesos',
@@ -195,6 +195,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         title: 'Filtro de Auditoria',
         autoScroll: true,
+
         onSubmit:function(){
 
             var me = this;
@@ -227,7 +228,7 @@ header("content-type: text/javascript; charset=UTF-8");
             },this);
         },
         loadValoresIniciales: function(){
-            Phx.vista.FiltroAuditoria.superclass.loadValoresIniciales.call(this);
+            Phx.vista.FormFiltroNoCon.superclass.loadValoresIniciales.call(this);
         },
 
 

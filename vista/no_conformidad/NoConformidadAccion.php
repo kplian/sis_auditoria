@@ -26,6 +26,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('revisar')].grid=false;
             this.Atributos[this.getIndAtributo('rechazar')].grid=false;
             Phx.vista.NoConformidadAccion.superclass.constructor.call(this,config);
+            this.getBoton('btnNoram').setVisible(false);
             this.store.baseParams.interfaz = this.nombreVista;
             this.init();
             this.load({params:{start:0, limit:this.tam_pag}});

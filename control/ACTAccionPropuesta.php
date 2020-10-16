@@ -13,19 +13,15 @@ class ACTAccionPropuesta extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_ap');
 		$this->objParam->defecto('dir_ordenacion','asc');
 
-		if ($this->objParam->getParametro('id_nc') != ''){
+        if ($this->objParam->getParametro('id_nc') != ''){
             $this->objParam->addFiltro("accpro.id_nc = ".$this->objParam->getParametro('id_nc'));
-
         }
-
-	    if($this->objParam->getParametro('interfaz') == 'AccionPropuesta' ){
-            $this->objParam->addFiltro("accpro.estado_wf in (''propuesta'') ");
+        if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaPendientes' ){
+            $this->objParam->addFiltro("accpro.estado_wf in (''propuesta'',''responsable'',''auditor'') ");
         }
-
-	    if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaImplementadas' ){
-            $this->objParam->addFiltro("accpro.estado_wf in (''accion_aprobada_responsable'') ");
+        if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaImplementadas' ){
+            $this->objParam->addFiltro("accpro.estado_wf in (''implementadas'') ");
         }
-
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODAccionPropuesta','listarAccionPropuesta');
@@ -82,6 +78,11 @@ class ACTAccionPropuesta extends ACTbase{
 	function multiCambiarEstadoAccionPropuesta(){
         $this->objFunc=$this->create('MODAccionPropuesta');
         $this->res=$this->objFunc->multiCambiarEstadoAccionPropuesta($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	function aprobarEstado(){
+        $this->objFunc=$this->create('MODAccionPropuesta');
+        $this->res=$this->objFunc->aprobarEstado($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
 	}
 	
