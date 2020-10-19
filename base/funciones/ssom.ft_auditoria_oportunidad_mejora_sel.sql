@@ -90,7 +90,7 @@ BEGIN
                             gct.requiere_programacion,
                             gct.requiere_formulario,
                             aom.id_destinatario,
-                            initcap(df.desc_funcionario1) as desc_funcionario_destinatario,
+                            df.desc_funcionario1 as desc_funcionario_destinatario,
                             aom.resumen,
                             aom.id_gestion
                             from ssom.tauditoria_oportunidad_mejora aom

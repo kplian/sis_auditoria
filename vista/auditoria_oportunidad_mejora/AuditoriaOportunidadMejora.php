@@ -274,7 +274,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                         totalProperty: 'total',
                         fields: ['id_funcionario','desc_funcionario1','descripcion_cargo','cargo_equipo'],
                         remoteSort: true,
-                        baseParams: {par_filtro: 'fu.desc_funcionario1'}
+                        baseParams: {par_filtro: 'fun.desc_funcionario1'}
                     }),
                     valueField: 'id_funcionario',
                     displayField: 'desc_funcionario1',
@@ -296,7 +296,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 },
                 type: 'ComboBox',
                 id_grupo: 0,
-                filters: {pfiltro: 'vfc.desc_funcionario1',type: 'string'},
+                filters: {pfiltro: 'df.desc_funcionario1',type: 'string'},
                 grid: true,
                 form: true,
                 bottom_filter:true
