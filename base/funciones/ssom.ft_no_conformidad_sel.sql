@@ -86,7 +86,7 @@ BEGIN
                         (select count(*)
                                from unnest(id_tipo_estado_wfs) elemento
                                where elemento = ew.id_tipo_estado)::integer  as contador_estados,
-                               rfun.desc_funcionario1 as funcionario_resp,
+                               initcap(rfun.desc_funcionario1) as funcionario_resp_nc,
             			noconf.calidad,
                         noconf.medio_ambiente,
                         noconf.seguridad,
@@ -355,7 +355,12 @@ BEGIN
                                 uo.nombre_unidad as uo_auditoria,
                                 uono.nombre_unidad as nof_auditoria,
                                 aom.nro_tramite_wf ||'' - '' || aom.nombre_aom1 as auditoria,
-                                funo.desc_funcionario1 as funcionario_resp_nof
+                                funo.desc_funcionario1 as funcionario_resp_nof,
+                                nof.calidad,
+                                nof.medio_ambiente,
+                                nof.seguridad,
+                                nof.responsabilidad_social,
+                                nof.sistemas_integrados
                                 from ssom.tno_conformidad nof
                                 inner join segu.tusuario usu1 on usu1.id_usuario = nof.id_usuario_reg
                                 inner join ssom.tauditoria_oportunidad_mejora aom on aom.id_aom = nof.id_aom

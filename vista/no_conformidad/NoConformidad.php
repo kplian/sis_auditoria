@@ -227,7 +227,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 		{
 			config: {
 				name: 'id_parametro',
-				fieldLabel: 'Tipo de No Conformidad (Parametro)',
+				fieldLabel: 'Tipo',
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
@@ -254,7 +254,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				mode: 'remote',
 				pageSize: 15,
 				queryDelay: 1000,
-                anchor: '75%',
+                width:100,
 				gwidth: 90,
 				minChars: 2,
 				renderer : function(value, p, record) {
@@ -269,11 +269,27 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 		},
         {
             config:{
+                name: 'descrip_nc',
+                fieldLabel: 'Descripcion',
+                allowBlank: true,
+                width:200,
+                gwidth: 300,
+                renderer : function(value, p, record) {
+                    return String.format('<div class="gridmultiline" style="text-align: justify;">{0}</div>', record.data['descrip_nc']);
+                }
+            },
+            type:'TextArea',
+            filters:{pfiltro:'noconf.descrip_nc',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
                 name: 'estado_wf',
                 fieldLabel: 'Estado',
                 allowBlank: true,
-                anchor: '80%',
-                gwidth: 180,
+                gwidth: 100,
                 maxLength:100, // ,
                 renderer: function(value,p,record){
                     let color = '#1419CC';
@@ -295,6 +311,26 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
             form:false
         },
         {
+            config:{
+                name: 'funcionario_resp_nc',
+                fieldLabel: 'Resp. No Conformidad',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 200,
+                renderer : function(value, p, record) {
+                    if(record.data['funcionario_resp_nc']){
+                        return String.format('<b>{0}</b>', record.data['funcionario_resp_nc']);
+                    }
+
+                }
+            },
+            type:'TextField',
+            filters:{pfiltro:'rfun.funcionario_resp_nc',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
             config : {
                 name : 'id_uo',
                 baseParams : {
@@ -305,7 +341,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel : 'Area',
                 gdisplayField : 'gerencia_uo1', //mapea al store del grid
                 anchor: '75%',
-                gwidth: 200,
+                gwidth: 250,
                 renderer : function(value, p, record) {
                     return String.format('{0}', record.data['gerencia_uo1']);
                 }
@@ -323,7 +359,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
             config : {
                 name : 'id_funcionario',
                 origen : 'FUNCIONARIOCAR',
-                fieldLabel : 'Responsable',
+                fieldLabel : 'Responsable Area',
                 gdisplayField : 'funcionario_uo', //mapea al store del grid
                 valueField : 'id_funcionario',
                 anchor: '75%',
@@ -337,20 +373,6 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
             grid : true,
             form : true
         },
-		{
-			config:{
-				name: 'descrip_nc',
-				fieldLabel: 'Descripcion',
-				allowBlank: true,
-				anchor: '75%',
-				gwidth: 280
-			},
-				type:'TextArea',
-				filters:{pfiltro:'noconf.descrip_nc',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:true
-		},
 		{
 			config:{
 				name: 'evidencia',
@@ -375,7 +397,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Observacion responsable de Area',
 				allowBlank: true,
 				anchor: '75%',
-				gwidth: 150,
+				gwidth: 200,
                 renderer: function(value, p, record) {
                     return String.format('{0}', value);
 
@@ -393,7 +415,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Observacion Consultor',
 				allowBlank: true,
 				anchor: '75%',
-				gwidth: 150,
+				gwidth: 200,
 				//maxLength:-5
 				renderer: function(value, p, record) {
                     return String.format('{0}', value);
@@ -406,29 +428,13 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
-
-        {
-            config:{
-                name: 'funcionario_resp',
-                fieldLabel: 'Resp. No Conformidad',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:10
-            },
-            type:'TextField',
-            filters:{pfiltro:'rfun.funcionario_resp',type:'string'},
-            id_grupo:1,
-            grid:false,
-            form:false
-        },
         {
             config:{
                 name: 'calidad',
                 fieldLabel: 'Calidad',
                 allowBlank: true,
                 anchor: '100%',
-                gwidth: 80,
+                gwidth: 100,
                 renderer : function(value, p, record) {
                     let cap =  (value === 't');
                     if(cap){
@@ -448,7 +454,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Medio Ambiente',
                 allowBlank: true,
                 anchor: '100%',
-                gwidth: 80,
+                gwidth: 100,
                 renderer : function(value, p, record) {
                     let cap =  (value === 't');
                     if(cap){
@@ -468,7 +474,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Seguridad',
                 allowBlank: true,
                 anchor: '100%',
-                gwidth: 80,
+                gwidth: 100,
                 renderer : function(value, p, record) {
                      let cap =  (value === 't');
                      if(cap){
@@ -488,7 +494,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Responsabilidad Social',
                 allowBlank: true,
                 anchor: '100%',
-                gwidth: 80,
+                gwidth: 100,
                 renderer : function(value, p, record) {
                     let cap =  (value === 't');
                     if(cap){
@@ -508,7 +514,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Sistemas Integrados',
                 allowBlank: true,
                 anchor: '100%',
-                gwidth: 80,
+                gwidth: 100,
                 renderer : function(value, p, record) {
                     let cap =  (value === 't');
                     if(cap){
@@ -667,7 +673,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 		{name:'gerencia_uo2', type: 'string'},
 		{name:'funcionario_uo', type: 'string'},
 		{name:'contador_estados', type: 'numeric'},
-		{name:'funcionario_resp', type: 'numeric'},
+		{name:'funcionario_resp_nc', type: 'numeric'},
 
         {name:'calidad', type: 'string'},
         {name:'medio_ambiente', type: 'string'},

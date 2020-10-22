@@ -59,7 +59,7 @@ class MODNoConformidad extends MODbase{
 		$this->captura('gerencia_uo2','varchar');
         $this->captura('funcionario_uo','text');   
 		$this->captura('contador_estados','int4');
-		$this->captura('funcionario_resp','text');
+		$this->captura('funcionario_resp_nc','text');
 
         $this->captura('calidad','bool');
         $this->captura('medio_ambiente','bool');
@@ -142,7 +142,7 @@ class MODNoConformidad extends MODbase{
         $this->setParametro('seguridad','seguridad','bool');
         $this->setParametro('responsabilidad_social','responsabilidad_social','bool');
         $this->setParametro('sistemas_integrados','sistemas_integrados','bool');
-        $this->setParametro('extra','extra','varchar');
+      //  $this->setParametro('extra','extra','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -492,6 +492,12 @@ class MODNoConformidad extends MODbase{
         $this->captura('nof_auditoria','varchar');
         $this->captura('auditoria','text');
         $this->captura('funcionario_resp_nof','text');
+
+        $this->captura('calidad','bool');
+        $this->captura('medio_ambiente','bool');
+        $this->captura('seguridad','bool');
+        $this->captura('responsabilidad_social','bool');
+        $this->captura('sistemas_integrados','bool');
 
         //Ejecuta la instruccion
         $this->armarConsulta();

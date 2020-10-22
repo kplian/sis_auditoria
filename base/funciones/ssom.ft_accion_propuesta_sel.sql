@@ -12,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.taccion_propuesta'
  AUTOR: 		 (szambrana)
  FECHA:	        04-07-2019 22:32:50
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				04-07-2019 22:32:50								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.taccion_propuesta'	
+ #0				04-07-2019 22:32:50								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.taccion_propuesta'
  #3				04-08-2020 19:53:16								Refactorización No Conformidad
  ***************************************************************************/
 

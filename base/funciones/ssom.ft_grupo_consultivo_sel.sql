@@ -62,11 +62,11 @@ BEGIN
 						gct.id_usuario_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        uo.nombre_unidad as empresa
+                        en.nombre as empresa
 						from ssom.tgrupo_consultivo gct
 						inner join segu.tusuario usu1 on usu1.id_usuario = gct.id_usuario_reg
+                        inner join param.tempresa en on en.id_empresa = gct.id_empresa
 						left join segu.tusuario usu2 on usu2.id_usuario = gct.id_usuario_mod
-                        join orga.tuo as uo on gct.id_empresa = uo.id_uo
 				        where  ';
 
 			--Definicion de la respuesta
@@ -91,9 +91,10 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_gconsultivo)
 					    from ssom.tgrupo_consultivo gct
-					    inner join segu.tusuario usu1 on usu1.id_usuario = gct.id_usuario_reg
+						inner join segu.tusuario usu1 on usu1.id_usuario = gct.id_usuario_reg
+                        inner join param.tempresa en on en.id_empresa = gct.id_empresa
 						left join segu.tusuario usu2 on usu2.id_usuario = gct.id_usuario_mod
-					    where ';
+				        where ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;

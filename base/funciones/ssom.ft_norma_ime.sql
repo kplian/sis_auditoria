@@ -12,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tnorma'
  AUTOR: 		 (szambrana)
  FECHA:	        02-07-2019 19:11:48
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				02-07-2019 19:11:48								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tnorma'	
+ #0				02-07-2019 19:11:48								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tnorma'
    #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
  ***************************************************************************/
 

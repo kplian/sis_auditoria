@@ -1,12 +1,12 @@
 CREATE OR REPLACE FUNCTION ssom.ft_aom_riesgo_oportunidad_ime (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
-	/**************************************************************************
+/**************************************************************************
    SISTEMA:		Seguimiento de Oportunidades de Mejora
    FUNCION: 		ssom.ft_aom_riesgo_oportunidad_ime
    DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.taom_riesgo_oportunidad'
@@ -22,12 +22,9 @@ $body$
 
 DECLARE
 
-	v_nro_requerimiento    	integer;
 	v_parametros           	record;
-	v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
-	v_mensaje_error         text;
 	v_id_aom_ro	integer;
 
 BEGIN
@@ -164,8 +161,12 @@ BEGIN
 
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_aom_riesgo_oportunidad_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

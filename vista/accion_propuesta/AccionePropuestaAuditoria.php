@@ -19,6 +19,7 @@ header("content-type: text/javascript; charset=UTF-8");
         bdel:true,
         bedit:true,
         storeResponsable: {},
+        id_ap_master : null,
         constructor: function(config) {
             this.Atributos[this.getIndAtributo('revisar')].grid=false;
             this.Atributos[this.getIndAtributo('rechazar')].grid=false;
@@ -111,9 +112,16 @@ header("content-type: text/javascript; charset=UTF-8");
                     scope: this,
                     width: '100',
                         handler: function() {
-                            const id = this.sm.getSelected().data.id_ap;
+                            const id = this.sm.getSelected()?this.sm.getSelected().data.id_ap:this.id_ap_master;
                             this.onResponsable(id);
                             this.ventanaResponsable.show();
+                            /*if(this.id_ap_master){
+                                this.onResponsable(id);
+                                this.ventanaResponsable.show();
+                            }else{
+                                alert('Tiene que registrar una accion')
+                            }*/
+
                         }
                     },
                     {
@@ -304,7 +312,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 name: 'descripcion_ap',
                                                 fieldLabel: 'Descripcion accion propuesta',
                                                 allowBlank: true,
-                                                style: 'margin: 10px',
                                                 anchor: '100%',
                                                 gwidth: 210,
                                                 style: 'background-image: none;'
@@ -315,7 +322,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 name: 'efectividad_cumpl_ap',
                                                 fieldLabel: 'Efectividad Cumplimiento ',
                                                 allowBlank: true,
-                                                style: 'margin: 10px',
                                                 anchor: '100%',
                                                 gwidth: 210,
                                                 style: 'background-image: none;'
@@ -405,34 +411,39 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
             },this);
            if (this.form.getForm().isValid()) {
-                Phx.CP.loadingShow();
-                Ext.Ajax.request({
-                    url: '../../sis_auditoria/control/AccionPropuesta/insertarAccionPropuesta',
-                    params: {
-                        obs_resp_area : null,
-                        descripcion_ap : submit.descripcion_ap,
-                        id_parametro : submit.id_parametro,
-                        descrip_causa_nc : submit.descrip_causa_nc,
-                        efectividad_cumpl_ap : submit.efectividad_cumpl_ap,
-                        fecha_fin_ap : submit.fecha_fin_ap,
-                        obs_auditor_consultor : null,
-                        id_nc : this.maestro.id_nc,
-                        fecha_inicio_ap : submit.fecha_inicio_ap,
-                        codigo_ap : null,
-                        nro_tramite_padre : this.maestro.nro_tramite_padre,
-                    },
-                    isUpload: false,
-                    success: function(a,b,c){
-                        this.store.rejectChanges();
-                        Phx.CP.loadingHide();
-                        this.formularioVentana.hide();
-                        this.reload();
-                    },
-                    argument: this.argumentSave,
-                    failure: this.conexionFailure,
-                    timeout: this.timeout,
-                    scope: this
-                });
+               if(!this.id_ap_master) {
+                   Phx.CP.loadingShow();
+                   Ext.Ajax.request({
+                       url: '../../sis_auditoria/control/AccionPropuesta/insertarAccionPropuesta',
+                       params: {
+                           obs_resp_area: null,
+                           descripcion_ap: submit.descripcion_ap,
+                           id_parametro: submit.id_parametro,
+                           descrip_causa_nc: submit.descrip_causa_nc,
+                           efectividad_cumpl_ap: submit.efectividad_cumpl_ap,
+                           fecha_fin_ap: submit.fecha_fin_ap,
+                           obs_auditor_consultor: null,
+                           id_nc: this.maestro.id_nc,
+                           fecha_inicio_ap: submit.fecha_inicio_ap,
+                           codigo_ap: null,
+                           nro_tramite_padre: this.maestro.nro_tramite_padre,
+                       },
+                       isUpload: false,
+                       success: function (resp) {
+                           this.store.rejectChanges();
+                           Phx.CP.loadingHide();
+                           const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                           this.id_ap_master = reg.ROOT.datos.id_ap
+                           this.reload();
+                       },
+                       argument: this.argumentSave,
+                       failure: this.conexionFailure,
+                       timeout: this.timeout,
+                       scope: this
+                   });
+               }else{
+                   this.formularioVentana.hide();
+               }
             } else {
                 Ext.MessageBox.alert('Validación', 'Existen datos inválidos en el formulario. Corrija y vuelva a intentarlo');
             }
@@ -464,7 +475,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 valueField : 'id_funcionario',
                 displayField : 'desc_funcionario',
                 forceSelection: true,
-                allowBlank : false,
                 anchor: '100%',
                 resizable : true,
                 enableMultiSelect: false
@@ -517,7 +527,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 success: function(a,b,c){
                     Phx.CP.loadingHide();
                     this.ventanaResponsable.hide();
+                    this.storeResponsable.baseParams.id_ap = this.cmpId_ap;
+
                     this.storeResponsable.load();
+
 
                 },
                 argument: this.argumentSave,

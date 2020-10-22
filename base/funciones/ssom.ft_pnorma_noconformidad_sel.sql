@@ -12,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tpnorma_noconformidad'
  AUTOR: 		 (szambrana)
  FECHA:	        19-07-2019 15:25:54
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				19-07-2019 15:25:54								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tpnorma_noconformidad'	
+ #0				19-07-2019 15:25:54								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tpnorma_noconformidad'
    #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
  ***************************************************************************/
 

@@ -39,6 +39,7 @@ header("content-type: text/javascript; charset=UTF-8");
         Phx.vista.InformeAuditoria.superclass.constructor.call(this,config);
         this.getBoton('sig_estado').setVisible(false);
         this.getBoton('ant_estado').setVisible(false);
+        this.getBoton('btnChequeoDocumentosWf').setVisible(false);
 
         this.recomendacionForm();
         this.store.baseParams.interfaz = this.nombreVista;
@@ -398,7 +399,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                                   fieldLabel: 'Destinatario',
                                                   allowBlank: false,
                                                   emptyText: 'Elija una opción...',
-                                                  emptyText: 'Elija una opción...',
                                                   store: new Ext.data.JsonStore({
                                                       url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarFuncionarioVigentes',
                                                       id: 'id_funcionario',
@@ -672,7 +672,7 @@ header("content-type: text/javascript; charset=UTF-8");
         var tb =this.tbar;
         Phx.vista.InformeAuditoria.superclass.preparaMenu.call(this,n);
         this.getBoton('notifcar_respo').enable();
-        this.getBoton('btnChequeoDocumentosWf').enable();
+      //  this.getBoton('btnChequeoDocumentosWf').enable();
         this.getBoton('diagrama_gantt').enable();
         this.getBoton('ant_estado').enable();
         return tb
@@ -681,7 +681,7 @@ header("content-type: text/javascript; charset=UTF-8");
         var tb = Phx.vista.InformeAuditoria.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('notifcar_respo').disable();
-            this.getBoton('btnChequeoDocumentosWf').disable();
+       //     this.getBoton('btnChequeoDocumentosWf').disable();
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('ant_estado').disable();
         }
@@ -802,12 +802,14 @@ header("content-type: text/javascript; charset=UTF-8");
     formularioNoConformidad:function(data){
         const maestro = this.sm.getSelected().data;
         const me = this;
+        let evento = 'NEW';
         let id_modificacion = null;
         if(data){
+            evento  = 'EDIT';
             id_modificacion = data.id_nc
         }
 
-         this.punto = new Ext.data.JsonStore({
+        this.punto = new Ext.data.JsonStore({
             url: '../../sis_auditoria/control/PnormaNoconformidad/listarPnormaNoconformidad',
             id: 'id_pnnc',
             root: 'datos',
@@ -817,11 +819,10 @@ header("content-type: text/javascript; charset=UTF-8");
             baseParams: {dir:'ASC',sort:'id_pnnc',limit:'100',start:'0'}
         });
         if(data){
-            this.punto.baseParams.id_nc = data.id_nc;
+            this.punto.baseParams.id_nc = data?data.id_nc:this.id_no_conformidad;
             this.punto.load();
         }
-       
-         this.documentos  = new Ext.data.JsonStore({
+        this.documentos  = new Ext.data.JsonStore({
             url: '../../sis_workflow/control/DocumentoWf/listarDocumentoWf',
             id: 'id_documento_wf',
             root: 'datos',
@@ -864,8 +865,6 @@ header("content-type: text/javascript; charset=UTF-8");
             remoteSort: true,
             baseParams: {dir:'ASC',sort:'id_documento_wf',limit:'100',start:'0'}
         });
-        
-
         if(data){
             this.documentos.baseParams.modoConsulta = 'no';
             this.documentos.baseParams.todos_documentos = 'no';
@@ -873,7 +872,6 @@ header("content-type: text/javascript; charset=UTF-8");
             this.documentos.baseParams.id_proceso_wf = data.id_proceso_wf; 
             this.documentos.load({params:{start: 0, limit: 50 }});
         }
-        
         const table = new Ext.grid.GridPanel({
             store: this.punto,
             height: 200,
@@ -1125,8 +1123,8 @@ header("content-type: text/javascript; charset=UTF-8");
                                             {
                                                 xtype: 'combo',
                                                 name: 'id_parametro',
-                                                fieldLabel: 'Tipo',
-                                                allowBlank: true,
+                                                fieldLabel: '*Tipo',
+                                                allowBlank: false,
                                                 emptyText: 'Elija una opción...',
                                                 store: new Ext.data.JsonStore({
                                                     url: '../../sis_auditoria/control/Parametro/listarParametro',
@@ -1230,8 +1228,8 @@ header("content-type: text/javascript; charset=UTF-8");
                                         {
                                             xtype: 'textarea',
                                             name: 'descrip_nc',
-                                            fieldLabel: 'Descripcion',
-                                            allowBlank: true,
+                                            fieldLabel: '*Descripcion',
+                                            allowBlank: false,
                                             anchor: '100%',
                                             gwidth: 280
                                         },
@@ -1277,20 +1275,21 @@ header("content-type: text/javascript; charset=UTF-8");
             region: 'center'
         });
         grilla.addListener('cellclick', this.oncellclick,this);
-       if(data){
-           console.log(data);
+        if(data){
            isForm.getForm().findField('descrip_nc').setValue(data.descrip_nc);
            isForm.getForm().findField('evidencia').setValue(data.evidencia);
            isForm.getForm().findField('obs_consultor').setValue(data.obs_consultor);
-           isForm.getForm().findField('id_parametro').setValue(data.id_parametro);
-           isForm.getForm().findField('id_parametro').setRawValue(data.valor_parametro);
+           setTimeout(() => {
+               isForm.getForm().findField('id_parametro').setValue(data.id_parametro);
+               isForm.getForm().findField('id_parametro').setRawValue(data.valor_parametro);
+           }, 1000);
            isForm.getForm().findField('calidad').setValue(this.onBool(data.calidad));
            isForm.getForm().findField('medio_ambiente').setValue(this.onBool(data.medio_ambiente));
            isForm.getForm().findField('seguridad').setValue(this.onBool(data.seguridad));
            isForm.getForm().findField('responsabilidad_social').setValue(this.onBool(data.responsabilidad_social));
            isForm.getForm().findField('sistemas_integrados').setRawValue(this.onBool(data.sistemas_integrados));
        }
-       let id_funcionario = null;
+        let id_funcionario = null;
           Ext.Ajax.request({
                 url:'../../sis_auditoria/control/NoConformidad/getUo',
                 params:{ id_uo: maestro.id_uo },
@@ -1337,64 +1336,68 @@ header("content-type: text/javascript; charset=UTF-8");
             buttons: [{
                 text: 'Guardar',
                 handler: function () {
-                    let submit={};
-                    Ext.each(isForm.getForm().items.keys, function(element, index){
+                    let submit = {};
+                    Ext.each(isForm.getForm().items.keys, function (element, index) {
                         obj = Ext.getCmp(element);
-                        if(obj.items){
-                            Ext.each(obj.items.items, function(elm, ind){
-                                submit[elm.name]=elm.getValue();
-                            },this)
+                        if (obj.items) {
+                            Ext.each(obj.items.items, function (elm, ind) {
+                                submit[elm.name] = elm.getValue();
+                            }, this)
                         } else {
-                            submit[obj.name]=obj.getValue();
+                            submit[obj.name] = obj.getValue();
                         }
-                    },this);
-                   Phx.CP.loadingShow();
-                    Ext.Ajax.request({
-                        url: '../../sis_auditoria/control/NoConformidad/insertarNoConformidad',
-                        params: {
-                            id_aom  : maestro.id_aom,
-                            nro_tramite_padre : maestro.nro_tramite_wf,
-                            id_parametro : submit.id_parametro,
-                            id_uo : submit.id_uo,
-                            id_funcionario : id_funcionario,
-                            calidad : submit.calidad,
-                            medio_ambiente : submit.medio_ambiente,
-                            responsabilidad_social : submit.responsabilidad_social,
-                            seguridad : submit.seguridad,
-                            sistemas_integrados : submit.sistemas_integrados,
-                            descrip_nc : submit.descrip_nc,
-                            evidencia : submit.evidencia,
-                            obs_resp_area : '',// submit.obs_resp_area,
-                            obs_consultor : submit.obs_consultor,
-                            id_norma : submit.id_norma,
-                            // id_pn : submit.id_pn,
-                            id_nc : id_modificacion
-                        },
-                        isUpload: false,
-                        success: function(resp){
-                            Phx.CP.loadingHide();
-                            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                            console.log(reg.ROOT.datos);
+                    }, this);
+                   if(isForm.getForm().isValid()) {
 
-                            this.id_no_conformidad = reg.ROOT.datos.id_nc;
-                            this.id_proceso_no_conformidad = reg.ROOT.datos.id_proceso_wf;
-
-
-                            this.documentos.baseParams.modoConsulta = 'no';
-                            this.documentos.baseParams.todos_documentos = 'no';
-                            this.documentos.baseParams.anulados = 'no';
-                            this.documentos.baseParams.id_proceso_wf = reg.ROOT.datos.id_proceso_wf; 
-                            this.documentos.load({params:{start: 0, limit: 50 }});
-                        },
-                        argument: this.argumentSave,
-                        failure: this.conexionFailure,
-                        timeout: this.timeout,
-                        scope: this
-                    });
+                       if (!this.id_no_conformidad) {
+                           Phx.CP.loadingShow();
+                           Ext.Ajax.request({
+                               url: '../../sis_auditoria/control/NoConformidad/insertarNoConformidad',
+                               params: {
+                                   id_aom: maestro.id_aom,
+                                   nro_tramite_padre: maestro.nro_tramite_wf,
+                                   id_parametro: submit.id_parametro,
+                                   id_uo: submit.id_uo,
+                                   id_funcionario: id_funcionario,
+                                   calidad: submit.calidad,
+                                   medio_ambiente: submit.medio_ambiente,
+                                   responsabilidad_social: submit.responsabilidad_social,
+                                   seguridad: submit.seguridad,
+                                   sistemas_integrados: submit.sistemas_integrados,
+                                   descrip_nc: submit.descrip_nc,
+                                   evidencia: submit.evidencia,
+                                   obs_resp_area: '',// submit.obs_resp_area,
+                                   obs_consultor: submit.obs_consultor,
+                                   id_norma: submit.id_norma,
+                                   // id_pn : submit.id_pn,
+                                   id_nc: id_modificacion
+                               },
+                               isUpload: false,
+                               success: function (resp) {
+                                   Phx.CP.loadingHide();
+                                   const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                                   this.id_no_conformidad = reg.ROOT.datos.id_nc;
+                                   this.id_proceso_no_conformidad = reg.ROOT.datos.id_proceso_wf;
+                                   this.documentos.baseParams.modoConsulta = 'no';
+                                   this.documentos.baseParams.todos_documentos = 'no';
+                                   this.documentos.baseParams.anulados = 'no';
+                                   this.documentos.baseParams.id_proceso_wf = reg.ROOT.datos.id_proceso_wf;
+                                   this.documentos.load({params: {start: 0, limit: 50}});
+                               },
+                               argument: this.argumentSave,
+                               failure: this.conexionFailure,
+                               timeout: this.timeout,
+                               scope: this
+                           });
+                       }else{
+                           me.ventanaNoConformidad.hide();
+                           me.tienda.load();
+                        }
+                }
                 },
                 scope: this
             }, {
-                text: 'Declinar',
+                text: 'Cerrar',
                 handler: function() {
                    me.ventanaNoConformidad.hide();
                    me.tienda.load();
@@ -1516,7 +1519,19 @@ header("content-type: text/javascript; charset=UTF-8");
                                     fields: ['id_pn', 'nombre_pn','nombre_descrip'],
                                     remoteSort: true,
                                     baseParams: {dir:'ASC',sort:'id_pn',limit:'100',start:'0'}
-                                }),
+                                }),  tbar:[{
+                                    text: 'Todo',
+                                    handler:function(){
+                                        const toStore  = isForm.getForm().findField('id_pn').multiselects[0].store;
+                                        const fromStore   = isForm.getForm().findField('id_pn').multiselects[1].store;
+                                        for(var i = toStore.getCount()-1; i >= 0; i--)
+                                        {
+                                            const record = toStore.getAt(i);
+                                            toStore.remove(record);
+                                            fromStore.add(record);
+                                        }
+                                    }
+                                }],
                                 displayField: 'nombre_descrip',
                                 valueField: 'id_pn',
                             },{
@@ -1531,6 +1546,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                     remoteSort: true,
                                     baseParams: {dir:'ASC',sort:'id_pn',limit:'100',start:'0', id_nc: data ? data.id_nc: this.id_no_conformidad}
                                 }),
+                                tbar:[{
+                                    text: 'Limpiar',
+                                    handler:function(){
+                                        isForm.getForm().findField('id_pn').reset();
+                                    }
+                                }],
                                 displayField: 'nombre_descrip',
                                 valueField: 'id_pn',
                             }]
@@ -1600,6 +1621,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             success: function(a,b,c){
                                 Phx.CP.loadingHide();
                                 me.ventanaPuntoNorma.hide();
+                                me.punto.baseParams.id_nc = data?data.id_nc:this.id_no_conformidad;
                                 me.punto.load();
 
                             },

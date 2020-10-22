@@ -12,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tresp_acciones_prop'
  AUTOR: 		 (szambrana)
  FECHA:	        17-09-2019 14:35:45
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				17-09-2019 14:35:45								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tresp_acciones_prop'	
+ #0				17-09-2019 14:35:45								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tresp_acciones_prop'
        #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
 
  ***************************************************************************/

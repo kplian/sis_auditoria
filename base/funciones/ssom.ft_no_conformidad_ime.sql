@@ -234,7 +234,7 @@ BEGIN
 		begin
 
 
-        if v_parametros.extra = 'si' then
+       /* if v_parametros.extra = 'si' then
 
         	update ssom.tno_conformidad set
 			obs_consultor = v_parametros.obs_consultor,
@@ -243,7 +243,7 @@ BEGIN
 			where id_nc=v_parametros.id_nc;
 
 
-        else
+        else*/
 			--Sentencia de la modificacion
 			update ssom.tno_conformidad set
 			obs_consultor = v_parametros.obs_consultor,
@@ -264,7 +264,7 @@ BEGIN
             responsabilidad_social = v_parametros.responsabilidad_social,
             sistemas_integrados = v_parametros.sistemas_integrados
 			where id_nc=v_parametros.id_nc;
-        end if;
+       --- end if;
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','No Conformidades modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_nc',v_parametros.id_nc::varchar);
@@ -986,11 +986,12 @@ BEGIN
 
 		begin
 			--Sentencia de la modificacion
+           -- raise exception '%',v_parametros.id_funcionario_nc;
 
            if( v_parametros.fieldName = 'revisar')then
 
 
-           	-- raise exception '%',v_parametros.id_funcionario_nc;
+           	--
 
                   select no.revisar into v_aceptar
                   from ssom.tno_conformidad no
@@ -998,10 +999,10 @@ BEGIN
 
 
                   if (v_aceptar = 'si')then
-
+                  		--
                   	update ssom.tno_conformidad set
                     revisar = 'no',
-                    id_funcionario_nc = v_parametros.id_funcionario_nc,
+                    id_funcionario_nc =null,
                     rechazar = 'no'
                     where id_nc=v_parametros.id_nc;
 
@@ -1011,7 +1012,7 @@ BEGIN
 
                     	update ssom.tno_conformidad set
                         revisar = 'si',
-                        id_funcionario_nc = null,
+                        id_funcionario_nc =  v_parametros.id_funcionario_nc,
                         rechazar = 'no'
                         where id_nc=v_parametros.id_nc;
 

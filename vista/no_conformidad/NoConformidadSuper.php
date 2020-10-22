@@ -19,8 +19,8 @@ header("content-type: text/javascript; charset=UTF-8");
         constructor:function(config){
             this.maestro=config.maestro;
             Phx.vista.NoConformidadSuper.superclass.constructor.call(this,config);
+            this.store.baseParams = {tipo_interfaz: 'NoConformidadSuper'};
             this.init();
-
             this.addButton('siguiente', {
                 text:'Aceptar',
                 iconCls: 'bok',
@@ -44,6 +44,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     handler: this.loadCheckDocumentosRecWf,
                     tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.'
                 });
+
             this.load({params:{start:0, limit:this.tam_pag}})
         },
         addBotonesGantt: function() {
@@ -500,7 +501,12 @@ header("content-type: text/javascript; charset=UTF-8");
             {name:'uo_auditoria', type: 'string'},
             {name:'nof_auditoria', type: 'string'},
             {name:'auditoria', type: 'string'},
-            {name:'funcionario_resp_nof', type: 'string'}
+            {name:'funcionario_resp_nof', type: 'string'},
+            {name:'calidad', type: 'string'},
+            {name:'medio_ambiente', type: 'string'},
+            {name:'seguridad', type: 'string'},
+            {name:'responsabilidad_social', type: 'string'},
+            {name:'sistemas_integrados', type: 'string'}
         ],
         sortInfo:{
             field: 'id_nc',
@@ -552,6 +558,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         onButtonSiguiente : function() {
             const record = this.sm.getSelected().data;
+            console.log(record)
             this.onResponsable(record);
             this.ventanaResponsable.show();
         },
@@ -596,12 +603,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 value: record.responsable_auditoria,
                 maxLength:50
             });
+
+
             const no_conformidad =  {
                 fieldLabel: 'No Conformidad',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: record.descrip_nc,
+                    html: record.descrip_nc.substr(0,191)+'...',
                 },
                 style: 'cursor:pointer; ',
                 listeners: {
@@ -638,14 +647,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 valueField : 'id_funcionario',
                 displayField : 'desc_funcionario',
                 forceSelection: true,
-                allowBlank : false,
                 anchor: '100%',
                 resizable : true,
                 enableMultiSelect: false
             });
             this.formAuto = new Ext.form.FormPanel({
                 autoDestroy: true,
-                border: false,
                 layout: 'form',
                 autoHeight: true,
                 autoScroll: true,
@@ -681,7 +688,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ventanaResponsable = new Ext.Window({
                 title: 'Asignar Responsable No Conformidad',
                 width: 600,
-                height: 530,
+                height: 300,
                 closeAction: 'hide',
                 labelAlign: 'bottom',
                 items: this.formAuto,
@@ -751,7 +758,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: record.descrip_nc,
+                    html:record.descrip_nc.substr(0,191)+'...'
                 },
                 style: 'cursor:pointer; ',
                 listeners: {
@@ -777,7 +784,6 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.formAuto = new Ext.form.FormPanel({
                 autoDestroy: true,
-                border: false,
                 layout: 'form',
                 autoHeight: true,
                 autoScroll: true,
@@ -813,7 +819,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ventanaObservacion = new Ext.Window({
                 title: 'Rechazar Responsable No Conformidad',
                 width: 600,
-                height: 530,
+                height: 330,
                 closeAction: 'hide',
                 labelAlign: 'bottom',
                 items: this.formAuto,
@@ -955,7 +961,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                     xtype: 'box',
                                     autoEl: {
                                         tag: 'a',
-                                        html: data.descrip_nc,
+                                        html: data.descrip_nc.substr(0,191)+'...'
                                     },
                                     style: 'cursor:pointer;',
                                     listeners: {
@@ -1026,7 +1032,7 @@ header("content-type: text/javascript; charset=UTF-8");
             });
             this.formularioVentanaCrear = new Ext.Window({
                     width: 600,
-                    height: 700,
+                    height: 540,
                     modal: true,
                     closeAction: 'hide',
                     labelAlign: 'bottom',
@@ -1684,30 +1690,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 items: [this.form_auditoria]
             });
         },
-        formularioNoConformidad:function(record){
-            if(this.ventanaNoConformidad){
-                this.isForm.destroy();
-                this.ventanaNoConformidad.destroy();
-            }
-            Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                url:'../../sis_auditoria/control/NoConformidad/listarNoConformidad',
-                params:{
-                    dir:'ASC',
-                    sort:'id_aom',
-                    limit:'100',
-                    start:'0',
-                    id_nc: record.id_nc
-                },
-                success:this.successNoConformidad,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });
-
-
-
+        formularioNoConformidad:function(data){
             const maestro = this.sm.getSelected().data;
+            const me = this;
+            let evento = 'NEW';
+            let id_modificacion = null;
+            if(data){
+                evento  = 'EDIT';
+                id_modificacion = data.id_nc
+            }
+
             this.punto = new Ext.data.JsonStore({
                 url: '../../sis_auditoria/control/PnormaNoconformidad/listarPnormaNoconformidad',
                 id: 'id_pnnc',
@@ -1717,8 +1709,60 @@ header("content-type: text/javascript; charset=UTF-8");
                 remoteSort: true,
                 baseParams: {dir:'ASC',sort:'id_pnnc',limit:'100',start:'0'}
             });
-            this.punto.baseParams.id_nc = record.id_nc;
-            this.punto.load();
+            if(data){
+                this.punto.baseParams.id_nc = data?data.id_nc:this.id_no_conformidad;
+                this.punto.load();
+            }
+            this.documentos  = new Ext.data.JsonStore({
+                url: '../../sis_workflow/control/DocumentoWf/listarDocumentoWf',
+                id: 'id_documento_wf',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: [
+                    {name:'id_documento_wf', type: 'numeric'},
+                    {name:'url', type: 'string'},
+                    {name:'num_tramite', type: 'string'},
+                    {name:'id_tipo_documento', type: 'numeric'},
+                    {name:'obs', type: 'string'},
+                    {name:'id_proceso_wf', type: 'numeric'},
+                    {name:'extension', type: 'string'},
+                    {name:'chequeado', type: 'string'},
+                    {name:'estado_reg', type: 'string'},
+                    {name:'nombre_tipo_doc', type: 'string'},
+                    {name:'nombre_doc', type: 'string'},
+                    {name:'momento', type: 'string'},
+                    {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+                    {name:'id_usuario_reg', type: 'numeric'},
+                    {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+                    {name:'id_usuario_mod', type: 'numeric'},
+                    {name:'priorizacion', type: 'numeric'},
+                    {name:'usr_reg', type: 'string'},
+                    {name:'usr_mod', type: 'string'},
+                    'codigo_tipo_proceso',
+                    'codigo_tipo_documento',
+                    'nombre_tipo_documento',
+                    'descripcion_tipo_documento',
+                    'nro_tramite',
+                    'codigo_proceso',
+                    'descripcion_proceso_wf',
+                    'nombre_estado',
+                    'chequeado_fisico',
+                    'usr_upload',
+                    'tipo_documento',
+                    'action','solo_lectura','id_documento_wf_ori','id_proceso_wf_ori','nro_tramite_ori',
+                    {name:'fecha_upload', type: 'date',dateFormat:'Y-m-d H:i:s.u'},'modificar','insertar','eliminar','demanda',
+                    'nombre_vista','esquema_vista','nombre_archivo_plantilla'
+                ],
+                remoteSort: true,
+                baseParams: {dir:'ASC',sort:'id_documento_wf',limit:'100',start:'0'}
+            });
+            if(data){
+                this.documentos.baseParams.modoConsulta = 'no';
+                this.documentos.baseParams.todos_documentos = 'no';
+                this.documentos.baseParams.anulados = 'no';
+                this.documentos.baseParams.id_proceso_wf = data.id_proceso_wf;
+                this.documentos.load({params:{start: 0, limit: 50 }});
+            }
             const table = new Ext.grid.GridPanel({
                 store: this.punto,
                 height: 120,
@@ -1735,36 +1779,155 @@ header("content-type: text/javascript; charset=UTF-8");
                     {
                         header: 'Norma',
                         dataIndex: 'id_norma',
-                        width: 150,
+                        width: 180,
                         sortable: false,
                         renderer:function(value, p, record){return String.format('{0}', record.data['sigla_norma'])},
                     },
                     {
                         header: 'Codigo',
                         dataIndex: 'codigo_pn',
-                        width: 60,
+                        width: 80,
                         sortable: false,
                     },
                     {
                         header: 'Punto de Norma',
                         dataIndex: 'id_pn',
-                        width: 320,
+                        width: 270,
                         sortable: false,
                         renderer:function(value, p, record){return String.format('{0}', record.data['nombre_pn'])},
                     },
                 ]
             });
-             this.isForm = new Ext.form.FormPanel({
+            const grilla =  new Ext.grid.GridPanel({
+                layout: 'fit',
+                store:  this.documentos,
+                region: 'center',
+                trackMouseOver: false,
+                split: true,
+                border: false,
+                plain: true,
+                plugins: [],
+                stripeRows: true,
+                loadMask: true,
+                tbar: [{
+                    text: '<button class="btn">&nbsp;&nbsp;<b>Nuevo</b></button>',
+                    scope: this,
+                    width: '100',
+                    handler: function() {
+                        this.onFormularioDocumento(data);
+                    }
+                },
+                    {
+                        text: '<button class="btn">&nbsp;&nbsp;<b>Eliminar</b></button>',
+                        scope: this,
+                        width: '100',
+                        handler: function() {
+                            const record = grilla.getSelectionModel().getSelections();
+                            Phx.CP.loadingShow();
+                            Ext.Ajax.request({
+                                url: '../../sis_workflow/control/DocumentoWf/eliminarDocumentoWf',
+                                params: {
+                                    id_documento_wf : record[0].data.id_documento_wf
+                                },
+                                isUpload: false,
+                                success: function(a,b,c){
+                                    Phx.CP.loadingHide();
+                                    this.documentos.load({params:{ start: 0, limit: 50 }});
+                                },
+                                argument: this.argumentSave,
+                                failure: this.conexionFailure,
+                                timeout: this.timeout,
+                                scope: this
+                            })
+                        }
+                    }
+                ],
+                columns: [
+                    new Ext.grid.RowNumberer(),
+                    {
+                        header: 'Doc. Digital',
+                        dataIndex: 'chequeado',
+                        width: 100,
+                        sortable: false,
+                        renderer:function (value, p, record, rowIndex, colIndex){
+
+                            if(record.data['chequeado'] == 'si') {
+                                return "<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Abrir Documento' src = '../../../lib/imagenes/icono_awesome/awe_print_good.png' align='center' width='30' height='30'></div>";
+                            } else if(record.data.nombre_vista) {
+                                return "<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Generar Plantilla' src = '../../../lib/imagenes/icono_awesome/awe_template.png' align='center' width='30' height='30'></div>";
+                            }
+                            else if (record.data['action'] != '') {
+                                return "<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Vista Previa Documento Generado' src = '../../../lib/imagenes/icono_awesome/awe_print_good.png' align='center' width='30' height='30'></div>";
+                            } else{
+                                return  String.format('{0}',"<div style='text-align:center'><img title='Documento No Escaneado' src = '../../../lib/imagenes/icono_awesome/awe_wrong.png' align='center' width='30' height='30'/></div>");
+                            }
+                        },
+                    },
+                    {
+                        header: 'Subir',
+                        dataIndex: 'upload',
+                        width: 100,
+                        sortable: false,
+                        renderer:function (value, p, record){
+                            if (record.data['solo_lectura'] == 'no' && !record.data['id_proceso_wf_ori']) {
+                                if(record.data['extension'].length!=0) {
+                                    return  String.format('{0}',"<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Reemplazar Archivo' src = '../../../lib/imagenes/icono_awesome/awe_upload.png' align='center' width='30' height='30'></div>");
+                                } else {
+                                    return  String.format('{0}',"<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Subir Archivo' src = '../../../lib/imagenes/icono_awesome/awe_upload.png' align='center' width='30' height='30'></div>");
+                                }
+                            }
+                        }
+                    },
+                    {
+                        header: 'Nombre Doc.',
+                        dataIndex: 'nombre_tipo_documento',
+                        width: 100,
+                        sortable: false,
+                        renderer:function(value,p,record){
+                            if( record.data.priorizacion==0||record.data.priorizacion==9){
+                                return String.format('<b><font color="red">{0}***</font></b>', value);
+                            }
+                            else{
+                                return String.format('{0}', value);
+                            }}
+                    },
+                    {
+                        header: 'Descripcion Proceso',
+                        dataIndex: 'descripcion_proceso_wf',
+                        width: 200,
+                        sortable: false,
+                        renderer:function(value,p,record){
+                            if( record.data.demanda == 'si'){
+                                return String.format('<b><font color="green">{0}</font></b>', value);
+                            }
+                            else{
+                                return String.format('{0}', value);
+                            }
+                        }
+                    },
+                    {
+                        header: 'Estado Reg.',
+                        dataIndex: 'estado_reg',
+                        width: 100,
+                        sortable: false
+                    },
+
+                ]
+            });
+            const isForm = new Ext.form.FormPanel({
                 items: [{
                     region: 'center',
                     layout: 'column',
                     border: false,
                     autoScroll: true,
+                    defaults: {
+                        //  bodyStyle: 'padding:10'
+                    },
                     items: [{
                         xtype: 'tabpanel',
                         plain: true,
                         activeTab: 0,
-                        height: 600,
+                        height: 550,
                         deferredRender: false,
                         items: [{
                             title: 'No Conformidad',
@@ -1777,24 +1940,23 @@ header("content-type: text/javascript; charset=UTF-8");
                                     collapsible: false,
                                     border:false,
                                     items: [
-
                                         {
                                             xtype: 'field',
                                             fieldLabel: 'Código Auditoria',
-                                            name: 'nro_tramite',
+                                            name: 'nro_tramite_wf',
                                             anchor: '100%',
-                                          //  value: maestro.nro_tramite_wf,
+                                            value: maestro.nro_tramite_wf,
                                             readOnly :true,
-                                            style: 'background-image: none;'
+                                            style: 'background-image: none; background: #eeeeee;'
                                         },
                                         {
                                             xtype: 'field',
                                             fieldLabel: 'Nombre Auditoria',
-                                            name: 'nombre_aom',
+                                            name: 'nombre_aom1',
                                             anchor: '100%',
-                                            //value: maestro.nombre_aom1,
+                                            value: maestro.nombre_aom1,
                                             readOnly :true,
-                                            style: 'background-image: none;'
+                                            style: 'background-image: none; background: #eeeeee;'
                                         },
                                         {
                                             xtype: 'combo',
@@ -1827,7 +1989,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                             minChars: 2,
                                             anchor: '100%',
                                             readOnly :true,
-                                            style: 'background-image: none;'
                                         },
                                         {
                                             xtype: 'field',
@@ -1835,14 +1996,13 @@ header("content-type: text/javascript; charset=UTF-8");
                                             name: 'id_funcionario',
                                             anchor: '100%',
                                             readOnly :true,
-                                            style: 'background-image: none;'
+                                            style: 'background-image: none; background: #eeeeee;'
                                         },
                                         {
                                             xtype: 'combo',
                                             name: 'id_parametro',
-                                            id: this.idContenedor + '_id_parametro',
-                                            fieldLabel: 'Tipo',
-                                            allowBlank: true,
+                                            fieldLabel: '*Tipo',
+                                            allowBlank: false,
                                             emptyText: 'Elija una opción...',
                                             store: new Ext.data.JsonStore({
                                                 url: '../../sis_auditoria/control/Parametro/listarParametro',
@@ -1868,7 +2028,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                             minChars: 2,
                                             anchor: '100%',
                                             readOnly :true,
-                                            style: 'background-image: none;'
                                         },
                                         new Ext.form.FieldSet({
                                             collapsible: false,
@@ -1885,14 +2044,11 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 {
                                                     xtype: 'checkbox',
                                                     name : 'calidad',
-                                                    id: this.idContenedor + '_calidad',
                                                     fieldLabel : 'Calidad',
                                                     renderer : function(value, p, record) {
                                                         return record.data['calidad'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50,
-                                                    readOnly :true,
-                                                    style: 'background-image: none;'
+                                                    gwidth : 50
                                                 }, //
                                                 new Ext.form.Label({
                                                     text: 'Medio Ambiente  :',
@@ -1901,14 +2057,11 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 {
                                                     xtype: 'checkbox',
                                                     name : 'medio_ambiente',
-                                                    id: this.idContenedor + '_medio_ambiente',
                                                     fieldLabel : 'Medio Ambiente',
                                                     renderer : function(value, p, record) {
                                                         return record.data['medio_ambiente'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50,
-                                                    readOnly :true,
-                                                    style: 'background-image: none;'
+                                                    gwidth : 50
                                                 },
                                                 new Ext.form.Label({
                                                     text: 'Seguridad :',
@@ -1917,14 +2070,11 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 {
                                                     xtype: 'checkbox',
                                                     name : 'seguridad',
-                                                    id: this.idContenedor + '_seguridad',
                                                     fieldLabel : 'Seguridad',
                                                     renderer : function(value, p, record) {
                                                         return record.data['seguridad'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50,
-                                                    readOnly :true,
-                                                    style: 'background-image: none;'
+                                                    gwidth : 50
                                                 }, //
                                                 new Ext.form.Label({
                                                     text: 'Responsabilidad Social :',
@@ -1933,14 +2083,11 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 {
                                                     xtype: 'checkbox',
                                                     name : 'responsabilidad_social',
-                                                    id: this.idContenedor + '_responsabilidad_social',
                                                     fieldLabel : 'Responsabilidad Social',
                                                     renderer : function(value, p, record) {
                                                         return record.data['responsabilidad_social'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50,
-                                                    readOnly :true,
-                                                    style: 'background-image: none;'
+                                                    gwidth : 50
                                                 },
                                                 new Ext.form.Label({
                                                     text: 'Sistemas Integrados :',
@@ -1949,98 +2096,55 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 {
                                                     xtype: 'checkbox',
                                                     name : 'sistemas_integrados',
-                                                    id: this.idContenedor + '_sistemas_integrados',
                                                     fieldLabel : 'Sistemas Integrados',
                                                     renderer : function(value, p, record) {
                                                         return record.data['sistemas_integrados'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50,
-                                                    readOnly :true,
-                                                    style: 'background-image: none;'
+                                                    gwidth : 50
                                                 }
                                             ]
                                         }),
                                         {
                                             xtype: 'textarea',
                                             name: 'descrip_nc',
-                                            id: this.idContenedor + '_descrip_nc',
-                                            fieldLabel: 'Descripcion',
-                                            allowBlank: true,
+                                            fieldLabel: '*Descripcion',
+                                            allowBlank: false,
                                             anchor: '100%',
                                             gwidth: 280,
                                             readOnly :true,
-                                            style: 'background-image: none;'
                                         },
                                         {
                                             xtype: 'textarea',
                                             name: 'evidencia',
-                                            id: this.idContenedor + '_evidencia',
                                             fieldLabel: 'Evidencia',
                                             allowBlank: true,
                                             anchor: '100%',
                                             gwidth: 280,
-                                             readOnly :true,
-                                            style: 'background-image: none;'
+                                            readOnly :true,
                                         },
                                         {
                                             xtype: 'textarea',
                                             name: 'obs_consultor',
-                                            id: this.idContenedor + '_obs_consultor',
                                             fieldLabel: 'Observacion Consultor',
                                             allowBlank: true,
                                             anchor: '100%',
                                             gwidth: 150,
-                                             readOnly :true,
-                                            style: 'background-image: none;'
+                                            readOnly :true,
                                         },
-                                        new Ext.form.FieldSet({
-                                            collapsible: false,
-                                            border: false,
-                                            layout: 'form',
-                                            items: [
-                                                 table
-                                            ]
-                                        })
+                                        table
                                     ]
                                 })
                             ]
-                            },
+                        },
                             {
                                 title: 'Archivos Evidencia',
                                 layout: 'fit',
                                 defaults: {width: 400},
                                 items: [
-                                    new Ext.grid.GridPanel({
-                                        layout: 'fit',
-                                        store:  [],
-                                        region: 'center',
-                                        trackMouseOver: false,
-                                        split: true,
-                                        border: false,
-                                        plain: true,
-                                        plugins: [],
-                                        stripeRows: true,
-                                        loadMask: true,
-                                        tbar: [{
-                                            text: '<button class="btn">&nbsp;&nbsp;<b>Nuevo</b></button>',
-                                            scope: this,
-                                            width: '100',
-                                            handler: function() {
-
-                                            }
-                                        }],
-                                        columns: [
-                                            new Ext.grid.RowNumberer(),
-                                            {
-                                                header: 'Estado Reg.',
-                                                dataIndex: 'estado_reg',
-                                                width: 100,
-                                                sortable: false
-                                            },
-                                        ]
-                                    })
+                                    grilla
                                 ]
                             },
+
                         ]
                     }]
                 }],
@@ -2052,32 +2156,44 @@ header("content-type: text/javascript; charset=UTF-8");
                 autoScroll: true,
                 region: 'center'
             });
+            grilla.addListener('cellclick', this.oncellclick,this);
+            if(data){
+                console.log(data.seguridad)
+                isForm.getForm().findField('descrip_nc').setValue(data.descrip_nc);
+                isForm.getForm().findField('evidencia').setValue(data.evidencia);
+                isForm.getForm().findField('obs_consultor').setValue(data.obs_consultor);
+                setTimeout(() => {
+                    isForm.getForm().findField('id_parametro').setValue(data.id_parametro);
+                    isForm.getForm().findField('id_parametro').setRawValue(data.valor_parametro);
+                }, 1000);
+                isForm.getForm().findField('calidad').setValue(this.onBool(data.calidad));
+                isForm.getForm().findField('medio_ambiente').setValue(this.onBool(data.medio_ambiente));
+                isForm.getForm().findField('seguridad').setValue(this.onBool(data.seguridad));
+                isForm.getForm().findField('responsabilidad_social').setValue(this.onBool(data.responsabilidad_social));
+                isForm.getForm().findField('sistemas_integrados').setRawValue(this.onBool(data.sistemas_integrados));
+            }
             let id_funcionario = null;
             Ext.Ajax.request({
                 url:'../../sis_auditoria/control/NoConformidad/getUo',
                 params:{ id_uo: maestro.id_uo },
                 success:function(resp){
                     const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                    this.isForm.getForm().findField('id_uo').setValue(reg.ROOT.datos.id_uo);
-                    this.isForm.getForm().findField('id_uo').setRawValue(reg.ROOT.datos.nombre_unidad);
-                    this.isForm.getForm().findField('id_funcionario').setValue(reg.ROOT.datos.desc_funcionario1);
-                    this.isForm.getForm().findField('nro_tramite').setValue(maestro.nro_tramite_wf);
-                    this.isForm.getForm().findField('nombre_aom').setValue(maestro.nombre_aom1);
-
+                    isForm.getForm().findField('id_uo').setValue(reg.ROOT.datos.id_uo);
+                    isForm.getForm().findField('id_uo').setRawValue(reg.ROOT.datos.nombre_unidad);
+                    isForm.getForm().findField('id_funcionario').setValue(reg.ROOT.datos.desc_funcionario1);
                     id_funcionario = reg.ROOT.datos.id_funcionario;
                 },
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
             });
-            this.isForm.getForm().findField('id_uo').on('select', function(combo, record, index){
+
+            isForm.getForm().findField('id_uo').on('select', function(combo, record, index){
                 Ext.Ajax.request({
                     url:'../../sis_auditoria/control/NoConformidad/getUo',
                     params:{ id_uo: record.data.id_uo },
                     success:function(resp) {
-
                         isForm.getForm().findField('id_funcionario').reset();
-
                         const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                         isForm.getForm().findField('id_funcionario').setValue(reg.ROOT.datos.desc_funcionario1);
                         id_funcionario = reg.ROOT.datos.id_funcionario;
@@ -2087,9 +2203,10 @@ header("content-type: text/javascript; charset=UTF-8");
                     scope:this
                 });
             },this);
+
             this.ventanaNoConformidad = new Ext.Window({
                 width: 650,
-                height: 650,
+                height: 610,
                 modal: false,
                 minimizable: true,
                 maximizable: true,
@@ -2098,14 +2215,77 @@ header("content-type: text/javascript; charset=UTF-8");
                 title: 'Formulario',
                 bodyStyle: 'padding:5px',
                 layout: 'border',
-                items: [this.isForm]
+                items: [isForm]
             });
         },
+
         onBool:function(valor){
-            if(valor === 't'){
-                return true;
+            return valor === 't';
+        },
+        oncellclick : function(grid, rowIndex, columnIndex, e) {
+
+            var record = this.documentos.getAt(rowIndex),
+                fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
+
+            if (fieldName == 'nro_tramite_ori' && record.data.id_proceso_wf_ori) {
+                //open documentos de origen
+                this.loadCheckDocumentosSolWf(record);
+            } else if (fieldName == 'upload') {
+
+                if (record.data.solo_lectura == 'no' &&  !record.data.id_proceso_wf_ori) {
+                    this.SubirArchivo(record);
+                    // this.onSubirDocumento(record.data);
+                }
+            } else if(fieldName == 'modificar') {
+                if(record.data['modificar'] == 'si'){
+
+                    this.cambiarMomentoClick(record);
+
+                }
             }
-            return  false;
+            else if (fieldName == 'chequeado') {
+                if(record.data['extension'].length!=0) {
+                    //Escaneados
+                    var data = "id=" + record.data['id_documento_wf'];
+                    data += "&extension=" + record.data['extension'];
+                    data += "&sistema=sis_workflow";
+                    data += "&clase=DocumentoWf";
+                    data += "&url="+record.data['url'];
+                    window.open('../../../lib/lib_control/CTOpenFile.php?' + data);
+                } else if(record.data.nombre_vista){
+                    //Plantillas
+                    Phx.CP.loadingShow();
+                    Ext.Ajax.request({
+                        url : '../../sis_workflow/control/TipoDocumento/generarDocumento',
+                        params : {
+                            id_proceso_wf    		: record.data.id_proceso_wf,
+                            id_tipo_documento		: record.data.id_tipo_documento,
+                            nombre_vista	 		: record.data.nombre_vista,
+                            esquema_vista    		: record.data.esquema_vista,
+                            nombre_archivo_plantilla: record.data.nombre_archivo_plantilla
+                        },
+                        success : this.successExport,
+                        failure : this.conexionFailure,
+                        timeout : this.timeout,
+                        scope : this
+                    });
+
+
+                } else if (record.data['tipo_documento'] == 'generado') {
+                    Phx.CP.loadingShow();
+                    Ext.Ajax.request({
+                        url:'../../'+record.data.action,
+                        params:{'id_proceso_wf':record.data.id_proceso_wf, 'action':record.data.action},
+                        success: this.successExport,
+                        failure: this.conexionFailure,
+                        timeout:this.timeout,
+                        scope:this
+                    });
+                } else {
+                    alert('No se ha subido ningun archivo para este documento');
+                }
+            }
+
         },
         successRevision: function(resp){
             Phx.CP.loadingHide();
@@ -2178,6 +2358,185 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         saveObservacion:function () {
             alert('saveObservacion')
-        }
+        },
+        onSubirDocumento:function(record){
+            this.crearFormDocumento(record);
+            this.ventanaDocumento.show();
+        },
+        onFormularioDocumento:function(data){
+            this.crearFormulario(data);
+            this.ventanaResponsable.show();
+        },
+        crearFormulario:function(record){
+            const storeCombo = new Ext.data.JsonStore({
+                url: '../../sis_workflow/control/TipoDocumento/listarTipoDocumento',
+                id: 'id_tipo_documento',
+                root: 'datos',
+                sortInfo: {
+                    field: 'tipdw.codigo',
+                    direction: 'ASC'
+                },
+                totalProperty: 'total',
+                fields: ['id_tipo_documento', 'codigo', 'nombre','descripcion'],
+                remoteSort: true,
+                baseParams: {par_filtro: 'tipdw.nombre#tipdw.codigo'}
+            });
+            const combo = new Ext.form.ComboBox({
+                name:'id_tipo_documentos',
+                fieldLabel:'Documentos',
+                allowBlank : false,
+                typeAhead: true,
+                store: storeCombo,
+                mode: 'remote',
+                pageSize: 15,
+                triggerAction: 'all',
+                valueField: 'id_tipo_documento',
+                displayField: 'nombre',
+                gdysplayfield: 'descripcion_tipo_documento',
+                forceSelection: true,
+                allowBlank : false,
+                anchor: '100%',
+                resizable : true,
+                enableMultiSelect: false
+            });
+            this.formAuto = new Ext.form.FormPanel({
+                baseCls: 'x-plain',
+                autoDestroy: true,
+                border: false,
+                layout: 'form',
+                autoHeight: true,
+                items: [combo]
+            });
+            this.ventanaResponsable = new Ext.Window({
+                title: 'Registar Nuevo Documento',
+                collapsible: true,
+                maximizable: true,
+                autoDestroy: true,
+                width: 500,
+                height: 150,
+                layout: 'fit',
+                plain: true,
+                bodyStyle: 'padding:5px;',
+                buttonAlign: 'center',
+                items: this.formAuto,
+                modal:true,
+                closeAction: 'hide',
+                buttons: [{
+                    text: 'Guardar',
+                    handler: this.saveDocumento,
+                    scope: this},
+                    {
+                        text: 'Cancelar',
+                        handler: function(){ this.ventanaResponsable.hide() },
+                        scope: this
+                    }]
+            });
+            this.cmpTipoDocumentos = this.formAuto.getForm().findField('id_tipo_documentos');
+            this.cmpIdProceso_wf = record?record.id_proceso_wf:this.id_proceso_no_conformidad;
+            Ext.Ajax.request({
+                url:'../../sis_workflow/control/DocumentoWf/verificarConfiguracion',
+                params: { 'id_proceso_wf': record?record.id_proceso_wf:this.id_proceso_no_conformidad},
+                success: function(resp){
+                    const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                    this.cmpTipoDocumentos.store.baseParams.id_tipo_documentos = reg.ROOT.datos.id_tipo_documentos;
+                    this.cmpTipoDocumentos.enable();
+                    this.cmpTipoDocumentos.show();
+                },
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+        },
+        saveDocumento:function(){
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_workflow/control/DocumentoWf/insertarDocumentoWf',
+                params: {
+                    id_tipo_documentos : this.cmpTipoDocumentos.getValue(),
+                    id_proceso_wf : this.cmpIdProceso_wf
+                },
+                success: this.successSinc,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        },
+        successSinc:function(resp){
+            Phx.CP.loadingHide();
+            const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            this.documentos.load({params:{ start: 0, limit: 50 }});
+            this.ventanaResponsable.hide();
+        },
+        crearFormDocumento:function(record){
+            const field = new Ext.form.Field({
+                fieldLabel: "Documento (archivo Pdf,Word)",
+                gwidth: 130,
+                inputType: 'file',
+                name: 'archivo',
+                allowBlank: false,
+                buttonText: '',
+                maxLength: 150,
+                anchor:'100%'
+            });
+
+            this.formAutoDoc = new Ext.form.FormPanel({
+                baseCls: 'x-plain',
+                autoDestroy: true,
+                border: false,
+                layout: 'form',
+                autoHeight: true,
+                items: [field]
+            });
+
+            this.ventanaDocumento = new Ext.Window({
+                title: 'Subir Documento',
+                collapsible: true,
+                maximizable: true,
+                autoDestroy: true,
+                width: 500,
+                height: 150,
+                layout: 'fit',
+                plain: true,
+                bodyStyle: 'padding:5px;',
+                buttonAlign: 'center',
+                items: this.formAutoDoc,
+                modal:true,
+                closeAction: 'hide',
+                buttons: [{
+                    text: 'Guardar',
+                    handler: this.saveDocumentoInsert,
+                    scope: this},
+                    {
+                        text: 'Cancelar',
+                        handler: function(){ this.ventanaDocumento.hide() },
+                        scope: this
+                    }]
+            });
+            this.cmpArchivo = this.formAutoDoc.getForm().findField('archivo');
+            this.cmpIdDocumento= record.id_documento_wf;
+            this.cmpNroTramite = record.nro_tramite;
+        },
+        saveDocumentoInsert:function(){
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_workflow/control/DocumentoWf/subirArchivoWf',
+                params: {
+                    id_documento_wf : this.cmpIdDocumento,
+                    num_tramite : this.cmpNroTramite,
+                    archivo : this.cmpArchivo.getValue()
+                },
+                isUpload: true,
+                success: this.successSincDoc,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        },
+        successSincDoc:function(resp){
+            Phx.CP.loadingHide();
+            const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            this.documentos.load({params:{ start: 0, limit: 50 }});
+            this.ventanaDocumento.hide();
+        },
     })
 </script>

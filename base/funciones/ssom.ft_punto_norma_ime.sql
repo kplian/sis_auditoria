@@ -12,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tpunto_norma'
  AUTOR: 		 (szambrana)
  FECHA:	        01-07-2019 18:45:10
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				01-07-2019 18:45:10								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tpunto_norma'	
+ #0				01-07-2019 18:45:10								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'ssom.tpunto_norma'
     #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
 
  ***************************************************************************/

@@ -20,8 +20,9 @@ class ACTNoConformidad extends ACTbase{
         if($this->objParam->getParametro('id_nc')!=''){
             $this->objParam->addFiltro("noconf.id_nc = ".$this->objParam->getParametro('id_nc'));
         }
+
         if($this->objParam->getParametro('interfaz') == 'NoConformidadSinAcciones'){
-          //  $this->objParam->addFiltro("noconf.estado_wf in (''acciones'')");
+           $this->objParam->addFiltro("noconf.estado_wf in (''correccion'')");
         }
        /* if($this->objParam->getParametro('interfaz') == 'NoConformidadSeg'){
             $this->objParam->addFiltro("noconf.estado_wf in (''correccion'')");
@@ -185,6 +186,10 @@ class ACTNoConformidad extends ACTbase{
     function listarNoConformidadSuper(){
         $this->objParam->defecto('ordenacion','id_nc');
         $this->objParam->defecto('dir_ordenacion','asc');
+
+        if ($this->objParam->getParametro('tipo_interfaz')  == 'NoConformidadSuper'){
+              $this->objParam->addFiltro("nof.estado_wf in (''acciones'')");
+        }
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
             $this->objReporte = new Reporte($this->objParam,$this);
             $this->res = $this->objReporte->generarReporteListado('MODNoConformidad','listarNoConformidadSuper');

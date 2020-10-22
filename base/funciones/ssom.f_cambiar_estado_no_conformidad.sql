@@ -46,12 +46,19 @@ DECLARE
     v_estado_new			varchar;
     v_id_estado_new			integer;
 
+    v_no_conformidad		record;
+
 BEGIN
 
     --Identificación del nombre de la función
     v_nombre_funcion = 'ssom.f_cambiar_estado_no_conformidad';
+    v_id_estado_new = null;
+    v_estado_new = null;
+    select n.* into v_no_conformidad
+    from ssom.tno_conformidad n
+    where n.id_proceso_wf = p_id_proceso;
 
-
+    	--raise exception '%',v_no_conformidad;
 
     	select
             pw.id_proceso_wf,
@@ -85,7 +92,7 @@ BEGIN
                     va_prioridad
                 from wf.f_obtener_estado_wf(
                 v_registro_estado.id_proceso_wf,
-                 null,
+                 v_registro_estado.id_estado_wf,
                  v_registro_estado.id_tipo_estado,
                  'siguiente',
                  p_id_usuario);
@@ -97,22 +104,21 @@ BEGIN
             v_titulo  = 'Aprobado';
 
 
-            if (p_accion = 'revisar') then
+            if (p_accion = 'rechazar') then
 
+              	v_id_estado_new =  va_id_tipo_estado[2]::integer;
+                v_estado_new = va_codigo_estado[2]::varchar;
+            else
             	v_id_estado_new =  va_id_tipo_estado[1]::integer;
                 v_estado_new = va_codigo_estado[1]::varchar;
 
             end if;
 
-            if (p_accion = 'rechazar') then
-
-             	v_id_estado_new =  va_id_tipo_estado[2]::integer;
-                v_estado_new = va_codigo_estado[2]::varchar;
-
+          	if (v_id_estado_new is null)then
+           	 raise exception 'error % % %',v_registro_estado.id_proceso_wf , v_registro_estado.id_tipo_estado,v_registro_estado.id_estado_wf;
             end if;
-
             v_id_estado_actual = wf.f_registra_estado_wf(   v_id_estado_new, -- va_id_tipo_estado[1]::integer,
-                                                            null,--v_parametros.id_funcionario_wf,
+                                                            v_no_conformidad.id_funcionario_nc,--v_parametros.id_funcionario_wf,
                                                             v_registro_estado.id_estado_wf,
                                                             v_registro_estado.id_proceso_wf,
                                                             p_id_usuario,
@@ -130,7 +136,7 @@ BEGIN
 
         update ssom.tno_conformidad  set
             id_estado_wf = v_id_estado_actual,
-            estado_wf = v_estado_new, -- va_codigo_estado[1],
+            estado_wf = v_estado_new,
             id_usuario_mod = p_id_usuario,
             fecha_mod = now()
         where id_proceso_wf = p_id_proceso;

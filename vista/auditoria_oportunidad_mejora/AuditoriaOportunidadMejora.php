@@ -237,7 +237,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                       estado_reg : 'activo'
                     },
                     origen:'UO',
-                    allowBlank:true,
+                    allowBlank:false,
                     fieldLabel:'Area',
                     gdisplayField:'nombre_unidad', //mapea al store del grid
                     tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre_unidad}</p> </div></tpl>',
@@ -366,7 +366,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 config:{
                     name: 'fecha_prev_inicio',
                     fieldLabel: 'Fecha Inicio',
-                    allowBlank: true,
+                    allowBlank: false,
                     anchor: '50%',
                     gwidth: 100,
                     format: 'd/m/Y',
@@ -382,7 +382,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 config:{
                     name: 'fecha_prev_fin',
                     fieldLabel: 'Fecha Fin',
-                    allowBlank: true,
+                    allowBlank: false,
                     anchor: '50%',
                     gwidth: 100,
                     format: 'd/m/Y',

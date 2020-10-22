@@ -32,7 +32,9 @@ Phx.vista.PlanificarAuditoria = {
         this.Atributos[this.getIndAtributo('id_tipo_om')].grid=false;
         Phx.vista.PlanificarAuditoria.superclass.constructor.call(this,config);
         this.getBoton('ant_estado').setVisible(false);
-          this.addButton('sig_estado',{
+        this.getBoton('btnChequeoDocumentosWf').setVisible(false);
+
+        this.addButton('sig_estado',{
               text:'Ejecutar',
               iconCls: 'bok',
               disabled: true,
@@ -308,7 +310,7 @@ Phx.vista.PlanificarAuditoria = {
                                             collapsible: false,
                                             border: true,
                                             layout: 'form',
-                                            defaults: {width: 500},
+                                            defaults: {width: 550},
                                             items: [
                                                 {
                                                     xtype: 'field',
@@ -347,16 +349,15 @@ Phx.vista.PlanificarAuditoria = {
                                                 items: [
                                                         {
                                                             xtype: 'field',
-                                                            fieldLabel: 'Lugar',
+                                                            fieldLabel: '*Lugar',
                                                             name: 'lugar',
                                                             anchor: '100%',
                                                             allowBlank: false,
-                                                            disabled: false,
                                                             id: this.idContenedor+'_lugar'
                                                         },
                                                         {
                                                             xtype: 'combo',
-                                                            fieldLabel: 'Tipo de Auditoria',
+                                                            fieldLabel: '*Tipo de Auditoria',
                                                             name: 'id_tnorma',
                                                             allowBlank: false,
                                                             id: this.idContenedor+'_id_tnorma',
@@ -389,7 +390,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         },
                                                         {
                                                             xtype: 'combo',
-                                                            fieldLabel: 'Objeto Auditoria',
+                                                            fieldLabel: '*Objeto Auditoria',
                                                             name: 'id_tobjeto',
                                                             allowBlank: false,
                                                             id: this.idContenedor+'_id_tobjeto',
@@ -437,7 +438,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         },
                                                         {
                                                             xtype: 'datefield',
-                                                            fieldLabel: 'Inicio Real',
+                                                            fieldLabel: '*Inicio Real',
                                                             name: 'fecha_prog_inicio',
                                                             disabled: false,
                                                             anchor: '100%',
@@ -445,7 +446,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         },
                                                         {
                                                             xtype: 'datefield',
-                                                            fieldLabel: 'Fin Real',
+                                                            fieldLabel: '*Fin Real',
                                                             name: 'fecha_prog_fin',
                                                             disabled: false,
                                                             anchor: '100%',
@@ -824,9 +825,9 @@ Phx.vista.PlanificarAuditoria = {
                          timeout: this.timeout,
                          scope: this
                      });
-                } else {
+            } else {
                     Ext.MessageBox.alert('Validación', 'Existen datos inválidos en el formulario. Corrija y vuelva a intentarlo');
-                }
+            }
     },
     onEdit:function(record){
         this.accionFormulario = 'EDIT';
@@ -1665,7 +1666,7 @@ Phx.vista.PlanificarAuditoria = {
              totalProperty: 'total',
              fields: ['id_cronograma','id_aom','id_actividad',
                      'nueva_actividad','fecha_ini_activ','actividad',
-                         'fecha_fin_activ','hora_ini_activ','hora_fin_activ','lista_funcionario'],
+                         'fecha_fin_activ','hora_ini_activ','hora_fin_activ','lista_funcionario','actividad'],
                          remoteSort: true,
              baseParams: {dir:'ASC',sort:'id_cronograma',limit:'100',start:'0'}
          });
@@ -1785,7 +1786,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         xtype: 'datefield',
                                                         anchor: '85%',
                                                         name: 'fecha_ini_activ',
-                                                        fieldLabel: 'Inicio',
+                                                        fieldLabel: '*Fecha Inicio',
                                                         allowBlank: false,
                                                         format: 'd/m/Y'
                                                     },
@@ -1793,7 +1794,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         xtype: 'datefield',
                                                         anchor: '85%',
                                                         name: 'fecha_fin_activ',
-                                                        fieldLabel: 'Fecha Fin',
+                                                        fieldLabel: '*Fecha Fin',
                                                         allowBlank: false,
                                                         format: 'd/m/Y',
                                                     },
@@ -1809,7 +1810,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         xtype: 'timefield',
                                                         anchor: '85%',
                                                         name: 'hora_ini_activ',
-                                                        fieldLabel: 'Hora Inicio',
+                                                        fieldLabel: '*Hora Inicio',
                                                         allowBlank: false,
                                                         format: 'H:i',
                                                     },
@@ -1817,7 +1818,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         xtype: 'timefield',
                                                         anchor: '85%',
                                                         name: 'hora_fin_activ',
-                                                        fieldLabel: 'Hora Fin',
+                                                        fieldLabel: '*Hora Fin',
                                                         allowBlank: false,
                                                         format: 'H:i',
                                                     },
@@ -1828,7 +1829,7 @@ Phx.vista.PlanificarAuditoria = {
                                     {
                                         xtype: 'combo',
                                         name: 'id_actividad',
-                                        fieldLabel: 'Actividad',
+                                        fieldLabel: '*Actividad',
                                         allowBlank: false,
                                         emptyText: 'Elija una opción...',
                                         store: new Ext.data.JsonStore({
@@ -1986,27 +1987,33 @@ Phx.vista.PlanificarAuditoria = {
             });
 
             if(data) {
-            isForm.getForm().items.items[0].setValue(data.fecha_ini_activ);
-            isForm.getForm().items.items[1].setValue(data.fecha_fin_activ);
-            isForm.getForm().items.items[2].setValue(new Date(data.fecha_ini_activ+' '+data.hora_ini_activ));
-            isForm.getForm().items.items[3].setValue(new Date(data.fecha_fin_activ+' '+data.hora_fin_activ));
-            isForm.getForm().items.items[4].setValue(data.id_actividad);
-            isForm.getForm().items.items[5].multiselects[0].store.baseParams = {
-                            dir:'ASC',
-                            sort:'id_aom',
-                            limit:'100',
-                            start:'0',
-                            id_aom: maestro.id_aom,
-                            item :data.id_cronograma
-                        };
-            isForm.getForm().items.items[5].multiselects[1].store.baseParams = {
-                            dir:'ASC',
-                            sort:'id_aom',
-                            limit:'100',
-                            start:'0',
-                            id_cronograma: data.id_cronograma
-            };
-            isForm.getForm().items.items[5].multiselects[1].store.load();
+                isForm.getForm().findField('fecha_ini_activ').setValue(data.fecha_ini_activ);
+                isForm.getForm().findField('fecha_fin_activ').setValue(data.fecha_fin_activ);
+                isForm.getForm().findField('hora_ini_activ').setValue(new Date(data.fecha_ini_activ+' '+data.hora_ini_activ));
+                isForm.getForm().findField('hora_fin_activ').setValue(new Date(data.fecha_fin_activ+' '+data.hora_fin_activ));
+
+                setTimeout(() => {
+                    isForm.getForm().findField('id_actividad').setValue(data.id_actividad);
+                    isForm.getForm().findField('id_actividad').setRawValue(data.actividad);
+                }, 1000);
+
+
+                isForm.getForm().findField('itemselector').multiselects[0].store.baseParams = {
+                                dir:'ASC',
+                                sort:'id_aom',
+                                limit:'100',
+                                start:'0',
+                                id_aom: maestro.id_aom,
+                                item :data.id_cronograma
+                            };
+                isForm.getForm().findField('itemselector').multiselects[1].store.baseParams = {
+                                dir:'ASC',
+                                sort:'id_aom',
+                                limit:'100',
+                                start:'0',
+                                id_cronograma: data.id_cronograma
+                };
+                isForm.getForm().findField('itemselector').multiselects[1].store.load();
             }
       const auditoria = maestro.nro_tramite_wf + ' '+maestro.nombre_aom1;
       this.ventanaCroronograma = new Ext.Window({
@@ -2080,7 +2087,7 @@ Phx.vista.PlanificarAuditoria = {
         if(data['estado_wf'] === 'planificacion'){
             this.getBoton('sig_estado').enable();
         }
-        this.getBoton('btnChequeoDocumentosWf').enable();
+        // this.getBoton('btnChequeoDocumentosWf').enable();
         this.getBoton('diagrama_gantt').enable();
         this.getBoton('ant_estado').enable();
         return tb
@@ -2089,7 +2096,7 @@ Phx.vista.PlanificarAuditoria = {
         const tb = Phx.vista.AuditoriaOportunidadMejora.superclass.liberaMenu.call(this);
         if(tb){
               this.getBoton('sig_estado').disable();
-              this.getBoton('btnChequeoDocumentosWf').disable();
+              // this.getBoton('btnChequeoDocumentosWf').disable();
               this.getBoton('diagrama_gantt').disable();
               this.getBoton('ant_estado').disable();
         }

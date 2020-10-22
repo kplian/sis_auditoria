@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION ssom.ft_auditoria_npnpg_sel (
-	p_administrador integer,
-	p_id_usuario integer,
-	p_tabla varchar,
-	p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-	RETURNS varchar AS
+RETURNS varchar AS
 $body$
 	/**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
@@ -17,7 +17,7 @@ $body$
    HISTORIAL DE MODIFICACIONES:
   #ISSUE				FECHA				AUTOR				DESCRIPCION
    #0				25-07-2019 21:34:47								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tauditoria_npnpg'
-   #
+       #4				04-08-2029 15:51:56		 MMV				    Refactorizacion Planificacion
    ***************************************************************************/
 
 DECLARE
@@ -121,8 +121,12 @@ BEGIN
 		raise exception '%',v_resp;
 END;
 $body$
-	LANGUAGE 'plpgsql'
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;
+
+ALTER FUNCTION ssom.ft_auditoria_npnpg_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
