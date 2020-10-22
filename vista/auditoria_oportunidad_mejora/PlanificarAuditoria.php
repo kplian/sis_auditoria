@@ -2118,7 +2118,7 @@ Phx.vista.PlanificarAuditoria = {
           };
           this.store.reload({ params: this.store.baseParams});
     },
-    bnew:true,
+    bnew:false,
     bdel:false,
     bedit:true,
     arrayDefaultColumHidden:['nombre_aom1','nombre_unidad','desc_funcionario_resp','nro_tramite','descrip_nc','lugar','desc_tipo_norma','desc_tipo_objeto'],
