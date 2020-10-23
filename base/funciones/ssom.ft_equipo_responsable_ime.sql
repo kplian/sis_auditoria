@@ -189,7 +189,7 @@ BEGIN
                                     null);
 
 
-          if (v_parametros.id_interno != null)then
+          if (v_parametros.id_interno is not null)then
           insert into ssom.tequipo_responsable(
                                     id_funcionario,
                                     -- exp_tec_externo,
@@ -218,7 +218,6 @@ BEGIN
                                     null);
           end if;
 
-          -- raise exception '%',v_parametros.id_aom;
 
             foreach v_id_funcionario IN  array (string_to_array(v_parametros.id_equipo_auditor::varchar,','))  loop
 

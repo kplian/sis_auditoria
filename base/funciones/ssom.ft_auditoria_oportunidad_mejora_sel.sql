@@ -250,7 +250,7 @@ BEGIN
         	end if;
 
         	v_consulta:='select  eus.id_funcionario,
-                                  initcap(fun.desc_funcionario1) as desc_funcionario1,
+                                  fun.desc_funcionario1,
                                   fun.descripcion_cargo,
                                   pa.valor_parametro as cargo_equipo
                         from ssom.tequipo_auditores eus
@@ -273,7 +273,7 @@ BEGIN
                                                      inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
                                                      and e.estado_reg = ''activo''
                                                   )select fu.id_funcionario,
-                                                          initcap(fun.desc_funcionario1) as desc_funcionario1,
+                                                          fun.desc_funcionario1,
                                                           fu.descripcion_cargo,
                                                           ''''::varchar as cargo_equipo
                                                    from uo_mas_subordinados suo
@@ -671,7 +671,7 @@ BEGIN
                                 fc.codigo,
                                 fc.descripcion_cargo
                         from orga.vfuncionario_cargo fc
-                        where (fc.fecha_finalizacion is null
+                        where fc.fecha_asignacion <= now()::date and(fc.fecha_finalizacion is null
                                     or fc.fecha_finalizacion >= now()::date) and';
           --Devuelve la respuesta
          v_consulta:=v_consulta||v_parametros.filtro;
@@ -690,7 +690,7 @@ BEGIN
           --Sentencia de la consulta de conteo de registros
           v_consulta:='select  count(fc.id_funcionario)
                               from orga.vfuncionario_cargo fc
-                              where (fc.fecha_finalizacion is null
+                              where fc.fecha_asignacion <= now()::date and (fc.fecha_finalizacion is null
                                           or fc.fecha_finalizacion >= now()::date) and';
             --Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;

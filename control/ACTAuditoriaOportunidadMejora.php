@@ -365,6 +365,7 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
     function listarFuncionarioVigentes(){
         $this->objParam->defecto('ordenacion','id_funcionario');
         $this->objParam->defecto('dir_ordenacion','ASC');
+        
         $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
         $this->res=$this->objFunc->listarFuncionarioVigentes($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());

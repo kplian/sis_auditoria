@@ -1407,10 +1407,7 @@ header("content-type: text/javascript; charset=UTF-8");
         });
     },
     onBool:function(valor){
-        if(valor === 't'){
-            return true;
-        }
-        return  false;
+        return valor === 't';
     },
     sigEstado:function(){
         Phx.CP.loadingShow();
@@ -1791,7 +1788,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 displayField: 'nombre',
                 gdysplayfield: 'descripcion_tipo_documento',
                 forceSelection: true,
-                allowBlank : false,
                 anchor: '100%',
                 resizable : true,
                 enableMultiSelect: false

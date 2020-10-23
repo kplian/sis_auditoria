@@ -30,10 +30,10 @@ Phx.vista.PlanificarAuditoria = {
         this.Atributos[this.getIndAtributo('id_destinatario')].grid=false;
         this.Atributos[this.getIndAtributo('recomendacion')].grid=false;
         this.Atributos[this.getIndAtributo('id_tipo_om')].grid=false;
+
         Phx.vista.PlanificarAuditoria.superclass.constructor.call(this,config);
         this.getBoton('ant_estado').setVisible(false);
         this.getBoton('btnChequeoDocumentosWf').setVisible(false);
-
         this.addButton('sig_estado',{
               text:'Ejecutar',
               iconCls: 'bok',
@@ -319,7 +319,7 @@ Phx.vista.PlanificarAuditoria = {
                                                     anchor: '100%',
                                                     readOnly: true,
                                                     id: this.idContenedor + '_nro_tramite_wf',
-                                                    style: 'background-image: none; background: #eeeeee;'
+                                                    style: 'background-image: none;'
                                                 },
                                                 {
                                                     xtype: 'field',
@@ -328,7 +328,7 @@ Phx.vista.PlanificarAuditoria = {
                                                     anchor: '100%',
                                                     readOnly: true,
                                                     id: this.idContenedor + '_nombre_unidad',
-                                                    style: 'background-image: none; background: #eeeeee;'
+                                                    style: 'background-image: none;'
                                                 },
                                                 {
                                                     xtype: 'field',
@@ -337,7 +337,7 @@ Phx.vista.PlanificarAuditoria = {
                                                     anchor: '100%',
                                                     readOnly: true,
                                                     id: this.idContenedor + '_nombre_aom1',
-                                                    style: 'background-image: none; background: #eeeeee;'
+                                                    style: 'background-image: none;'
                                                 },
                                             ]
                                             }),
@@ -846,7 +846,7 @@ Phx.vista.PlanificarAuditoria = {
     formularioProceso:function(){
         const maestro = this.sm.getSelected().data;
         const isForm = new Ext.form.FormPanel({
-          id: this.idContenedor + '_formulario_proceso',
+          // id: this.idContenedor + '_formulario_proceso',
             items: [{
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
@@ -854,7 +854,7 @@ Phx.vista.PlanificarAuditoria = {
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
                         readOnly :true,
-                        style: 'background-color: #F2F1F0; background-image: none;'
+                        style: 'background-image: none;'
                     },
                     {
                           xtype: 'field',
@@ -863,7 +863,7 @@ Phx.vista.PlanificarAuditoria = {
                           anchor: '100%',
                           value: maestro.nombre_aom1,
                           readOnly :true,
-                          style: 'background-color: #F2F1F0; background-image: none;'
+                          style: 'background-image: none;'
                     },
                     {
                             anchor: '100%',
@@ -1016,11 +1016,11 @@ Phx.vista.PlanificarAuditoria = {
       });
     },
     formularioEquipo:function(){
+      Phx.CP.loadingShow();
       const maestro = this.sm.getSelected().data;
       const me = this;
-      var isForm = new Ext.form.FormPanel({
+      const isForm = new Ext.form.FormPanel({
             id: this.idContenedor + '_formulario_proceso',
-          //  baseCls: 'x-plain',
             items: [{
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
@@ -1028,7 +1028,7 @@ Phx.vista.PlanificarAuditoria = {
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
                         readOnly :true,
-                        style: 'background-color: #F2F1F0; background-image: none;'
+                        style: 'background-image: none;'
                     },
                     {
                           xtype: 'field',
@@ -1037,7 +1037,7 @@ Phx.vista.PlanificarAuditoria = {
                           anchor: '100%',
                           value: maestro.nombre_aom1,
                           readOnly :true,
-                          style: 'background-color: #F2F1F0; background-image: none;'
+                          style: 'background-image: none;'
                     },
                     {
                                xtype: 'combo',
@@ -1056,9 +1056,7 @@ Phx.vista.PlanificarAuditoria = {
                                        totalProperty: 'total',
                                        fields: ['id_funcionario', 'desc_funcionario1'],
                                        remoteSort: true,
-                                       baseParams: {par_filtro: 'fu.desc_funcionario1',
-                                       codigo:'RESP',
-                                       id_uo: maestro.id_uo}
+                                       baseParams: {par_filtro: 'fun.desc_funcionario1', codigo:'RESP', id_uo: maestro.id_uo}
                                }),
                                valueField: 'id_funcionario',
                                displayField: 'desc_funcionario1',
@@ -1147,7 +1145,7 @@ Phx.vista.PlanificarAuditoria = {
                                    allowBlank: false,
                                    emptyText: 'Elija una opción...',
                                    store: new Ext.data.JsonStore({
-                                           url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListAuditores',
+                                           url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarFuncionarioVigentes',
                                            id: 'id_funcionario',
                                            root: 'datos',
                                            sortInfo: {
@@ -1157,9 +1155,7 @@ Phx.vista.PlanificarAuditoria = {
                                            totalProperty: 'total',
                                            fields: ['id_funcionario', 'desc_funcionario1'],
                                            remoteSort: true,
-                                           baseParams: {par_filtro: 'fu.desc_funcionario1',
-                                           codigo:'ETI',
-                                           id_uo: maestro.id_uo}
+                                           baseParams: {par_filtro: 'fc.desc_funcionario1'}
                                    }),
                                    valueField: 'id_funcionario',
                                    displayField: 'desc_funcionario1',
@@ -1182,8 +1178,7 @@ Phx.vista.PlanificarAuditoria = {
           region: 'center'
 
        });
-
-       Ext.Ajax.request({
+      Ext.Ajax.request({
           url:'../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
           params:{  dir:'ASC',
                     sort:'id_aom',
@@ -1193,14 +1188,33 @@ Phx.vista.PlanificarAuditoria = {
                     codigo_parametro : 'RESP'
                    },
           success:function(resp){
-              var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+              const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
               isForm.getForm().items.items[2].setValue(reg.datos[0].id_funcionario);
               isForm.getForm().items.items[2].setRawValue(reg.datos[0].desc_funcionario1);
+              Phx.CP.loadingHide();
           },
           failure: this.conexionFailure,
           timeout:this.timeout,
           scope:this
       });
+        Ext.Ajax.request({
+            url:'../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
+            params:{  dir:'ASC',
+                sort:'id_aom',
+                limit:'100',
+                start:'0',
+                id_aom:maestro.id_aom,
+                codigo_parametro : 'ETI'
+            },
+            success:function(resp){
+                const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                isForm.getForm().items.items[4].setValue(reg.datos[0].id_funcionario);
+                isForm.getForm().items.items[4].setRawValue(reg.datos[0].desc_funcionario1);
+            },
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });
       this.ventanaEquipo = new Ext.Window({
          width: 700,
          height: 500,
@@ -1227,7 +1241,6 @@ Phx.vista.PlanificarAuditoria = {
                                submit[obj.name]=obj.getValue();
                            }
                        },this);
-
                        Phx.CP.loadingShow();
                        Ext.Ajax.request({
                            url: '../../sis_auditoria/control/EquipoResponsable/insertarItemEquipoResponsable',
@@ -1271,7 +1284,7 @@ Phx.vista.PlanificarAuditoria = {
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
                         readOnly :true,
-                        style: 'background-color: #F2F1F0; background-image: none;'
+                        style: 'background-image: none;'
                     },
                     {
                           xtype: 'field',
@@ -1280,7 +1293,7 @@ Phx.vista.PlanificarAuditoria = {
                           anchor: '100%',
                           value: maestro.nombre_aom1,
                           readOnly :true,
-                          style: 'background-color: #F2F1F0; background-image: none;'
+                          style: 'background-image: none;'
                     },
                     {
                                xtype: 'combo',
@@ -1468,7 +1481,7 @@ Phx.vista.PlanificarAuditoria = {
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
                         readOnly :true,
-                        style: 'background-color: #F2F1F0; background-image: none;'
+                        style: 'background-image: none;'
                     },
                     {
                           xtype: 'field',
@@ -1477,7 +1490,7 @@ Phx.vista.PlanificarAuditoria = {
                           anchor: '100%',
                           value: maestro.nombre_aom1,
                           readOnly :true,
-                          style: 'background-color: #F2F1F0; background-image: none;'
+                          style: 'background-image: none;'
                     },
                     {
                                xtype: 'combo',
@@ -2121,17 +2134,6 @@ Phx.vista.PlanificarAuditoria = {
     bnew:false,
     bdel:false,
     bedit:true,
-    arrayDefaultColumHidden:['nombre_aom1','nombre_unidad','desc_funcionario_resp','nro_tramite','descrip_nc','lugar','desc_tipo_norma','desc_tipo_objeto'],
-    rowExpander: new Ext.ux.grid.RowExpander({
-        tpl : new Ext.Template(
-            '<br>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Nombre Auditoria:&nbsp;&nbsp;</b> {nombre_aom1}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Area:&nbsp;&nbsp;</b> {nombre_unidad}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Responsable Auditoria:&nbsp;&nbsp;</b> {desc_funcionario2}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Codigo:&nbsp;&nbsp;</b> {nro_tramite_wf}</p>',
-
-        )
-    }),
     tabsouth:[
       {
           url:'../../../sis_auditoria/vista/auditoria_proceso/AuditoriaProceso.php',

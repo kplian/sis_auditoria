@@ -152,10 +152,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     allowBlank: true,
                     anchor: '50%',
                     gwidth: 140,
-                    renderer: function(value,p,record){
-                        var color = '#575F90';
-                        return '<font color="'+color+'">'+record.data['nro_tramite_wf']+'</font>';
-                    }
+                    renderer:function(value, p, record){return String.format('<a style="cursor:pointer;">{0}</a>', value);},
                 },
                 type:'TextField',
                 filters:{pfiltro:'aom.nro_tramite_wf',type:'string'},
@@ -171,7 +168,9 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     allowBlank: false,
                     anchor: '80%',
                     emptyText: 'Intruzca titulo...',
-                    gwidth: 280
+                    gwidth: 280,
+                    renderer:function(value, p, record){return String.format('<a style="cursor:pointer;">{0}</a>', value);},
+
                 },
                 type:'TextField',
                 filters:{pfiltro:'aom.nombre_aom1',type:'string'},
