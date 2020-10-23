@@ -62,7 +62,7 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         aom.nombre_aom1,
-                        initcap(vfc.desc_funcionario1) as desc_funcionario1,
+                        vfc.desc_funcionario1,
                         par.valor_parametro,
                         par.codigo_parametro
 						from ssom.tequipo_responsable eqre
