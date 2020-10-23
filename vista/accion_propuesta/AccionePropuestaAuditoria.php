@@ -263,7 +263,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     name: 'descrip_causa_nc',
                                                     fieldLabel: 'Descripcion causa No conformidad',
                                                     allowBlank: true,
-                                                    style: 'margin: 10px',
                                                     anchor: '100%',
                                                     gwidth: 210,
                                                     style: 'background-image: none;'

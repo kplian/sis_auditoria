@@ -1324,7 +1324,7 @@ header("content-type: text/javascript; charset=UTF-8");
         this.ventanaNoConformidad = new Ext.Window({
             width: 650,
             height: 700,
-            modal: false,
+            modal: true,
             minimizable: true,
             maximizable: true,
             closeAction: 'hide',
@@ -1392,6 +1392,7 @@ header("content-type: text/javascript; charset=UTF-8");
                        }else{
                            me.ventanaNoConformidad.hide();
                            me.tienda.load();
+                           this.id_no_conformidad = null;
                         }
                 }
                 },
@@ -1399,6 +1400,7 @@ header("content-type: text/javascript; charset=UTF-8");
             }, {
                 text: 'Cerrar',
                 handler: function() {
+                   this.id_no_conformidad = null;
                    me.ventanaNoConformidad.hide();
                    me.tienda.load();
                 },
@@ -1640,7 +1642,7 @@ header("content-type: text/javascript; charset=UTF-8");
             });
         },
 
-        arrayDefaultColumHidden:['nombre_aom1','nombre_unidad','desc_funcionario_resp',
+        /*arrayDefaultColumHidden:['nombre_aom1','nombre_unidad','desc_funcionario_resp',
         'nro_tramite','descrip_nc','lugar','desc_tipo_norma','desc_tipo_objeto',
     'desc_funcionario_destinatario','resumen','recomendacion'],
     rowExpander: new Ext.ux.grid.RowExpander({
@@ -1654,7 +1656,7 @@ header("content-type: text/javascript; charset=UTF-8");
             '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Objeto Auditoria:&nbsp;&nbsp;</b> {desc_tipo_objeto}</p>',
             '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Destinatario:&nbsp;&nbsp;</b> {desc_funcionario_destinatario}</p>',
         )
-    }),
+    }),*/
     oncellclick : function(grid, rowIndex, columnIndex, e) {
 		
 	    var record = this.documentos.getAt(rowIndex),

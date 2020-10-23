@@ -229,36 +229,49 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:false
             },
-            /*{
-                config: {
-                    name: 'id_uo',
-                    baseParams: {
-                        nivel: '0,1,2'
+        {
+            config: {
+                name: 'id_destinatario',
+                fieldLabel: 'Destinatario',
+                allowBlank: false,
+                emptyText: 'Elija una opción...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListFuncionario',
+                    id: 'id_funcionario',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'desc_funcionario1',
+                        direction: 'ASC'
                     },
-                    origen:'UO',
-                    allowBlank:false,
-                    fieldLabel:'Area',
-                    gdisplayField:'nombre_unidad', //mapea al store del grid
-                    tpl:'<tpl for="."><div class="x-combo-list-item"<p><b>CODIGO </b>{codigo}</p><p><b>NOMBRE </b><span style="color: mediumblue">{nombre_unidad}</span></p></div></tpl>',
-                    gwidth: 250,
-                    pageSize:50,
-                    anchor: '80%',
-                    lazyRender: true,
-                    listWidth:'380',
-                    renderer : function(value, p, record) {
-                        return String.format('{0}', record.data['nombre_unidad']);
-                    }
-                },
-                type:'ComboRec',
-                id_grupo:1,
-                filters:{
-                    pfiltro:'uni.nombre_unidad',
-                    type:'string'
-                },
-                grid:true,
-                form:true,
-                bottom_filter:true
-            },*/
+                    totalProperty: 'total',
+                    fields: ['id_funcionario','desc_funcionario1','descripcion_cargo','cargo_equipo'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'fu.desc_funcionario1', codigo:'RESP'}
+                }),
+                valueField: 'id_funcionario',
+                displayField: 'desc_funcionario1',
+                gdisplayField: 'desc_funcionario_destinatario',
+                hiddenName: 'id_destinatario',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,
+                anchor: '80%',
+                gwidth: 300,
+                minChars: 2,
+                renderer : function(value, p, record) {
+                    return String.format('<b>{0}</b>', record.data['desc_funcionario_destinatario']);
+                }
+            },
+            type: 'ComboBox',
+            id_grupo: 0,
+            filters: {pfiltro: 'vfc.desc_funcionario1',type: 'string'},
+            grid: true,
+            form: false
+        },
             {
                 config: {
                     name: 'id_uo',
@@ -299,7 +312,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     queryDelay: 1000,
                     anchor: '80%',
                     listWidth:'380',
-                    gwidth: 200,
+                    gwidth: 300,
                     minChars: 2,
                     renderer : function(value, p, record) {
                         return String.format('{0}', record.data['nombre_unidad']);
@@ -353,7 +366,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     queryDelay: 1000,
                     anchor: '80%',
                     listWidth:'380',
-                    gwidth: 200,
+                    gwidth: 300,
                     minChars: 2,
                     renderer : function(value, p, record) {
                         return String.format('{0}', record.data['desc_funcionario2']);
@@ -365,49 +378,6 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 grid: true,
                 form: true,
                 bottom_filter:true
-            },
-            {
-                config: {
-                    name: 'id_destinatario',
-                    fieldLabel: 'Destinatario',
-                    allowBlank: false,
-                    emptyText: 'Elija una opción...',
-                    store: new Ext.data.JsonStore({
-                        url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListFuncionario',
-                        id: 'id_funcionario',
-                        root: 'datos',
-                        sortInfo: {
-                            field: 'desc_funcionario1',
-                            direction: 'ASC'
-                        },
-                        totalProperty: 'total',
-                        fields: ['id_funcionario','desc_funcionario1','descripcion_cargo','cargo_equipo'],
-                        remoteSort: true,
-                        baseParams: {par_filtro: 'fu.desc_funcionario1', codigo:'RESP'}
-                    }),
-                    valueField: 'id_funcionario',
-                    displayField: 'desc_funcionario1',
-                    gdisplayField: 'desc_funcionario_destinatario',
-                    hiddenName: 'id_destinatario',
-                    forceSelection: true,
-                    typeAhead: false,
-                    triggerAction: 'all',
-                    lazyRender: true,
-                    mode: 'remote',
-                    pageSize: 15,
-                    queryDelay: 1000,
-                    anchor: '80%',
-                    gwidth: 200,
-                    minChars: 2,
-                    renderer : function(value, p, record) {
-                        return String.format('{0}', record.data['desc_funcionario_destinatario']);
-                    }
-                },
-                type: 'ComboBox',
-                id_grupo: 0,
-                filters: {pfiltro: 'vfc.desc_funcionario1',type: 'string'},
-                grid: true,
-                form: false
             },
             {
                 config:{
