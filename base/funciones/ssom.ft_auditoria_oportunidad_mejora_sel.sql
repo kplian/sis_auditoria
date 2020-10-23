@@ -186,15 +186,18 @@ BEGIN
 
 	elsif(p_transaccion='SSOM_AOMX2_SEL')then
 		begin
-			v_consulta:='select  eus.id_funcionario,
+			v_consulta:='select   eus.id_funcionario,
                                   fun.desc_funcionario1,
+                                  fun.codigo,
+                                  ger.nombre_unidad as gerencia,
                                   fun.descripcion_cargo,
                                   pa.valor_parametro as cargo_equipo
-                        from ssom.tequipo_auditores eus
-                        inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
-                        inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
-                        where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
-                        and pa.valor_parametro = ''Responsable'' and ';
+                          from ssom.tequipo_auditores eus
+                          inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
+                          inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
+                          inner join orga.tuo ger ON ger.id_uo = orga.f_get_uo_gerencia(fun.id_uo, NULL::integer, NULL::date)
+                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                          and pa.valor_parametro = ''Responsable'' and ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -213,11 +216,12 @@ BEGIN
 	elsif(p_transaccion='SSOM_AOMX2_CONT')then
 		begin
 
-			v_consulta:='select count(eus.id_funcionario)
+			v_consulta:=' select count(eus.id_funcionario)
                           from ssom.tequipo_auditores eus
                           inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
                           inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
-                          where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                          inner join orga.tuo ger ON ger.id_uo = orga.f_get_uo_gerencia(fun.id_uo, NULL::integer, NULL::date)
+                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
                           and pa.valor_parametro = ''Responsable'' and';
 
 			--Definicion de la respuesta
@@ -523,13 +527,13 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta
-			v_consulta:='select
-                            id_uo,
-                            nombre_unidad,
-                            codigo,
-                            id_nivel_organizacional as nivel_organizacional
-                            from orga.tuo
-                            where estado_reg = ''activo'' and';
+			v_consulta:='select   uo.id_uo,
+                                  uo.nombre_unidad,
+                                  uo.codigo,
+                                  n.numero_nivel
+                          from orga.tuo uo
+                          inner join orga.tnivel_organizacional n on n.id_nivel_organizacional = uo.id_nivel_organizacional
+                          where uo.estado_reg = ''activo'' and';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -553,12 +557,13 @@ BEGIN
 		begin
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(uo.id_uo)
-                            from orga.tuo as uo
-                            where estado_reg = ''activo''  and';
+                            from orga.tuo uo
+                            inner join orga.tnivel_organizacional n on n.id_nivel_organizacional = uo.id_nivel_organizacional
+                            where uo.estado_reg = ''activo''  and';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-
+			--raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 

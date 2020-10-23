@@ -282,10 +282,14 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
     }
     function getListUO(){
-        $this->objParam->defecto('ordenacion','id_nivel_organizacional');
+        $this->objParam->defecto('ordenacion','id_uo');
         $this->objParam->defecto('dir_ordenacion','asc');
+         if($this->objParam->getParametro('nivel')!='') {
+             $this->objParam->addFiltro("n.numero_nivel in (" . $this->objParam->getParametro('nivel') . ")");
+         }
         $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
         $this->res=$this->objFunc->getListUO($this->objParam);
+        
         if($this->objParam->getParametro('_adicionar')!=''){
             $respuesta = $this->res->getDatos();
             array_unshift ( $respuesta, array(  'id_uo'=>'0',

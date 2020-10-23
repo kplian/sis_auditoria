@@ -219,6 +219,8 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         //Definicion de la lista del resultado del query
         $this->captura('id_funcionario','int4');
         $this->captura('desc_funcionario1','text');
+        $this->captura('codigo','varchar');
+        $this->captura('gerencia','varchar');
         $this->captura('descripcion_cargo','varchar');
         $this->captura('cargo_equipo','varchar');
 

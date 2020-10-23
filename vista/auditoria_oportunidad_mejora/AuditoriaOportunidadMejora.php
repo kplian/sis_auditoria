@@ -230,19 +230,22 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:false
             },
-            {
+            /*{
                 config: {
                     name: 'id_uo',
                     baseParams: {
-                      estado_reg : 'activo'
+                        nivel: '0,1,2'
                     },
                     origen:'UO',
                     allowBlank:false,
                     fieldLabel:'Area',
                     gdisplayField:'nombre_unidad', //mapea al store del grid
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre_unidad}</p> </div></tpl>',
+                    tpl:'<tpl for="."><div class="x-combo-list-item"<p><b>CODIGO </b>{codigo}</p><p><b>NOMBRE </b><span style="color: mediumblue">{nombre_unidad}</span></p></div></tpl>',
                     gwidth: 250,
+                    pageSize:50,
                     anchor: '80%',
+                    lazyRender: true,
+                    listWidth:'380',
                     renderer : function(value, p, record) {
                         return String.format('{0}', record.data['nombre_unidad']);
                     }
@@ -256,11 +259,67 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:true,
                 bottom_filter:true
+            },*/
+            {
+                config: {
+                    name: 'id_uo',
+                    fieldLabel: 'Area',
+                    tinit:false,
+                    resizable:true,
+                    tasignacion:false,
+                    allowBlank: false,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListUO',
+                        id: 'id_uo',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'nombre_unidad',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_uo','nombre_unidad','codigo'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'uo.nombre_unidad#uo.codigo', nivel:'2,4'}
+                    }),
+                    valueField: 'id_uo',
+                    displayField: 'nombre_unidad',
+                    gdisplayField: 'nombre_unidad',
+                    hiddenName: 'id_uo',
+                    tpl:'<tpl for="."><div class="x-combo-list-item">' +
+                        '<p><b>NOMBRE </b><span style="color: mediumblue"><b>{nombre_unidad}</b></span></p> ' +
+                        '<p><b>CODIGO </b><span style="color: #533005"><b>{codigo}</b></span></p>' +
+                        '</div>' +
+                        '</tpl>',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '80%',
+                    listWidth:'380',
+                    gwidth: 200,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['nombre_unidad']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {pfiltro: 'df.desc_funcionario1',type: 'string'},
+                grid: true,
+                form: true,
+                bottom_filter:true
             },
             {
                 config: {
                     name: 'id_funcionario',
                     fieldLabel: 'Responsable',
+                    tinit:false,
+                    resizable:true,
+                    tasignacion:false,
                     allowBlank: false,
                     emptyText: 'Elija una opción...',
                     store: new Ext.data.JsonStore({
@@ -272,7 +331,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                             direction: 'ASC'
                         },
                         totalProperty: 'total',
-                        fields: ['id_funcionario','desc_funcionario1','descripcion_cargo','cargo_equipo'],
+                        fields: ['id_funcionario','desc_funcionario1','descripcion_cargo','cargo_equipo','codigo','gerencia'],
                         remoteSort: true,
                         baseParams: {par_filtro: 'fun.desc_funcionario1'}
                     }),
@@ -280,6 +339,12 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     displayField: 'desc_funcionario1',
                     gdisplayField: 'desc_funcionario2',
                     hiddenName: 'id_funcionario',
+                    tpl:'<tpl for="."><div class="x-combo-list-item">' +
+                        '<p><b>NOMBRE </b><span style="color: mediumblue"><b>{desc_funcionario1}</b></span></p> ' +
+                        '<p><b>CODIGO </b><span style="color: darkgreen"><b>{codigo}</b></span></p>' +
+                        '<p><b>CARGO </b><span style="color: brown"><b>{descripcion_cargo}</b></span></p>' +
+                        '</div>' +
+                        '</tpl>',
                     forceSelection: true,
                     typeAhead: false,
                     triggerAction: 'all',
@@ -288,6 +353,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     pageSize: 15,
                     queryDelay: 1000,
                     anchor: '80%',
+                    listWidth:'380',
                     gwidth: 200,
                     minChars: 2,
                     renderer : function(value, p, record) {
