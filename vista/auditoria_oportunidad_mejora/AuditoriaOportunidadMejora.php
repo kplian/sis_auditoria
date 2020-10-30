@@ -1040,13 +1040,13 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
         }
         return resultado;
     },
-    // west: {
-    //        url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/FormFiltro.php',
-    //        width: '30%',
-    //        title:'Filtros',
-    //        collapsed: true,
-    //        cls: 'FormFiltro'
-    // }
+   west: {
+          url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/FormFiltro.php',
+          width: '30%',
+          title:'Filtros',
+          collapsed: true,
+          cls: 'FormFiltro'
+   }
 }
 )
 </script>
