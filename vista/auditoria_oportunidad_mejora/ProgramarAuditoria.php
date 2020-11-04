@@ -32,9 +32,20 @@ header("content-type: text/javascript; charset=UTF-8");
         onButtonNew: function () {
             Phx.vista.ProgramarAuditoria.superclass.onButtonNew.call(this);
             this.Cmp.id_tipo_auditoria.setValue(1);
-            this.Cmp.axuliar.setValue('Estado :');
-            this.Cmp.nro_tramite_wf.setValue('0');
-            this.Cmp.estado_wf.setValue('Programada');
+            Ext.Ajax.request({
+                url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getCorrelativo',
+                params: {id_tipo_auditoria: 1},
+                success: function(resp){
+                    const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                    this.Cmp.nro_tramite.setValue(reg.ROOT.datos.correlativo);
+                    this.Cmp.axuliar.setValue('Estado :');
+                    this.Cmp.estado_wf.setValue('Programada');
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+
 
 
         },

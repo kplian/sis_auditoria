@@ -68,7 +68,9 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 		$this->captura('desc_funcionario_destinatario','text');
 		$this->captura('resumen','text');
         $this->captura('id_gestion','int4');
-		//Ejecuta la instruccion
+        $this->captura('nro_tramite','varchar');
+
+        //Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 
@@ -600,6 +602,22 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         $this->captura('desc_funcionario1','text');
         $this->captura('codigo','varchar');
         $this->captura('descripcion_cargo','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function getCorrelativo(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='ssom.ft_auditoria_oportunidad_mejora_ime';
+        $this->transaccion='SSOM_CORREL_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_tipo_auditoria','id_tipo_auditoria','int4');
 
         //Ejecuta la instruccion
         $this->armarConsulta();

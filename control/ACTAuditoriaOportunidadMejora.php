@@ -371,6 +371,11 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
         $this->res=$this->objFunc->listarFuncionarioVigentes($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+    function getCorrelativo(){
+        $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
+        $this->res=$this->objFunc->getCorrelativo($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

@@ -128,6 +128,15 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
     			form:true
     		},
             {
+    			config:{
+    					labelSeparator:'',
+    					inputType:'hidden',
+    					name: 'nro_tramite_wf'
+    			},
+    			type:'Field',
+    			form:true
+    		},
+            {
                 config:{
                     name: 'codigo_tpo_aom',
                     fieldLabel: 'Tipo',
@@ -147,7 +156,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
             },
             {
                 config:{
-                    name: 'nro_tramite_wf',
+                    name: 'nro_tramite',
                     fieldLabel: 'Codigo',
                     allowBlank: true,
                     width: 150,
@@ -157,7 +166,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     renderer:function(value, p, record){return String.format('<a style="cursor:pointer;">{0}</a>', value);},
                 },
                 type:'TextField',
-                filters:{pfiltro:'aom.nro_tramite_wf',type:'string'},
+                filters:{pfiltro:'aom.nro_tramite',type:'string'},
                 id_grupo: 6,
                 grid:true,
                 form:true,
@@ -846,7 +855,8 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
         {name:'nombre_estado', type: 'string'},
         {name:'id_destinatario', type: 'numeric'},
         {name:'desc_funcionario_destinatario', type: 'string'},
-        {name:'resumen', type: 'string'}
+        {name:'resumen', type: 'string'},
+        {name:'nro_tramite', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_aom',
