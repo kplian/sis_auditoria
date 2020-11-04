@@ -22,7 +22,8 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
         }
         if($this->objParam->getParametro('interfaz')== 'ProgramarAuditoria'){
 
-             $filtroInit = "aom.estado_wf in (''programada'',''aprobado_responsable'') and tau.codigo_tpo_aom = ''AETR''";
+             /*aom.estado_wf in (''programada'',''aprobado_responsable'') and */
+             $filtroInit = "tau.codigo_tpo_aom = ''AETR''";
 
             if ($this->objParam->getParametro('id_gestion') != '' ){
                 $filtroInit = "aom.id_gestion = ".$this->objParam->getParametro('id_gestion')."and tau.codigo_tpo_aom = ''AETR''";

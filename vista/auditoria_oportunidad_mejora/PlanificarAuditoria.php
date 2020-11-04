@@ -159,530 +159,532 @@ Phx.vista.PlanificarAuditoria = {
                baseParams: {dir:'ASC',sort:'id_cronograma',limit:'100',start:'0'}
          });
         const me = this;
-        const crorograma = new Ext.grid.GridPanel({
-                    layout: 'fit',
-                    store:  this.storeCronograma,
-                    region: 'center',
-                    split: true,
-                    border: false,
-                    plain: true,
-                    trackMouseOver: false,
-                    stripeRows: true,
-                    tbar: [{
-                        text:'<button class="btn"><i class="fa fa-plus fa-lg"></i>&nbsp;&nbsp;<b>Asignar</b></button>',
-                        scope: this,
-                        width: '100',
-                        handler: function() {
-                           me.formularioCroronograma(null);
-                           me.ventanaCroronograma.show();
-                        },
+
+        const procesos = new Ext.grid.GridPanel({
+            store:  this.storeProceso,
+            layout: 'fit',
+            region:'center',
+            anchor: '100%',
+            split: true,
+            border: false,
+            plain: true,
+            stripeRows: true,
+            trackMouseOver: false,
+            tbar: [
+                {
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'a',
+                        html: 'Asignar Procesos'
                     },
-                    {
-                        text:'<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Editar</b></button>',
-                        scope:this,
-                        width: '100',
-                        handler: function(){
-                           const s = crorograma.getSelectionModel().getSelections();
-                           if (s.length === 0) {
-                             alert('Selection un registro')
-                           }
-                           me.formularioCroronograma(s[0].data);
-                           me.ventanaCroronograma.show();
-                        }
-                    },
-                    {
-                        text: '<button class="btn"><i class="fa fa-trash fa-lg"></i>&nbsp;&nbsp;<b>Eliminar</b></button>',
-                        scope:this,
-                        width: '100',
-                        handler: function(){
-                          const  s = crorograma.getSelectionModel().getSelections();
-                            Phx.CP.loadingShow();
-                            Ext.Ajax.request({
-                                url: '../../sis_auditoria/control/Cronograma/eliminarCronograma',
-                                params: {
-                                    id_cronograma : s[0].data.id_cronograma
-                                },
-                                isUpload: false,
-                                success: function(a,b,c){
-                                    Phx.CP.loadingHide();
-                                    me.storeCronograma.load();
-                                },
-                                argument: this.argumentSave,
-                                failure: this.conexionFailure,
-                                timeout: this.timeout,
-                                scope: this
-                            })
+                    style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                    listeners: {
+                        render: function(component) {
+                            component.getEl().on('click', function(e) {
+                                me.formularioProceso();
+                                me.procesoVentana.show();
+                            });
                         }
                     }
-                  ],
+                }
+            ],
+            columns: [
+                new Ext.grid.RowNumberer(),
+                {
+                    header: 'Proceso',
+                    dataIndex: 'id_proceso',
+                    width: 300,
+                    sortable: false,
+                    renderer:function(value, p, record){return String.format('<a style="cursor:pointer;">{0}</a>', record.data['proceso']);},
+                },
+                {
+                    header: 'Responsable',
+                    dataIndex: 'desc_funcionario',
+                    width: 300,
+                    sortable: false,
+                    renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario']);},
+                },
+                {
+                    header: 'Estado Reg.',
+                    dataIndex: 'estado_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Creado por.',
+                    dataIndex: 'usr_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Fecha creación',
+                    dataIndex: 'fecha_reg',
+                    align: 'center',
+                    width: 110
+                }
+            ]
+        });
+        const responsable = new Ext.grid.GridPanel({
+            store:  this.storeEquipo,
+            layout: 'fit',
+            region:'center',
+            anchor: '100%',
+            split: true,
+            border: false,
+            plain: true,
+            stripeRows: true,
+            trackMouseOver: false,
+            tbar: [
+                {
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'a',
+                        html: 'Asignar Responsables'
+                    },
+                    style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                    listeners: {
+                        render: function(component) {
+                            component.getEl().on('click', function(e) {
+                                me.formularioEquipo();
+                                me.ventanaEquipo.show();
+                            });
+                        }
+                    }
+                }],
+            columns: [
+                new Ext.grid.RowNumberer(),
+                {
+                    header: 'Funcionario',
+                    dataIndex: 'id_funcionario',
+                    width: 280,
+                    sortable: false,
+                    renderer:function(value, p, record){return String.format('<a style="cursor:pointer;">{0}</a>', record.data['desc_funcionario1'])},
+                },
+                {
+                    header: 'Tipo Auditor',
+                    dataIndex: 'id_parametro',
+                    width: 200,
+                    sortable: false,
+                    renderer:function(value, p, record){return String.format('{0}', record.data['valor_parametro'])},
+                },
+                {
+                    header: 'Estado Reg.',
+                    dataIndex: 'estado_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Creado por.',
+                    dataIndex: 'usr_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Fecha creación',
+                    dataIndex: 'fecha_reg',
+                    align: 'center',
+                    width: 110
+                }
+            ]
+        })
+        const puntoNorma =  new Ext.grid.GridPanel({
+            store:  this.storePuntoNorma,
+            layout: 'fit',
+            region:'center',
+            anchor: '100%',
+            split: true,
+            border: false,
+            plain: true,
+            stripeRows: true,
+            trackMouseOver: false,
+            columns: [
+                new Ext.grid.RowNumberer(),
+                {
+                    header: 'Norma',
+                    dataIndex: 'id_norma',
+                    width: 150,
+                    sortable: false,
+                    renderer:function(value, p, record){
+                        let resultao = '';
+                        if(this.sigla !== record.data['sigla_norma']){
+                            resultao = String.format('<b>{0}</b>', record.data['sigla_norma']);
+                            this.sigla =  record.data['sigla_norma']
+                        }
+                        return resultao
+                    }
+                },
+                {
+                    header: 'Codigo',
+                    dataIndex: 'codigo_pn',
+                    width: 100,
+                    sortable: false,
+                    renderer:function(value, p, record){
+                        return String.format('<a style="cursor:pointer;" >{0}</a>', record.data['codigo_pn'])
+                    },
 
-                    columns: [
-                        new Ext.grid.RowNumberer(),
-                        {
-                             header: 'Actividad',
-                             dataIndex: 'id_actividad',
-                             width: 150,
-                             renderer:function(value, p, record){return String.format('{0}', record.data['actividad'])},
-                         },
-                         {
-                             header: 'Funcionarios',
-                             dataIndex: 'lista_funcionario',
-                             width: 210,
-                             renderer : function(value, p, record) {
-                                 return String.format('<div class="gridmultiline">{0}</div>', record.data['lista_funcionario']);
-                             }
-                         },
-                         {
-                             header: 'Fecha Inicio',
-                             dataIndex: 'fecha_ini_activ',
-                             align: 'center',
-                             width: 100,
-                             renderer:function (value,p,record){
-                                 const fecha = value.split("-");
-                                 return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
-                             }
-                         },
-                         {
-                             header: 'Fecha Fin',
-                             dataIndex: 'fecha_fin_activ',
-                             align: 'center',
-                             width: 100,
-                             renderer:function (value,p,record){
-                                 const fecha = value.split("-");
-                                 return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
-                             }
-                         },
-                         {
-                             header: 'Hora Inicio',
-                             dataIndex: 'hora_ini_activ',
-                             align: 'center',
-                             width: 100,
-                         },
-                         {
-                             header: 'Hora Fin',
-                             dataIndex: 'hora_fin_activ',
-                             align: 'center',
-                             width: 100,
-                         },
-                        {
-                                header: 'Estado Reg.',
-                                dataIndex: 'estado_reg',
-                                width: 100,
-                                sortable: false
-                        },
-                        {
-                            header: 'Creado por.',
-                            dataIndex: 'usr_reg',
-                            width: 100,
-                            sortable: false
-                        },
-                        {
-                            header: 'Fecha creación',
-                                dataIndex: 'fecha_reg',
-                            align: 'center',
-                            width: 110
-                        }]
-                });
+                },
+                {
+                    header: 'Punto de Norma',
+                    dataIndex: 'id_pn',
+                    width: 350,
+                    sortable: false,
+                    renderer:function(value, p, record){
+                        return String.format('<a style="cursor:pointer;">{0}</a>', record.data['nombre_pn'])
+                    },
+                },
+                {
+                    header: 'Estado Reg.',
+                    dataIndex: 'estado_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Creado por.',
+                    dataIndex: 'usr_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Fecha creación',
+                    dataIndex: 'fecha_reg',
+                    align: 'center',
+                    width: 110
+                }
+            ],
+            tbar: [
+                {
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'a',
+                        html: 'Asignar Puntos de Norma'
+                    },
+                    style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                    listeners: {
+                        render: function(component) {
+                            component.getEl().on('click', function(e) {
+                                me.formularioPuntoNorma();
+                                me.ventanaPuntoNorma.show();
+                            });
+                        }
+                    }
+                }]
+        });
+        const crorograma = new Ext.grid.GridPanel({
+            store:  this.storeCronograma,
+            trackMouseOver: false,
+            layout: 'fit',
+            region:'center',
+            anchor: '100%',
+            split: true,
+            border: false,
+            plain: true,
+            stripeRows: true,
+            tbar: [
+                {
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'a',
+                        html: 'Nueva Actividad'
+                    },
+                    style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                    listeners: {
+                        render: function(component) {
+                            component.getEl().on('click', function(e) {
+                                me.formularioCroronograma(null);
+                                me.ventanaCroronograma.show();
+                            });
+                        }
+                    }
+                }
+            ],
+            columns: [
+                new Ext.grid.RowNumberer(),
+                {
+                    header: 'Actividad',
+                    dataIndex: 'id_actividad',
+                    width: 140,
+                    renderer:function(value, p, record){
+                        return String.format('<a class="gridmultiline" style="cursor:pointer;">{0}</a>', record.data['actividad'])
+                    },
+                },
+                {
+                    header: 'Fecha',
+                    dataIndex: 'fecha_ini_activ',
+                    align: 'center',
+                    width: 100,
+                    renderer:function (value,p,record){
+                        const fecha = value.split("-");
+                        return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
+                    }
+                },
+                {
+                    header: 'Hora Inicio',
+                    dataIndex: 'hora_ini_activ',
+                    align: 'center',
+                    width: 80,
+                },
+                {
+                    header: 'Hora Fin',
+                    dataIndex: 'hora_fin_activ',
+                    align: 'center',
+                    width: 80,
+                },
+                {
+                    header: 'Funcionarios',
+                    dataIndex: 'lista_funcionario',
+                    width: 220,
+                    renderer : function(value, p, record) {
+                        return String.format('<div class="gridmultiline">{0}</div>', record.data['lista_funcionario']);
+                    }
+                },
+                {
+                    header: 'Eliminar',
+                    dataIndex: 'eliminar',
+                    width: 50,
+                    renderer : function(value, p, record) {
+                        return String.format('<a style="display: flex; justify-content: center; align-items: center"><i class="fa fa-trash fa-lg" style="cursor:pointer;"></i></a>', record.data['lista_funcionario']);
+                    }
+                },
+                {
+                    header: 'Estado Reg.',
+                    dataIndex: 'estado_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Creado por.',
+                    dataIndex: 'usr_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Fecha creación',
+                    dataIndex: 'fecha_reg',
+                    align: 'center',
+                    width: 110
+                }]
+        });
+        procesos.addListener('cellclick', this.oncellclick,this);
+        responsable.addListener('cellclick', this.oncellclick,this);
+        puntoNorma.addListener('cellclick', this.oncellclick,this);
+        crorograma.addListener('cellclick', this.oncellclick,this);
+
         this.form = new Ext.form.FormPanel({
              id: this.idContenedor + '_formulario_aud',
              items: [{ region: 'center',
                       layout: 'column',
                       border: false,
-                      autoScroll: true,
                       items: [{
                              xtype: 'tabpanel',
                              plain: true,
                              activeTab: 0,
                              height: 500,
+                             width: 700,
                              deferredRender: false,
-                             items: [{
-                                 title: 'Datos Principales',
-                                 layout: 'form',
-                                 defaults: {width: 750},
-                                 autoScroll: true,
-                                 defaultType: 'textfield',
-                                 items: [
-                                   new Ext.form.FieldSet({
-                                        collapsible: false,
-                                        border:false,
-                                        items: [
-                                        new Ext.form.FieldSet({
-                                            collapsible: false,
-                                            border: true,
-                                            layout: 'form',
-                                            defaults: {width: 550},
-                                            items: [
-                                                {
-                                                    xtype: 'field',
-                                                    fieldLabel: 'Código',
-                                                    name: 'nro_tramite_wf',
-                                                    anchor: '100%',
-                                                    readOnly: true,
-                                                    id: this.idContenedor + '_nro_tramite_wf',
-                                                    style: 'background-image: none;'
-                                                },
-                                                {
-                                                    xtype: 'field',
-                                                    fieldLabel: 'Area',
-                                                    name: 'nombre_unidad',
-                                                    anchor: '100%',
-                                                    readOnly: true,
-                                                    id: this.idContenedor + '_nombre_unidad',
-                                                    style: 'background-image: none;'
-                                                },
-                                                {
-                                                    xtype: 'field',
-                                                    fieldLabel: 'Nombre',
-                                                    name: 'nombre_aom1',
-                                                    anchor: '100%',
-                                                    readOnly: true,
-                                                    id: this.idContenedor + '_nombre_aom1',
-                                                    style: 'background-image: none;'
-                                                },
-                                            ]
-                                            }),
-                                            new Ext.form.FieldSet({
-                                                collapsible: false,
-                                                border: true,
-                                                layout: 'form',
-                                                defaults: {width: 750},
-                                                items: [
-                                                        {
-                                                            xtype: 'field',
-                                                            fieldLabel: '*Lugar',
-                                                            name: 'lugar',
-                                                            anchor: '100%',
-                                                            allowBlank: false,
-                                                            id: this.idContenedor+'_lugar'
-                                                        },
-                                                        {
-                                                            xtype: 'combo',
-                                                            fieldLabel: '*Tipo de Auditoria',
-                                                            name: 'id_tnorma',
-                                                            allowBlank: false,
-                                                            id: this.idContenedor+'_id_tnorma',
-                                                            emptyText: 'Elija una opción...',
-                                                            store: new Ext.data.JsonStore({
-                                                                url: '../../sis_auditoria/control/Parametro/listarParametro',
-                                                                id: 'id_parametro',
-                                                                root: 'datos',
-                                                                fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
-                                                                totalProperty: 'total',
-                                                                sortInfo: {
-                                                                    field: 'valor_parametro',
-                                                                    direction: 'ASC'
-                                                                },
-                                                                baseParams:{
-                                                                    tipo_parametro:'TIPO_NORMA',
-                                                                    par_filtro:'prm.id_tipo_parametro'
-                                                                }
-                                                            }),
-                                                            valueField: 'id_parametro',
-                                                            displayField: 'valor_parametro',
-                                                            gdisplayField: 'desc_tipo_norma',
-                                                            hiddenName: 'id_parametro',
-                                                            mode: 'remote',
-                                                            triggerAction: 'all',
-                                                            lazyRender: true,
-                                                            pageSize: 15,
-                                                            minChars: 2,
-                                                            anchor: '100%'
-                                                        },
-                                                        {
-                                                            xtype: 'combo',
-                                                            fieldLabel: '*Objeto Auditoria',
-                                                            name: 'id_tobjeto',
-                                                            allowBlank: false,
-                                                            id: this.idContenedor+'_id_tobjeto',
-                                                            emptyText: 'Elija una opción...',
-                                                            store: new Ext.data.JsonStore({
-                                                                url: '../../sis_auditoria/control/Parametro/listarParametro',
-                                                                id: 'id_parametro',
-                                                                root: 'datos',
-                                                                fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
-                                                                totalProperty: 'total',
-                                                                sortInfo: {
-                                                                    field: 'valor_parametro',
-                                                                    direction: 'ASC'
-                                                                },
-                                                                baseParams:{
-                                                                    tipo_parametro:'OBJETO_AUDITORIA',
-                                                                    par_filtro:'prm.id_parametro'
-                                                                }
-                                                            }),
-                                                            valueField: 'id_parametro',
-                                                            displayField: 'valor_parametro',
-                                                            gdisplayField: 'desc_tipo_objeto',
-                                                            mode: 'remote',
-                                                            triggerAction: 'all',
-                                                            lazyRender: true,
-                                                            pageSize: 15,
-                                                            minChars: 2,
-                                                            anchor: '100%'
-                                                        },
-                                                    {
-                                                            xtype: 'datefield',
-                                                            fieldLabel: 'Inicio Prev',
-                                                            name: 'fecha_prev_inicio',
-                                                            disabled: false,
-                                                            anchor: '100%',
-                                                            id: this.idContenedor+'_fecha_prev_inicio'
-                                                        },
-                                                        {
-                                                            xtype: 'datefield',
-                                                            fieldLabel: 'Fin Prev',
-                                                            name: 'fecha_prev_fin',
-                                                            disabled: false,
-                                                            anchor: '100%',
-                                                            id: this.idContenedor+'_fecha_prev_fin'
-                                                        },
-                                                        {
-                                                            xtype: 'datefield',
-                                                            fieldLabel: '*Inicio Real',
-                                                            name: 'fecha_prog_inicio',
-                                                            disabled: false,
-                                                            anchor: '100%',
-                                                            id: this.idContenedor+'_fecha_prog_inicio'
-                                                        },
-                                                        {
-                                                            xtype: 'datefield',
-                                                            fieldLabel: '*Fin Real',
-                                                            name: 'fecha_prog_fin',
-                                                            disabled: false,
-                                                            anchor: '100%',
-                                                            id: this.idContenedor+'_fecha_prog_fin'
-                                                        },
+                             autoScroll: false,
+                             items: [
+                                 {
+                                     title: 'Datos Principales',
+                                     layout: 'fit',
+                                     defaultType: 'textfield',
+                                     items: [
+                                         new Ext.form.FieldSet({
+                                             collapsible: false,
+                                             border:false,
+                                             items: [
+                                                 new Ext.form.FieldSet({
+                                                     collapsible: false,
+                                                     border: true,
+                                                     layout: 'form',
+                                                     width: 500,
+                                                     autoScroll: true,
+                                                     // defaults: {width: 550},
+                                                     items: [
+                                                         {
+                                                             xtype: 'field',
+                                                             fieldLabel: 'Código',
+                                                             name: 'nro_tramite_wf',
+                                                             anchor: '100%',
+                                                             disabled: true,
+                                                             id: this.idContenedor + '_nro_tramite_wf',
+                                                             // style: 'background-image: none;'
+                                                         },
+                                                         {
+                                                             xtype: 'field',
+                                                             fieldLabel: 'Area',
+                                                             name: 'nombre_unidad',
+                                                             anchor: '100%',
+                                                             disabled: true,
+                                                             id: this.idContenedor + '_nombre_unidad',
+                                                             // style: 'background-image: none;'
+                                                         },
+                                                         {
+                                                             xtype: 'field',
+                                                             fieldLabel: 'Nombre',
+                                                             name: 'nombre_aom1',
+                                                             anchor: '100%',
+                                                             disabled: true,
+                                                             id: this.idContenedor + '_nombre_aom1',
+                                                             // style: 'background-image: none;'
+                                                         },
+                                                     ]
+                                                 }),
+                                                 new Ext.form.FieldSet({
+                                                     collapsible: false,
+                                                     border: true,
+                                                     layout: 'form',
+                                                     width: 500,
+                                                     // defaults: {width: 550},
+                                                     items: [
+                                                         {
+                                                             xtype: 'field',
+                                                             fieldLabel: '*Lugar',
+                                                             name: 'lugar',
+                                                             anchor: '100%',
+                                                             allowBlank: false,
+                                                             id: this.idContenedor+'_lugar'
+                                                         },
+                                                         {
+                                                             xtype: 'combo',
+                                                             fieldLabel: '*Tipo de Auditoria',
+                                                             name: 'id_tnorma',
+                                                             allowBlank: false,
+                                                             id: this.idContenedor+'_id_tnorma',
+                                                             emptyText: 'Elija una opción...',
+                                                             store: new Ext.data.JsonStore({
+                                                                 url: '../../sis_auditoria/control/Parametro/listarParametro',
+                                                                 id: 'id_parametro',
+                                                                 root: 'datos',
+                                                                 fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                                                                 totalProperty: 'total',
+                                                                 sortInfo: {
+                                                                     field: 'valor_parametro',
+                                                                     direction: 'ASC'
+                                                                 },
+                                                                 baseParams:{
+                                                                     tipo_parametro:'TIPO_NORMA',
+                                                                     par_filtro:'prm.id_tipo_parametro'
+                                                                 }
+                                                             }),
+                                                             valueField: 'id_parametro',
+                                                             displayField: 'valor_parametro',
+                                                             gdisplayField: 'desc_tipo_norma',
+                                                             hiddenName: 'id_parametro',
+                                                             mode: 'remote',
+                                                             triggerAction: 'all',
+                                                             lazyRender: true,
+                                                             pageSize: 15,
+                                                             minChars: 2,
+                                                             anchor: '100%'
+                                                         },
+                                                         {
+                                                             xtype: 'combo',
+                                                             fieldLabel: '*Objeto Auditoria',
+                                                             name: 'id_tobjeto',
+                                                             allowBlank: false,
+                                                             id: this.idContenedor+'_id_tobjeto',
+                                                             emptyText: 'Elija una opción...',
+                                                             store: new Ext.data.JsonStore({
+                                                                 url: '../../sis_auditoria/control/Parametro/listarParametro',
+                                                                 id: 'id_parametro',
+                                                                 root: 'datos',
+                                                                 fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                                                                 totalProperty: 'total',
+                                                                 sortInfo: {
+                                                                     field: 'valor_parametro',
+                                                                     direction: 'ASC'
+                                                                 },
+                                                                 baseParams:{
+                                                                     tipo_parametro:'OBJETO_AUDITORIA',
+                                                                     par_filtro:'prm.id_parametro'
+                                                                 }
+                                                             }),
+                                                             valueField: 'id_parametro',
+                                                             displayField: 'valor_parametro',
+                                                             gdisplayField: 'desc_tipo_objeto',
+                                                             mode: 'remote',
+                                                             triggerAction: 'all',
+                                                             lazyRender: true,
+                                                             pageSize: 15,
+                                                             minChars: 2,
+                                                             anchor: '100%'
+                                                         },
+                                                         {
+                                                             xtype: 'datefield',
+                                                             fieldLabel: 'Inicio Prev',
+                                                             name: 'fecha_prev_inicio',
+                                                             disabled: true,
+                                                             anchor: '100%',
+                                                             id: this.idContenedor+'_fecha_prev_inicio'
+                                                         },
+                                                         {
+                                                             xtype: 'datefield',
+                                                             fieldLabel: 'Fin Prev',
+                                                             name: 'fecha_prev_fin',
+                                                             disabled: true,
+                                                             anchor: '100%',
+                                                             id: this.idContenedor+'_fecha_prev_fin'
+                                                         },
+                                                         {
+                                                             xtype: 'datefield',
+                                                             fieldLabel: '*Inicio Real',
+                                                             name: 'fecha_prog_inicio',
+                                                             disabled: false,
+                                                             anchor: '100%',
+                                                             id: this.idContenedor+'_fecha_prog_inicio'
+                                                         },
+                                                         {
+                                                             xtype: 'datefield',
+                                                             fieldLabel: '*Fin Real',
+                                                             name: 'fecha_prog_fin',
+                                                             disabled: false,
+                                                             anchor: '100%',
+                                                             id: this.idContenedor+'_fecha_prog_fin'
+                                                         },
 
-                                                 ]
-                                            })
-                                        ]
-                                      })
+                                                     ]
+                                                 })
+                                             ]
+                                         })
                                      ]
-                            },
-                            {
-                                 title: 'Procesos',
-                                 layout: 'fit',
-                                 defaults: {width: 400},
-                                 items: [
-                                   new Ext.grid.GridPanel({
-                                               layout: 'fit',
-                                               store:  this.storeProceso,
-                                               region: 'center',
-                                               trackMouseOver: false,
-                                               split: true,
-                                               border: false,
-                                               plain: true,
-                                               plugins: [],
-                                               stripeRows: true,
-                                               loadMask: true,
-                                               tbar: [{
-                                                 text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar / Designar Procesos Auditables</b></button>',
-                                                   scope: this,
-                                                   width: '100',
-                                                   handler: function() {
-                                                      me.formularioProceso();
-                                                      me.procesoVentana.show();
-                                                   }
-                                               }],
-                                               columns: [
-                                                   new Ext.grid.RowNumberer(),
-                                                   {
-                                                       header: 'Proceso',
-                                                       dataIndex: 'id_proceso',
-                                                       width: 300,
-                                                       sortable: false,
-                                                       renderer:function(value, p, record){return String.format('{0}', record.data['proceso']);},
-                                                   },
-                                                   {
-                                                       header: 'Responsable',
-                                                       dataIndex: 'desc_funcionario',
-                                                       width: 300,
-                                                       sortable: false,
-                                                       renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario']);},
-                                                   },
-                                                   {
-                                                       header: 'Estado Reg.',
-                                                       dataIndex: 'estado_reg',
-                                                       width: 100,
-                                                       sortable: false
-                                                   },
-                                                   {
-                                                       header: 'Creado por.',
-                                                       dataIndex: 'usr_reg',
-                                                       width: 100,
-                                                       sortable: false
-                                                   },
-                                                   {
-                                                       header: 'Fecha creación',
-                                                       dataIndex: 'fecha_reg',
-                                                       align: 'center',
-                                                       width: 110
-                                                   }
-                                               ]
-                                           })
-                                 ]
-                             },
-                             {
-                                 title: 'Responsables',
-                                 layout: 'fit',
-                                  region:'center',
-                                 items: [
-                                   new Ext.grid.GridPanel({
-                                               layout: 'fit',
-                                               store:  this.storeEquipo,
-                                               region: 'center',
-                                               split: true,
-                                               border: false,
-                                               plain: true,
-                                               plugins: [],
-                                               stripeRows: true,
-                                               trackMouseOver: false,
-                                               tbar: [{
-                                                 text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar / Designar</b></button>',
-                                                   scope: this,
-                                                   width: '100',
-                                                   handler: function() {
-                                                      me.formularioEquipo();
-                                                      me.ventanaEquipo.show();
-                                                   }
-                                               }],
-                                               columns: [
-                                                   new Ext.grid.RowNumberer(),
-                                                   {
-                                                        header: 'Tipo Auditor',
-                                                        dataIndex: 'id_parametro',
-                                                        width: 100,
-                                                        sortable: false,
-                                                        renderer:function(value, p, record){return String.format('{0}', record.data['valor_parametro'])},
-                                                    },
-                                                    {
-                                                        header: 'Funcionario',
-                                                        dataIndex: 'id_funcionario',
-                                                        width: 200,
-                                                        sortable: false,
-                                                        renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario1'])},
-                                                    },
-                                                    {
-                                                        header: 'Interno',
-                                                        dataIndex: 'id_funcionario_interno',
-                                                        width: 150,
-                                                        sortable: false,
-                                                    },
-                                                    {
-                                                       header: 'Externo',
-                                                       dataIndex: 'exp_tec_externo',
-                                                       width: 150,
-                                                       sortable: false,
-                                                    },
-                                                    {
-                                                       header: 'Estado Reg.',
-                                                       dataIndex: 'estado_reg',
-                                                       width: 100,
-                                                       sortable: false
-                                                    },
-                                                    {
-                                                       header: 'Creado por.',
-                                                       dataIndex: 'usr_reg',
-                                                       width: 100,
-                                                       sortable: false
-                                                    },
-                                                    {
-                                                       header: 'Fecha creación',
-                                                       dataIndex: 'fecha_reg',
-                                                       align: 'center',
-                                                       width: 110
-                                                    }
-                                               ]
-                                           })
-                                 ]
-                             },
-                             {
-                                 title: 'Punto de Norma',
-                                 layout: 'fit',
-                                 region:'center',
-                                 items: [
-                                   new Ext.grid.GridPanel({
-                                               layout: 'fit',
-                                               store:  this.storePuntoNorma,
-                                               region:  'center',
-                                               margins: '3 3 3 0',
-                                               trackMouseOver: false,
-                                               columns: [
-                                                   new Ext.grid.RowNumberer(),
-                                                   {
-                                                      header: 'Norma',
-                                                      dataIndex: 'id_norma',
-                                                      width: 150,
-                                                      sortable: false,
-                                                      renderer:function(value, p, record){
-                                                          let resultao = '';
-                                                          if(this.sigla !== record.data['sigla_norma']){
-                                                              resultao = String.format('<b>{0}</b>', record.data['sigla_norma']);
-                                                              this.sigla =  record.data['sigla_norma']
-                                                          }
-                                                          return resultao
-                                                      }
-                                                  },
-                                                   {
-                                                       header: 'Codigo',
-                                                       dataIndex: 'codigo_pn',
-                                                       width: 100,
-                                                       sortable: false,
-                                                       renderer:function(value, p, record){
-                                                           return String.format('<span>{0}</span>', record.data['codigo_pn'])
-                                                       },
-
-                                                   },
-                                                  {
-                                                      header: 'Punto de Norma',
-                                                      dataIndex: 'id_pn',
-                                                      width: 350,
-                                                      sortable: false,
-                                                      renderer:function(value, p, record){
-                                                          return String.format('<span>{0}</span>', record.data['nombre_pn'])
-                                                      },
-                                                  },
-                                                   {
-                                                       header: 'Estado Reg.',
-                                                       dataIndex: 'estado_reg',
-                                                       width: 100,
-                                                       sortable: false
-                                                   },
-                                                   {
-                                                       header: 'Creado por.',
-                                                       dataIndex: 'usr_reg',
-                                                       width: 100,
-                                                       sortable: false
-                                                   },
-                                                   {
-                                                       header: 'Fecha creación',
-                                                       dataIndex: 'fecha_reg',
-                                                       align: 'center',
-                                                       width: 110
-                                                   }
-                                               ],
-                                                tbar: [{
-                                                    text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar / Designar</b></button>',
-                                                    scope: this,
-                                                    width: '100',
-                                                    handler: function() {
-                                                        me.formularioPuntoNorma();
-                                                        me.ventanaPuntoNorma.show();
-                                                    }
-                                                }]
-                                })
-                                 ]
-                             },
+                                 },
+                                 {
+                                     title: 'Procesos',
+                                     layout: 'fit',
+                                     items: [
+                                         procesos
+                                     ]
+                                 },
+                                 {
+                                     title: 'Responsables',
+                                     layout: 'fit',
+                                     region:'center',
+                                     items: [
+                                         responsable
+                                     ]
+                                 },
+                                 {
+                                     title: 'Punto de Norma',
+                                     layout: 'fit',
+                                     region:'center',
+                                     items: [
+                                         puntoNorma
+                                     ]
+                                 },
                                  {
                                      title: 'Lista de Verificación',
                                      layout: 'fit',
                                      region:'center',
                                      items: [
                                          new Ext.grid.GridPanel({
-                                             layout: 'fit',
                                              store:  this.storePregunta,
-                                             region:  'center',
-                                             margins: '3 3 3 0',
+                                             layout: 'fit',
+                                             region:'center',
+                                             anchor: '100%',
+                                             split: true,
+                                             border: false,
+                                             plain: true,
+                                             stripeRows: true,
                                              trackMouseOver: false,
                                              columns: [
                                                  new Ext.grid.RowNumberer(),
@@ -698,14 +700,14 @@ Phx.vista.PlanificarAuditoria = {
                                                      dataIndex: 'id_pn',
                                                      width: 300,
                                                      sortable: false,
-                                                     renderer:function(value, p, record){return String.format('{0}', record.data['nombre_pn'])},
+                                                     renderer:function(value, p, record){return String.format('<a>{0}</a>', record.data['nombre_pn'])},
                                                  },
                                                  {
                                                      header: 'Pregunta',
                                                      dataIndex: 'id_pregunta',
                                                      width: 300,
                                                      sortable: false,
-                                                     renderer:function(value, p, record){return String.format('{0}', record.data['descrip_pregunta'])},
+                                                     renderer:function(value, p, record){return String.format('<a>{0}</a>', record.data['descrip_pregunta'])},
                                                  },
                                                  {
                                                      header: 'Estado Reg.',
@@ -726,45 +728,53 @@ Phx.vista.PlanificarAuditoria = {
                                                      width: 110
                                                  }
                                              ],
-
-                                             tbar: [{
-                                                 text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar / Designar</b></button>',
-                                                 scope: this,
-                                                 width: '100',
-                                                 handler: function() {
-                                                     me.formularioPregunta();
-                                                     me.ventanaPregunta.show();
-                                                 }
-                                             }]
+                                             tbar: [
+                                                 {
+                                                     xtype: 'box',
+                                                     autoEl: {
+                                                         tag: 'a',
+                                                         html: 'Asignar Preguntas'
+                                                     },
+                                                     style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                                                     listeners: {
+                                                         render: function(component) {
+                                                             component.getEl().on('click', function(e) {
+                                                                 me.formularioPregunta();
+                                                                 me.ventanaPregunta.show();
+                                                             });
+                                                         }
+                                                     }
+                                                 }]
                                          })
                                      ]
                                  },
-                             {
-                                 title: 'Cronograma',
-                                 layout: 'fit',
-                                 region:'center',
-                                 items: [
-                                   crorograma
-                                 ]
-                             }
+                                 {
+                                     title: 'Cronograma',
+                                     layout: 'fit',
+                                     region:'center',
+                                     items: [
+                                         crorograma
+                                     ]
+                                 }
                            ]
                          }]
                      }],
-             padding: this.paddingForm,
-             bodyStyle: this.bodyStyleForm,
-             border: this.borderForm,
-             frame: this.frameForm,
+             // padding: this.paddingForm,
+             // bodyStyle: this.bodyStyleForm,
+             // border: this.borderForm,
+             // frame: this.frameForm,
              autoDestroy: true,
              autoScroll: true,
              region: 'center'
         });
         this.formularioVentana = new Ext.Window({
-            width: 860,
-            height: 580,
+           width: 730,
+           height: 590,
            modal: true,
+           autoScroll: true,
            closeAction: 'hide',
            labelAlign: 'top',
-           title: 'Auditoria Planificacion',
+           title: 'AUDITORIA PLANIFICADA',
            bodyStyle: 'padding:5px',
            layout: 'border',
            items: [
@@ -846,15 +856,14 @@ Phx.vista.PlanificarAuditoria = {
     formularioProceso:function(){
         const maestro = this.sm.getSelected().data;
         const isForm = new Ext.form.FormPanel({
-          // id: this.idContenedor + '_formulario_proceso',
             items: [{
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
                         name: 'nro_tramite_wf',
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
-                        readOnly :true,
-                        style: 'background-image: none;'
+                        disabled :true,
+                        // style: 'background-image: none;'
                     },
                     {
                           xtype: 'field',
@@ -862,12 +871,13 @@ Phx.vista.PlanificarAuditoria = {
                           name: 'nombre_aom1',
                           anchor: '100%',
                           value: maestro.nombre_aom1,
-                          readOnly :true,
-                          style: 'background-image: none;'
+                          disabled :true,
+                          // style: 'background-image: none;'
                     },
                     {
                             anchor: '100%',
                             bodyStyle: 'padding:10px;',
+                            title: 'PROCESOS ASIGNADOS A ESTA AUDITORIA',
                             items:[{
                                 xtype: 'itemselector',
                                 name: 'id_proceso',
@@ -884,16 +894,12 @@ Phx.vista.PlanificarAuditoria = {
                                         url: '../../sis_auditoria/control/Proceso/listarProceso',
                                         id: 'id_proceso',
                                         root: 'datos',
-                                        sortInfo: {
-                                            field: 'proceso',
-                                            direction: 'ASC'
-                                        },
                                         totalProperty: 'total',
                                         fields: ['id_proceso', 'proceso'],
                                         remoteSort: true,
                                         autoLoad: true,
                                         baseParams: { dir:'ASC',
-                                                      sort:'id_aom',
+                                                      sort:'id_proceso',
                                                       limit:'100',
                                                       start:'0',
                                                       item : maestro.id_aom
@@ -926,7 +932,7 @@ Phx.vista.PlanificarAuditoria = {
                                         remoteSort: true,
                                         autoLoad: true,
                                         baseParams: { dir:'ASC',
-                                                      sort:'id_aom',
+                                                      sort:'id_proceso',
                                                       limit:'100',
                                                       start:'0',
                                                       id_aom: maestro.id_aom
@@ -955,11 +961,12 @@ Phx.vista.PlanificarAuditoria = {
        });
         this.procesoVentana = new Ext.Window({
          width: 700,
-         height: 400,
+         height: 450,
          modal: true,
+         autoScroll:true,
          closeAction: 'hide',
          labelAlign: 'bottom',
-         title: 'Selección de Procesos Auditables',
+         title: 'SELECCIÓN DE PROCESOS AUDITABLES',
          bodyStyle: 'padding:5px',
          layout: 'form',
          items: [
@@ -990,13 +997,10 @@ Phx.vista.PlanificarAuditoria = {
                            },
                            isUpload: false,
                            success: function(a,b,c){
-
-                               // this.store.rejectChanges();
                                Phx.CP.loadingHide();
-                               // isForm.getForm().findField('id_proceso').reset()
-                               this.procesoVentana.hide();
                                this.storeProceso.load();
-                            //   isForm.destroy();
+                               isForm.getForm().findField('id_proceso').multiselects[0].store.load();
+                               isForm.getForm().findField('id_proceso').multiselects[1].store.load();
                            },
                            argument: this.argumentSave,
                            failure: this.conexionFailure,
@@ -1007,28 +1011,27 @@ Phx.vista.PlanificarAuditoria = {
              scope: this
              },
              {
-             text: 'Declinar',
+             text: 'Cerrar',
              handler: function() {
                  this.procesoVentana.hide();
+                 this.storeProceso.load();
              },
              scope: this
          }]
       });
     },
     formularioEquipo:function(){
-      Phx.CP.loadingShow();
-      const maestro = this.sm.getSelected().data;
-      const me = this;
-      const isForm = new Ext.form.FormPanel({
-            id: this.idContenedor + '_formulario_proceso',
+        Phx.CP.loadingShow();
+        const maestro = this.sm.getSelected().data;
+        const me = this;
+        const isForm = new Ext.form.FormPanel({
             items: [{
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
                         name: 'nro_tramite_wf',
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
-                        readOnly :true,
-                        style: 'background-image: none;'
+                        disabled :true,
                     },
                     {
                           xtype: 'field',
@@ -1036,12 +1039,11 @@ Phx.vista.PlanificarAuditoria = {
                           name: 'nombre_aom1',
                           anchor: '100%',
                           value: maestro.nombre_aom1,
-                          readOnly :true,
-                          style: 'background-image: none;'
+                          disabled :true,
                     },
                     {
                                xtype: 'combo',
-                               fieldLabel: 'Responsable',
+                               fieldLabel: 'Auditor Responsable',
                                name: 'id_responsable',
                                allowBlank: false,
                                emptyText: 'Elija una opción...',
@@ -1069,9 +1071,10 @@ Phx.vista.PlanificarAuditoria = {
                                pageSize: 15,
                                minChars: 2,
                       },
-                      {
+                    {
                             anchor: '100%',
                             bodyStyle: 'padding:10px;',
+                            title: 'EQUIPO DE AUDITORES',
                             items:[{
                                 xtype: 'itemselector',
                                 name: 'id_equipo_auditor',
@@ -1088,10 +1091,10 @@ Phx.vista.PlanificarAuditoria = {
                                         url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListAuditores',
                                         id: 'id_funcionario',
                                         root: 'datos',
-                                        sortInfo: {
+                                        /*sortInfo: {
                                           field: 'desc_funcionario1',
                                           direction: 'DESC'
-                                        },
+                                        },*/
                                         totalProperty: 'total',
                                         fields: ['id_funcionario', 'desc_funcionario1'],
                                         remoteSort: true,
@@ -1138,36 +1141,54 @@ Phx.vista.PlanificarAuditoria = {
                                 }]
                             }]
                         },
-                        {
-                                   xtype: 'combo',
-                                   fieldLabel: 'Interno',
-                                   name: 'id_interno',
-                                   allowBlank: false,
-                                   emptyText: 'Elija una opción...',
-                                   store: new Ext.data.JsonStore({
-                                           url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarFuncionarioVigentes',
-                                           id: 'id_funcionario',
-                                           root: 'datos',
-                                           sortInfo: {
-                                             field: 'desc_funcionario1',
-                                             direction: 'DESC'
-                                           },
-                                           totalProperty: 'total',
-                                           fields: ['id_funcionario', 'desc_funcionario1'],
-                                           remoteSort: true,
-                                           baseParams: {par_filtro: 'fc.desc_funcionario1'}
-                                   }),
-                                   valueField: 'id_funcionario',
-                                   displayField: 'desc_funcionario1',
-                                   gdisplayField: 'desc_funcionario1',
-                                   hiddenName: 'id_funcionario',
-                                   mode: 'remote',
-                                   anchor: '100%',
-                                   triggerAction: 'all',
-                                   lazyRender: true,
-                                   pageSize: 15,
-                                   minChars: 2
-                          }
+                    {
+                            xtype: 'radiogroup',
+                            name : 'tecnico',
+                            fieldLabel : 'Experto Técnico',
+                            itemCls: 'x-check-group-alt',
+                            items: [
+                                {boxLabel: 'Interno', name: 'tecnico', inputValue: 'interno', checked: true},
+                                {boxLabel: 'Externo', name: 'tecnico', inputValue: 'externo'}
+                            ]
+                        },
+                    {
+                           xtype: 'combo',
+                           name: 'id_interno',
+                           fieldLabel: 'Interno',
+                           allowBlank: true,
+                           emptyText: 'Elija una opción...',
+                           store: new Ext.data.JsonStore({
+                                   url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarFuncionarioVigentes',
+                                   id: 'id_funcionario',
+                                   root: 'datos',
+                                   sortInfo: {
+                                     field: 'desc_funcionario1',
+                                     direction: 'DESC'
+                                   },
+                                   totalProperty: 'total',
+                                   fields: ['id_funcionario', 'desc_funcionario1'],
+                                   remoteSort: true,
+                                   baseParams: {par_filtro: 'fc.desc_funcionario1'}
+                           }),
+                           valueField: 'id_funcionario',
+                           displayField: 'desc_funcionario1',
+                           gdisplayField: 'desc_funcionario1',
+                           hiddenName: 'id_funcionario',
+                           mode: 'remote',
+                           anchor: '100%',
+                           triggerAction: 'all',
+                           lazyRender: true,
+                           pageSize: 15,
+                           minChars: 2,
+                           disabled : false
+                    },
+                    {
+                            xtype: 'field',
+                            fieldLabel: 'Externo',
+                            name: 'externo',
+                            anchor: '100%',
+                            disabled : true
+                    },
                     ],
           padding: this.paddingForm,
           bodyStyle: this.bodyStyleForm,
@@ -1176,52 +1197,64 @@ Phx.vista.PlanificarAuditoria = {
           autoDestroy: true,
           autoScroll: true,
           region: 'center'
-
        });
-      Ext.Ajax.request({
+
+        Ext.Ajax.request({
           url:'../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
           params:{  dir:'ASC',
                     sort:'id_aom',
                     limit:'100',
                     start:'0',
-                    id_aom:maestro.id_aom,
-                    codigo_parametro : 'RESP'
+                    id_aom:maestro.id_aom
                    },
           success:function(resp){
               const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-              isForm.getForm().items.items[2].setValue(reg.datos[0].id_funcionario);
-              isForm.getForm().items.items[2].setRawValue(reg.datos[0].desc_funcionario1);
+              const  record = reg.datos;
+              for (const value  of record) {
+                  if (value.codigo_parametro === 'RESP'){
+                     isForm.getForm().items.items[2].setValue(value.id_funcionario);
+                     isForm.getForm().items.items[2].setRawValue(value.desc_funcionario1);
+                  }
+                  if (value.codigo_parametro === 'ETI'){
+                      isForm.getForm().items.items[5].setValue(value.id_funcionario);
+                      isForm.getForm().items.items[5].setRawValue(value.desc_funcionario1);
+                  }
+                  if (value.codigo_parametro === 'EXT'){
+                      isForm.getForm().items.items[4].items.items[1].setValue(true);
+                      setTimeout(() => {
+                          isForm.getForm().items.items[6].setValue(value.exp_tec_externo);
+                      }, 1000)
+                  }
+              }
               Phx.CP.loadingHide();
           },
           failure: this.conexionFailure,
           timeout:this.timeout,
           scope:this
-      });
-        Ext.Ajax.request({
-            url:'../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
-            params:{  dir:'ASC',
-                sort:'id_aom',
-                limit:'100',
-                start:'0',
-                id_aom:maestro.id_aom,
-                codigo_parametro : 'ETI'
-            },
-            success:function(resp){
-                const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                isForm.getForm().items.items[4].setValue(reg.datos[0].id_funcionario);
-                isForm.getForm().items.items[4].setRawValue(reg.datos[0].desc_funcionario1);
-            },
-            failure: this.conexionFailure,
-            timeout:this.timeout,
-            scope:this
         });
+        isForm.getForm().findField('tecnico').on('change', function(cmp, check){
+              if(check.getRawValue() === 'interno'){
+                  isForm.getForm().items.items[5].reset();
+                  isForm.getForm().findField('externo').reset();
+                  isForm.getForm().items.items[5].enable(true);
+                  isForm.getForm().findField('externo').disable(true);
+              }else{
+                  isForm.getForm().items.items[5].reset();
+                  isForm.getForm().findField('externo').reset();
+                  isForm.getForm().items.items[5].disable(true);
+                  isForm.getForm().findField('externo').enable(true);
+              }
+        },this);
+
+
       this.ventanaEquipo = new Ext.Window({
          width: 700,
-         height: 500,
+         height: 570,
          modal: true,
          closeAction: 'hide',
+         autoScroll:true,
          labelAlign: 'bottom',
-         title: 'Asignación de Equipo de Auditores',
+         title: 'ASIGNACIÓN DE EQUIPO DE AUDITORES',
          bodyStyle: 'padding:5px',
          layout: 'form',
          items: [
@@ -1248,12 +1281,12 @@ Phx.vista.PlanificarAuditoria = {
                                id_aom :maestro.id_aom,
                                id_equipo_auditor: submit.id_equipo_auditor,
                                id_interno: submit.id_interno,
-                               id_responsable: submit.id_responsable
+                               id_responsable: submit.id_responsable,
+                               externo: submit.externo
                            },
                            isUpload: false,
                            success: function(a,b,c){
                                Phx.CP.loadingHide();
-                               me.ventanaEquipo.hide();
                                me.storeEquipo.load();
                            },
                            argument: this.argumentSave,
@@ -1264,15 +1297,16 @@ Phx.vista.PlanificarAuditoria = {
              },
              scope: this
              }, {
-             text: 'Declinar',
+             text: 'Cerrar',
              handler: function() {
                  this.ventanaEquipo.hide();
+                 this.storeEquipo.load();
              },
              scope: this
          }]
       });
     },
-    formularioPuntoNorma:function(){
+    formularioPuntoNorma:function(record){
       const maestro = this.sm.getSelected().data;
       const me = this;
         const isForm = new Ext.form.FormPanel({
@@ -1283,8 +1317,8 @@ Phx.vista.PlanificarAuditoria = {
                         name: 'nro_tramite_wf',
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
-                        readOnly :true,
-                        style: 'background-image: none;'
+                        disabled :true,
+                        // style: 'background-image: none;'
                     },
                     {
                           xtype: 'field',
@@ -1292,8 +1326,8 @@ Phx.vista.PlanificarAuditoria = {
                           name: 'nombre_aom1',
                           anchor: '100%',
                           value: maestro.nombre_aom1,
-                          readOnly :true,
-                          style: 'background-image: none;'
+                          disabled :true,
+                          // style: 'background-image: none;'
                     },
                     {
                                xtype: 'combo',
@@ -1306,10 +1340,6 @@ Phx.vista.PlanificarAuditoria = {
                                    url: '../../sis_auditoria/control/Norma/listarNorma',
                                    id: 'id_norma',
                                    root: 'datos',
-                                   sortInfo: {
-                                       field: 'nombre_norma',
-                                       direction: 'ASC'
-                                   },
                                    totalProperty: 'total',
                                    fields: ['id_norma', 'id_tipo_norma','nombre_norma','sigla_norma','descrip_norma'],
                                    remoteSort: true,
@@ -1328,9 +1358,10 @@ Phx.vista.PlanificarAuditoria = {
                                minChars: 2
                       },
                       {
-                            anchor: '100%',
-                            bodyStyle: 'padding:10px;',
-                            items:[{
+                          anchor: '100%',
+                          bodyStyle: 'padding:10px;',
+                          title: 'PUNTOS DE NORMA ASOCIADOS A ESTA AUDITORIA',
+                          items:[{
                                 xtype: 'itemselector',
                                 name: 'id_pn',
                               //  id: this.idContenedor+'id_pn',
@@ -1403,6 +1434,34 @@ Phx.vista.PlanificarAuditoria = {
           autoScroll: true,
           region: 'center'
        });
+        if(record){
+            Phx.CP.loadingShow();
+
+            setTimeout(() => {
+                isForm.getForm().items.items[2].setValue(record.json.id_norma);
+                isForm.getForm().items.items[2].setRawValue(record.json.sigla_norma);
+                isForm.getForm().items.items[3].multiselects[0].store.baseParams = {
+                    dir: "ASC",
+                    sort: "id_aom",
+                    limit: "100",
+                    start: "0",
+                    id_norma: record.json.id_norma,
+                    item :maestro.id_aom
+                };
+                isForm.getForm().items.items[3].multiselects[0].store.load();
+                isForm.getForm().items.items[3].multiselects[1].store.baseParams = {
+                    dir: "ASC",
+                    sort: "id_aom",
+                    limit: "100",
+                    start: "0",
+                    id_aom: maestro.id_aom,
+                    id_norma: record.json.id_norma
+                };
+                isForm.getForm().items.items[3].multiselects[1].store.load();
+                Phx.CP.loadingHide();
+
+            },1000)
+        }
          isForm.getForm().items.items[2].on('select', function(combo, record, index){
                isForm.getForm().items.items[3].multiselects[0].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_norma: record.data.id_norma,item :maestro.id_aom};
                isForm.getForm().items.items[3].multiselects[1].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_aom: maestro.id_aom,id_norma: record.data.id_norma};
@@ -1411,13 +1470,16 @@ Phx.vista.PlanificarAuditoria = {
                isForm.getForm().items.items[3].reset();
          },this);
 
+
+
       this.ventanaPuntoNorma = new Ext.Window({
          width: 700,
          height: 500,
          modal: true,
+         autoScroll:true,
          closeAction: 'hide',
          labelAlign: 'bottom',
-         title: 'Selección de punto de norma',
+         title: 'SELECCIÓN DE PUNTOS DE NORMA',
          bodyStyle: 'padding:5px',
          layout: 'form',
          items: [
@@ -1448,7 +1510,7 @@ Phx.vista.PlanificarAuditoria = {
                            isUpload: false,
                            success: function(a,b,c){
                                Phx.CP.loadingHide();
-                               me.ventanaPuntoNorma.hide();
+                              // me.ventanaPuntoNorma.hide();
                                me.storePuntoNorma.load();
 
                            },
@@ -1464,6 +1526,7 @@ Phx.vista.PlanificarAuditoria = {
              text: 'Declinar',
              handler: function() {
                  this.ventanaPuntoNorma.hide();
+                 this.storePuntoNorma.load();
              },
              scope: this
          }]
@@ -1480,8 +1543,8 @@ Phx.vista.PlanificarAuditoria = {
                         name: 'nro_tramite_wf',
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
-                        readOnly :true,
-                        style: 'background-image: none;'
+                        disabled :true,
+                        // style: 'background-image: none;'
                     },
                     {
                           xtype: 'field',
@@ -1489,8 +1552,8 @@ Phx.vista.PlanificarAuditoria = {
                           name: 'nombre_aom1',
                           anchor: '100%',
                           value: maestro.nombre_aom1,
-                          readOnly :true,
-                          style: 'background-image: none;'
+                          disabled :true,
+                          // style: 'background-image: none;'
                     },
                     {
                                xtype: 'combo',
@@ -1612,7 +1675,7 @@ Phx.vista.PlanificarAuditoria = {
          modal: true,
          closeAction: 'hide',
          labelAlign: 'bottom',
-         title: 'Selección de punto de norma',
+         title: 'LISTA DE VERIFICACION DE LA AUDITORIA',
          bodyStyle: 'padding:5px',
          layout: 'form',
          items: [
@@ -1670,7 +1733,7 @@ Phx.vista.PlanificarAuditoria = {
         const me = this;
         let id_modificacion = null;
         if(data){
-          id_modificacion = data.id_cronograma
+          id_modificacion = data.json.id_cronograma
         }
         const tienda = new Ext.data.JsonStore({
              url: '../../sis_auditoria/control/Cronograma/listarCronograma',
@@ -1702,32 +1765,14 @@ Phx.vista.PlanificarAuditoria = {
                     {
                         header: 'Actividad',
                         dataIndex: 'id_actividad',
-                        width: 100,
+                        width: 150,
                         renderer:function(value, p, record){return String.format('{0}', record.data['actividad']);},
-                    },
-                    {
-                        header: 'Funcionarios',
-                        dataIndex: 'lista_funcionario',
-                        width: 210,
-                        renderer : function(value, p, record) {
-                            return String.format('<div class="gridmultiline">{0}</div>', record.data['lista_funcionario']);
-                        }
                     },
                     {
                         header: 'Fecha Inicio',
                         dataIndex: 'fecha_ini_activ',
                         align: 'center',
-                        width: 110,
-                        renderer:function (value,p,record){
-                            const fecha = value.split("-");
-                            return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
-                        }
-                    },
-                    {
-                        header: 'Fecha Fin',
-                        dataIndex: 'fecha_fin_activ',
-                        align: 'center',
-                        width: 110,
+                        width: 80,
                         renderer:function (value,p,record){
                             const fecha = value.split("-");
                             return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
@@ -1737,13 +1782,21 @@ Phx.vista.PlanificarAuditoria = {
                         header: 'Hora Inicio',
                         dataIndex: 'hora_ini_activ',
                         align: 'center',
-                        width: 110,
+                        width: 80,
                     },
                     {
                         header: 'Hora Fin',
                         dataIndex: 'hora_fin_activ',
                         align: 'center',
-                        width: 110,
+                        width: 80,
+                    },
+                    {
+                        header: 'Funcionarios',
+                        dataIndex: 'lista_funcionario',
+                        width: 210,
+                        renderer : function(value, p, record) {
+                            return String.format('<div class="gridmultiline">{0}</div>', record.data['lista_funcionario']);
+                        }
                     }
                 ],
                 tbar: [
@@ -1775,7 +1828,7 @@ Phx.vista.PlanificarAuditoria = {
                 ],
             });
             const isForm = new Ext.form.FormPanel({
-                id: this.idContenedor + '_formulario_crorogrma',
+              //  id: this.idContenedor + '_formulario_crorogrma',
                 items: [
                     new Ext.form.FieldSet({
                             collapsible: false,
@@ -1799,10 +1852,10 @@ Phx.vista.PlanificarAuditoria = {
                                                         xtype: 'datefield',
                                                         anchor: '85%',
                                                         name: 'fecha_ini_activ',
-                                                        fieldLabel: '*Fecha Inicio',
+                                                        fieldLabel: '*Fecha',
                                                         allowBlank: false,
                                                         format: 'd/m/Y'
-                                                    },
+                                                    }/*,
                                                     {
                                                         xtype: 'datefield',
                                                         anchor: '85%',
@@ -1810,7 +1863,7 @@ Phx.vista.PlanificarAuditoria = {
                                                         fieldLabel: '*Fecha Fin',
                                                         allowBlank: false,
                                                         format: 'd/m/Y',
-                                                    },
+                                                    },*/
                                                 ]
                                             }),
                                             new Ext.form.FieldSet({
@@ -1873,6 +1926,7 @@ Phx.vista.PlanificarAuditoria = {
                                         anchor: '100%',
                                         bodyStyle: 'padding:10px;',
                                         title: 'Equipo Responsable',
+                                        // autoScroll: true,
                                         items:[{
                                             xtype: 'itemselector',
                                             name: 'itemselector',
@@ -1883,7 +1937,7 @@ Phx.vista.PlanificarAuditoria = {
                                             drawTopIcon:false,
                                             drawBotIcon:false,
                                             multiselects: [{
-                                                width: 370,
+                                                width: 300,
                                                 height: 180,
                                                 store: new Ext.data.JsonStore({
                                                     url: '../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
@@ -1916,7 +1970,7 @@ Phx.vista.PlanificarAuditoria = {
                                                 displayField: 'desc_funcionario1',
                                             },
                                             {
-                                                width: 370,
+                                                width: 300,
                                                 height: 180,
                                                 store: new Ext.data.JsonStore({
                                                     url: '../../sis_auditoria/control/CronogramaEquipoResponsable/listarCronogramaEquipoResponsable',
@@ -2000,14 +2054,14 @@ Phx.vista.PlanificarAuditoria = {
             });
 
             if(data) {
-                isForm.getForm().findField('fecha_ini_activ').setValue(data.fecha_ini_activ);
-                isForm.getForm().findField('fecha_fin_activ').setValue(data.fecha_fin_activ);
-                isForm.getForm().findField('hora_ini_activ').setValue(new Date(data.fecha_ini_activ+' '+data.hora_ini_activ));
-                isForm.getForm().findField('hora_fin_activ').setValue(new Date(data.fecha_fin_activ+' '+data.hora_fin_activ));
+                console.log(data)
+                isForm.getForm().findField('fecha_ini_activ').setValue(data.json.fecha_ini_activ);
+                isForm.getForm().findField('hora_ini_activ').setValue(new Date(data.json.fecha_ini_activ+' '+data.json.hora_ini_activ));
+                isForm.getForm().findField('hora_fin_activ').setValue(new Date(data.json.fecha_ini_activ+' '+data.json.hora_fin_activ));
 
                 setTimeout(() => {
-                    isForm.getForm().findField('id_actividad').setValue(data.id_actividad);
-                    isForm.getForm().findField('id_actividad').setRawValue(data.actividad);
+                    isForm.getForm().findField('id_actividad').setValue(data.json.id_actividad);
+                    isForm.getForm().findField('id_actividad').setRawValue(data.json.actividad);
                 }, 1000);
 
 
@@ -2017,25 +2071,25 @@ Phx.vista.PlanificarAuditoria = {
                                 limit:'100',
                                 start:'0',
                                 id_aom: maestro.id_aom,
-                                item :data.id_cronograma
+                                item :data.json.id_cronograma
                             };
                 isForm.getForm().findField('itemselector').multiselects[1].store.baseParams = {
                                 dir:'ASC',
                                 sort:'id_aom',
                                 limit:'100',
                                 start:'0',
-                                id_cronograma: data.id_cronograma
+                                id_cronograma: data.json.id_cronograma
                 };
                 isForm.getForm().findField('itemselector').multiselects[1].store.load();
             }
-      const auditoria = maestro.nro_tramite_wf + ' '+maestro.nombre_aom1;
       this.ventanaCroronograma = new Ext.Window({
-         width: 850,
+         width: 700,
          height: 680,
          modal: true,
+          autoScroll: true,
          closeAction: 'hide',
          labelAlign: 'bottom',
-         title: 'Cronograma de Actividades de la Auditoria '+ auditoria,
+         title: 'CRONOGRAMA DE ACTIVIDADES POR AUDITORIA',
          bodyStyle: 'padding:5px',
           layout: 'border',
          items: [
@@ -2130,6 +2184,50 @@ Phx.vista.PlanificarAuditoria = {
             contenedor: this.idContenedor
           };
           this.store.reload({ params: this.store.baseParams});
+    },
+    oncellclick : function(grid, rowIndex, columnIndex, e) {
+
+        const fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
+
+        if (fieldName === 'id_proceso') {
+            this.formularioProceso();
+            this.procesoVentana.show();
+        }
+        if (fieldName === 'id_funcionario') {
+            this.formularioEquipo();
+            this.ventanaEquipo.show();
+        }
+        if (fieldName === 'codigo_pn' || fieldName === 'id_pn') {
+            const record = this.storePuntoNorma.getAt(rowIndex);
+            this.formularioPuntoNorma(record);
+            this.ventanaPuntoNorma.show();
+        }
+        if (fieldName === 'id_actividad') {
+            const record = this.storeCronograma.getAt(rowIndex);
+            this.formularioCroronograma(record);
+            this.ventanaCroronograma.show();
+        }
+        if (fieldName === 'eliminar') {
+            const record = this.storeCronograma.getAt(rowIndex);
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_auditoria/control/Cronograma/eliminarCronograma',
+                params: {
+                    id_cronograma : record.json.id_cronograma
+                },
+                isUpload: false,
+                success: function(a,b,c){
+                    setTimeout(() => {
+                        Phx.CP.loadingHide();
+                        this.storeCronograma.load();
+                    },1000)
+                },
+                argument: this.argumentSave,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            })
+        }
     },
     bnew:false,
     bdel:false,

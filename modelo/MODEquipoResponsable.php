@@ -123,6 +123,7 @@ class MODEquipoResponsable extends MODbase{
 		$this->setParametro('id_responsable','id_responsable','int4');
 		$this->setParametro('id_interno','id_interno','int4');
 		$this->setParametro('id_equipo_auditor','id_equipo_auditor','text');
+		$this->setParametro('externo','externo','varchar');
 
 
 		//Ejecuta la instruccion

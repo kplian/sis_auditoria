@@ -41,11 +41,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: '<b>Aceptar toda las no conformidades...</b>',
                 scope:this
             });
+
         },
         onReloadPage:function(m){
             this.maestro=m;
             this.store.baseParams = {id_aom: this.maestro.id_aom,interfaz : this.nombreVista};
             this.load({params:{start:0, limit:50}})
+
         },
         loadValoresIniciales: function () {
             Phx.vista.NoConformidadInforme.superclass.loadValoresIniciales.call(this);
@@ -119,23 +121,22 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
         },
-        /*onAceptar:function () {
-            Phx.CP.loadingShow();
+        onAceptar:function () {
+
+            this.crearFormTodo()
+            this.ventanaResponsableTodo.hide();
+            /*Phx.CP.loadingShow();
             Ext.Ajax.request({
                 url:'../../sis_auditoria/control/NoConformidad/siTodoNoConformidad',
                 params:{ id_aom: this.maestro.id_aom },
-                success: this.successRevision,
+                success: this.successRevisionS,
                 failure: this.conexionFailure,
                 timeout: this.timeout,
                 scope: this
             });
-            this.reload();
+            this.reload();*/
         },
-        successRevision: function(resp){
-            Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 
-        },*/
         crearFormResponsableNC:function(record){
             const me = this;
             Phx.CP.loadingShow();
@@ -1727,6 +1728,155 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         onBool:function(valor){
             return valor === 't';
+        },
+        crearFormTodo:function(){
+            const me = this;
+            Phx.CP.loadingShow();
+            const informe =  {
+                fieldLabel: 'Informe',
+                xtype: 'box',
+                autoEl: {
+                    tag: 'a',
+                    html: this.maestro.nombre_aom1+' '+this.maestro.nro_tramite_wf,
+                },
+                style: 'cursor:pointer;',
+                listeners: {
+                    render: function(component) {
+                        component.getEl().on('click', function(e) {
+
+
+                        });
+                    }
+                }
+            };
+            const area = new Ext.form.TextField({
+                name: 'area',
+                msgTarget: 'title',
+                fieldLabel: 'Area',
+                allowBlank: true,
+                readOnly :true,
+                anchor: '100%',
+                style: 'background-image: none;',
+                value: this.maestro.nombre_unidad,
+                maxLength:50
+            });
+            const responsable_area = new Ext.form.TextField({
+                name: 'responsable_area',
+                msgTarget: 'title',
+                fieldLabel: 'Responsable area',
+                allowBlank: true,
+                readOnly :true,
+                anchor: '100%',
+                style: 'background-image: none;',
+                value: '',
+                maxLength:50
+            });
+
+            const no_conformidad =  {
+                fieldLabel: 'No Conformidad',
+                xtype: 'box',
+                autoEl: {
+                    tag: 'a',
+                    html: this.descrip_nc
+                },
+                style: 'cursor:pointer;',
+                listeners: {
+                    render: function(component) {
+                        component.getEl().on('click', function(e) {
+
+
+                        });
+                    }
+                }
+            };
+            const storeCombo = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/NoConformidad/listarFuncionariosUO',
+                id: 'id_funcionario',
+                root: 'datos',
+                sortInfo:{
+                    field: 'desc_funcionario',
+                    direction: 'ASC'
+                },
+                totalProperty: 'total',
+                fields: ['id_funcionario','desc_funcionario','desc_funcionario_cargo'],
+                remoteSort: true,
+                baseParams: {par_filtro: 'vfc.desc_funcionario1 '}
+            });
+
+            const combo = new Ext.form.ComboBox({
+                name:'id_funcionario_nc',
+                fieldLabel:'Responsable de No Conformidad',
+                allowBlank : false,
+                typeAhead: true,
+                store: storeCombo,
+                mode: 'remote',
+                pageSize: 15,
+                triggerAction: 'all',
+                valueField : 'id_funcionario',
+                displayField : 'desc_funcionario',
+                forceSelection: true,
+                anchor: '100%',
+                resizable : true,
+                enableMultiSelect: false
+            });
+            this.formAutoTodo = new Ext.form.FormPanel({
+                autoDestroy: true,
+                border: false,
+                layout: 'form',
+                autoHeight: true,
+                autoScroll: true,
+                region: 'center',
+                defaults: { height: 450},
+                items: [
+                    new Ext.form.FieldSet({
+                        collapsible: false,
+                        title:'Datos Generales',
+                        border: true,
+                        layout: 'form',
+                        items: [
+                            informe,
+                            area,
+                            responsable_area,
+                            no_conformidad,
+                            combo
+                        ]})
+                ]
+            });
+            this.ventanaResponsableTodo = new Ext.Window({
+                title: 'Asignar Responsable No Conformidad',
+                width: 600,
+                height: 400,
+                closeAction: 'hide',
+                labelAlign: 'bottom',
+                items: this.formAutoTodo,
+                modal:true,
+                bodyStyle: 'padding:5px',
+                layout: 'form',
+                buttons: [{
+                    text: 'Guardar',
+                    handler: this.saveResponsable,
+                    scope: this},
+                    {
+                        text: 'Cancelar',
+                        handler: function(){ this.ventanaResponsable.hide() },
+                        scope: this
+                    }]
+            });
+            Ext.Ajax.request({
+                url: '../../sis_auditoria/control/NoConformidad/listarRespAreaGerente',
+                params: {
+                    id_uo: this.maestro.id_uo
+                },
+                success: function(resp){
+                    const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                    this.formAutoTodo.getForm().findField('responsable_area').setValue(reg.ROOT.datos.desc_funcionario);
+                    Phx.CP.loadingHide();
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+       //     this.cmpResponsable = this.formAuto.getForm().findField('id_funcionario_nc');
 
         },
     };

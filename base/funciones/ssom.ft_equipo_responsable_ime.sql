@@ -218,6 +218,37 @@ BEGIN
                                     null);
           end if;
 
+            if (v_parametros.externo <> '')then
+
+
+            insert into ssom.tequipo_responsable(
+                                      id_funcionario,
+                                      exp_tec_externo,
+                                      id_parametro,
+                                      estado_reg,
+                                      id_aom,
+                                      id_usuario_ai,
+                                      id_usuario_reg,
+                                      usuario_ai,
+                                      fecha_reg,
+                                      id_usuario_mod,
+                                      fecha_mod
+                                      ) values(
+                                      null,
+                                      upper(v_parametros.externo)::varchar,
+                                        (select pa.id_parametro
+                                    from  ssom.tparametro pa
+                                    where  pa.codigo_parametro = 'EXT'),
+                                      'activo',
+                                      v_parametros.id_aom,
+                                      v_parametros._id_usuario_ai,
+                                      p_id_usuario,
+                                      v_parametros._nombre_usuario_ai,
+                                      now(),
+                                      null,
+                                      null);
+            end if;
+
 
             foreach v_id_funcionario IN  array (string_to_array(v_parametros.id_equipo_auditor::varchar,','))  loop
 

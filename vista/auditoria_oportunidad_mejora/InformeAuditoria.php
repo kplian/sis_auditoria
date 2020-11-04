@@ -821,6 +821,14 @@ header("content-type: text/javascript; charset=UTF-8");
         if(data){
             this.punto.baseParams.id_nc = data?data.id_nc:this.id_no_conformidad;
             this.punto.load();
+            console.log(this.punto.getCount())
+            console.log(this.punto.getAt(this.punto.getCount()))
+
+
+            /*for(var i = this.punto.getCount()-1; i >= 0; i--){
+                const record = this.punto.getAt(i);
+                console.log(this.punto.getCount()-)
+            }*/
         }
         this.documentos  = new Ext.data.JsonStore({
             url: '../../sis_workflow/control/DocumentoWf/listarDocumentoWf',

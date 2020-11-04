@@ -150,67 +150,31 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     name: 'nro_tramite_wf',
                     fieldLabel: 'Codigo',
                     allowBlank: true,
-                    anchor: '50%',
+                    width: 150,
                     gwidth: 140,
+                    readOnly :true,
+                    style: 'background-image: none; border: 0;',
                     renderer:function(value, p, record){return String.format('<a style="cursor:pointer;">{0}</a>', value);},
                 },
                 type:'TextField',
                 filters:{pfiltro:'aom.nro_tramite_wf',type:'string'},
-                id_grupo:0,
-                grid:true,
-                form:false,
-                bottom_filter:true
-            },
-            {
-                config:{
-                    name: 'nombre_aom1',
-                    fieldLabel: 'Nombre',
-                    allowBlank: false,
-                    anchor: '80%',
-                    emptyText: 'Intruzca titulo...',
-                    gwidth: 280,
-                    renderer:function(value, p, record){return String.format('<a style="cursor:pointer;">{0}</a>', value);},
-
-                },
-                type:'TextField',
-                filters:{pfiltro:'aom.nombre_aom1',type:'string'},
-                id_grupo:0,
+                id_grupo: 6,
                 grid:true,
                 form:true,
                 bottom_filter:true
             },
-           
             {
                 config:{
-                    name: 'fecha_prog_inicio',
-                    fieldLabel: 'Fecha Inicio',
-                    allowBlank: false,
-                    anchor: '50%',
-                    gwidth: 80,
-                    format: 'd/m/Y',
-                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                    name: 'axuliar',
+                    fieldLabel: 'axuliar',
+                    style: 'background-image: none; border: 0; ',
+                    width: 80,
+                    readOnly :true,
                 },
-                type:'DateField',
-                filters:{pfiltro:'aom.fecha_prog_inicio',type:'date'},
-                id_grupo:0,
-                grid:true,
-                form:true
-            },
-            {
-                config:{
-                    name: 'fecha_prog_fin',
-                    fieldLabel: 'Fecha Fin',
-                    allowBlank: false,
-                    anchor: '50%',
-                    gwidth: 80,
-                    format: 'd/m/Y',
-                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-                },
-                type:'DateField',
-                filters:{pfiltro:'aom.fecha_prog_fin',type:'date'},
-                id_grupo:0,
-                grid:true,
-                form:true
+                type:'TextField',
+                id_grupo: 6,
+                form:true,
+                grid:false
             },
             {
                 config:{
@@ -219,59 +183,17 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 150,
+                    readOnly :true,
+                    style: 'background-image: none; border: 0; color: #0C07F1; font-weight: bold;',
                     renderer: function(value,p,record){
-                        var color = '#BC4D05';
-                        return '<font color="'+color+'">'+record.data['estado_wf']+'</font>';
+                        return String.format('<a style="cursor:pointer;">{0}</a>', value)
                     }
                 },
                 type:'TextField',
-                id_grupo:0,
+                id_grupo: 6,
                 grid:true,
-                form:false
+                form:true
             },
-        {
-            config: {
-                name: 'id_destinatario',
-                fieldLabel: 'Destinatario',
-                allowBlank: false,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListFuncionario',
-                    id: 'id_funcionario',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'desc_funcionario1',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_funcionario','desc_funcionario1','descripcion_cargo','cargo_equipo'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'fu.desc_funcionario1', codigo:'RESP'}
-                }),
-                valueField: 'id_funcionario',
-                displayField: 'desc_funcionario1',
-                gdisplayField: 'desc_funcionario_destinatario',
-                hiddenName: 'id_destinatario',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '80%',
-                gwidth: 300,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('<b>{0}</b>', record.data['desc_funcionario_destinatario']);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'vfc.desc_funcionario1',type: 'string'},
-            grid: true,
-            form: false
-        },
             {
                 config: {
                     name: 'id_uo',
@@ -315,7 +237,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     gwidth: 300,
                     minChars: 2,
                     renderer : function(value, p, record) {
-                        return String.format('{0}', record.data['nombre_unidad']);
+                        return String.format('<a style="cursor:pointer;">{0}</a>', record.data['nombre_unidad']);
                     }
                 },
                 type: 'ComboBox',
@@ -324,6 +246,117 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 grid: true,
                 form: true,
                 bottom_filter:true
+            },
+            {
+                config:{
+                    name: 'nombre_aom1',
+                    fieldLabel: 'Nombre de Auditoría ',
+                    allowBlank: false,
+                    anchor: '80%',
+                    emptyText: 'Intruzca titulo...',
+                    gwidth: 280,
+                    renderer:function(value, p, record){return String.format('<a style="cursor:pointer;">{0}</a>', value);},
+
+                },
+                type:'TextField',
+                filters:{pfiltro:'aom.nombre_aom1',type:'string'},
+                id_grupo:0,
+                grid:true,
+                form:true,
+                bottom_filter:true
+            },
+            {
+                config:{
+                    name: 'fecha_prog_inicio',
+                    fieldLabel: 'Fecha Inicio',
+                    allowBlank: false,
+                    anchor: '50%',
+                    gwidth: 80,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_prog_inicio',type:'date'},
+                id_grupo:0,
+                grid:true,
+                form:true
+            },
+            {
+                config:{
+                    name: 'fecha_prog_fin',
+                    fieldLabel: 'Fecha Fin',
+                    allowBlank: false,
+                    anchor: '50%',
+                    gwidth: 80,
+                    format: 'd/m/Y',
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'aom.fecha_prog_fin',type:'date'},
+                id_grupo:0,
+                grid:true,
+                form:true
+            },
+            {
+                config: {
+                    name: 'id_destinatario',
+                    fieldLabel: 'Destinatario',
+                    allowBlank: false,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListFuncionario',
+                        id: 'id_funcionario',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'desc_funcionario1',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_funcionario','desc_funcionario1','descripcion_cargo','cargo_equipo'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'fu.desc_funcionario1', codigo:'RESP'}
+                    }),
+                    valueField: 'id_funcionario',
+                    displayField: 'desc_funcionario1',
+                    gdisplayField: 'desc_funcionario_destinatario',
+                    hiddenName: 'id_destinatario',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '80%',
+                    gwidth: 300,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('<b>{0}</b>', record.data['desc_funcionario_destinatario']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {pfiltro: 'vfc.desc_funcionario1',type: 'string'},
+                grid: true,
+                form: false
+            },
+            {
+                config:{
+                    name: 'descrip_aom1',
+                    fieldLabel: 'Descripcion',
+                    allowBlank: true,
+                    resizable:true,
+                    anchor: '80%',
+                    gwidth: 350,
+                    renderer : function(value, p, record) {
+                        return String.format('<div class="gridmultiline" style="text-align: justify;">{0}</div>', record.data['descrip_aom1']);
+                    }
+                },
+                type:'TextArea',
+                filters:{pfiltro:'aom.descrip_aom1',type:'string'},
+                id_grupo:0,
+                grid:true,
+                form:true
             },
             {
                 config: {
@@ -361,6 +394,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     typeAhead: false,
                     triggerAction: 'all',
                     lazyRender: true,
+                    modificado: true,
                     mode: 'remote',
                     pageSize: 15,
                     queryDelay: 1000,
@@ -378,24 +412,6 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 grid: true,
                 form: true,
                 bottom_filter:true
-            },
-            {
-                config:{
-                    name: 'descrip_aom1',
-                    fieldLabel: 'Descripcion',
-                    allowBlank: true,
-                    resizable:true,
-                    anchor: '80%',
-                    gwidth: 350,
-                    renderer : function(value, p, record) {
-                        return String.format('<div class="gridmultiline" style="text-align: justify;">{0}</div>', record.data['descrip_aom1']);
-                    }
-                },
-                type:'TextArea',
-                filters:{pfiltro:'aom.descrip_aom1',type:'string'},
-                id_grupo:0,
-                grid:true,
-                form:true
             },
             {
                 config:{
@@ -776,7 +792,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
             }
 	],
 	tam_pag:50,
-	title:'Auditoria - Oportunidad Mejora',
+	title:'AUDITORIA PROGRAMADA',
     id:'AOM',
 	ActSave:'../../sis_auditoria/control/AuditoriaOportunidadMejora/insertarAuditoriaOportunidadMejora',
 	ActDel:'../../sis_auditoria/control/AuditoriaOportunidadMejora/eliminarAuditoriaOportunidadMejora',

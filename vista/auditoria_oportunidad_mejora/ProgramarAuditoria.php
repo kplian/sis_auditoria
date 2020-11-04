@@ -15,7 +15,7 @@ header("content-type: text/javascript; charset=UTF-8");
         require:'../../../sis_auditoria/vista/auditoria_oportunidad_mejora/AuditoriaOportunidadMejora.php',
         requireclase:'Phx.vista.AuditoriaOportunidadMejora',
         nombreVista: 'ProgramarAuditoria',
-        dblclickEdit: false,
+        dblclickEdit: true,
         constructor: function(config) {
             this.eventoGrill();
             this.idContenedor = config.idContenedor;
@@ -32,14 +32,20 @@ header("content-type: text/javascript; charset=UTF-8");
         onButtonNew: function () {
             Phx.vista.ProgramarAuditoria.superclass.onButtonNew.call(this);
             this.Cmp.id_tipo_auditoria.setValue(1);
+            this.Cmp.axuliar.setValue('Estado :');
+            this.Cmp.nro_tramite_wf.setValue('0');
+            this.Cmp.estado_wf.setValue('Programada');
+
+
         },
         onButtonEdit:function(){
             Phx.vista.ProgramarAuditoria.superclass.onButtonEdit.call(this);
+            this.Cmp.axuliar.setValue('Estado :');
         },
         preparaMenu:function(n){
             const tb =this.tbar;
             Phx.vista.ProgramarAuditoria.superclass.preparaMenu.call(this,n);
-            const rec = this.getSelectedData();
+            /*const rec = this.getSelectedData();
             if (rec.estado_wf === 'programada'){
                 this.getBoton('sig_estado').enable();
                 this.getBoton('del').enable();
@@ -48,7 +54,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('sig_estado').disable();
                 this.getBoton('del').disable();
                 this.getBoton('edit').disable();
-            }
+            }*/
+            this.getBoton('sig_estado').enable();
+            this.getBoton('del').enable();
+            this.getBoton('edit').enable();
             return tb
         },
         liberaMenu:function(){
@@ -119,7 +128,53 @@ header("content-type: text/javascript; charset=UTF-8");
           		};
           		this.store.reload({ params: this.store.baseParams});
        },
-       fwidth: '45%',
+       fwidth: 550,
        fheight: '60%',
+       Grupos:[
+            {
+                layout: 'column',
+                border: false,
+                defaults: {
+                    border: false
+                },
+                items : [{
+                    bodyStyle : 'padding-left:5px;padding-left:5px;',
+                    border : false,
+                    defaults : {
+                        border : false
+                    },
+                    width : 650,
+                    items: [
+                        {
+                            items: [{
+                                xtype: 'fieldset',
+                                autoHeight: true,
+                                items: [
+                                    {
+                                        xtype: 'compositefield',
+                                        msgTarget : 'side',
+                                        fieldLabel: 'Codigo',
+                                        defaults: {
+                                            flex: 1,
+                                            padding: 5
+                                        },
+                                        items: [],
+                                        id_grupo: 6
+                                    },
+
+                                ]
+                            }]
+                        },
+                        {
+                            items: [{
+                                xtype: 'fieldset',
+                                autoHeight: true,
+                                items: [],
+                                id_grupo:0
+                            }]
+                        }]
+                }] //
+            }
+        ]
 };
 </script>

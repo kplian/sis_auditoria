@@ -62,14 +62,14 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         aom.nombre_aom1,
-                        vfc.desc_funcionario1,
-                        par.valor_parametro,
+                        COALESCE(vfc.desc_funcionario1, upper(exp_tec_externo))as desc_funcionario1,
+                        upper(par.valor_parametro)::varchar as valor_parametro,
                         par.codigo_parametro
 						from ssom.tequipo_responsable eqre
 						inner join segu.tusuario usu1 on usu1.id_usuario = eqre.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = eqre.id_usuario_mod
-                        join ssom.tauditoria_oportunidad_mejora aom on eqre.id_aom = aom.id_aom
-                        join orga.vfuncionario vfc on eqre.id_funcionario = vfc.id_funcionario
+                        inner join ssom.tauditoria_oportunidad_mejora aom on eqre.id_aom = aom.id_aom
+                        left join orga.vfuncionario vfc on eqre.id_funcionario = vfc.id_funcionario
             			left join ssom.tparametro par on eqre.id_parametro = par.id_parametro
 				        where  ';
 

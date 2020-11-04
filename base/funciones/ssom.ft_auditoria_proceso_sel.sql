@@ -58,7 +58,7 @@ BEGIN
 						aupc.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        initcap(fu.desc_funcionario1) as desc_funcionario,
+                        fu.desc_funcionario1 as desc_funcionario,
                         pcs.proceso
 						from ssom.tauditoria_proceso aupc
 						inner join segu.tusuario usu1 on usu1.id_usuario = aupc.id_usuario_reg

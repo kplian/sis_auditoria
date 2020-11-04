@@ -85,20 +85,6 @@ header("content-type: text/javascript; charset=UTF-8");
             alert('Todas la No Conformidades han sido aceptadas.\n El informe ha sido ACEPTADO \n Se a enviado un aviso al equipo de auditores y responsables de no conformidades');
             this.reload();
         },
-        arrayDefaultColumHidden:['nombre_aom1','nombre_unidad','desc_funcionario_resp',
-            'nro_tramite','descrip_nc','lugar','desc_tipo_norma','desc_tipo_objeto',
-            'desc_funcionario_destinatario','resumen','recomendacion'],
-        rowExpander: new Ext.ux.grid.RowExpander({
-            tpl : new Ext.Template(
-                '<br>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Area:&nbsp;&nbsp;</b> {nombre_unidad}</p>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Responsable Auditoria:&nbsp;&nbsp;</b> {desc_funcionario2}</p>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Tipo Norma:&nbsp;&nbsp;</b> {desc_tipo_norma}</p>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Lugar:&nbsp;&nbsp;</b> {lugar}</p>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Objeto Auditoria:&nbsp;&nbsp;</b> {desc_tipo_objeto}</p>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Destinatario:&nbsp;&nbsp;</b> {desc_funcionario_destinatario}</p>',
-            )
-        }),
         south:{
                 url:'../../../sis_auditoria/vista/no_conformidad/NoConformidadInforme.php',
                 title:'No Conformidad',

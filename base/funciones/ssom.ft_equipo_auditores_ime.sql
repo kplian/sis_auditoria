@@ -138,7 +138,7 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update ssom.tequipo_auditores set
-			obs_dba = v_parametros.obs_dba,
+			-- obs_dba = v_parametros.obs_dba,
 			id_funcionario = v_parametros.id_funcionario,
 			id_tipo_participacion = v_parametros.id_tipo_participacion,
 			id_usuario_mod = p_id_usuario,

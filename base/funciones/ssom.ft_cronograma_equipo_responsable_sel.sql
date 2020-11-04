@@ -60,7 +60,7 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         crer.id_funcionario,
-                        initcap(vfc.desc_funcionario1) as desc_funcionario1
+                        vfc.desc_funcionario1
 						from ssom.tcronograma_equipo_responsable crer
 						inner join segu.tusuario usu1 on usu1.id_usuario = crer.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = crer.id_usuario_mod
