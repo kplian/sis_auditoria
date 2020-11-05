@@ -39,7 +39,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                     this.Cmp.nro_tramite.setValue(reg.ROOT.datos.correlativo);
                     this.Cmp.axuliar.setValue('Estado :');
-                    this.Cmp.estado_wf.setValue('Programada');
+                    this.Cmp.nombre_estado.setValue('Programada');
                 },
                 failure: this.conexionFailure,
                 timeout: this.timeout,
@@ -139,7 +139,7 @@ header("content-type: text/javascript; charset=UTF-8");
           		};
           		this.store.reload({ params: this.store.baseParams});
        },
-       fwidth: 550,
+       fwidth: 600,
        fheight: '60%',
        Grupos:[
             {
@@ -154,7 +154,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     defaults : {
                         border : false
                     },
-                    width : 650,
+                    width : 560,
                     items: [
                         {
                             items: [{

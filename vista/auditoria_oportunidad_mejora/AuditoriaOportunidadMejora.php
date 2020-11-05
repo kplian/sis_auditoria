@@ -137,6 +137,15 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
     			form:true
     		},
             {
+    			config:{
+    					labelSeparator:'',
+    					inputType:'hidden',
+    					name: 'estado_wf'
+    			},
+    			type:'Field',
+    			form:true
+    		},
+            {
                 config:{
                     name: 'codigo_tpo_aom',
                     fieldLabel: 'Tipo',
@@ -159,7 +168,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     name: 'nro_tramite',
                     fieldLabel: 'Codigo',
                     allowBlank: true,
-                    width: 150,
+                    width: 130,
                     gwidth: 140,
                     readOnly :true,
                     style: 'background-image: none; border: 0;',
@@ -187,11 +196,11 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
             },
             {
                 config:{
-                    name: 'estado_wf',
+                    name: 'nombre_estado',
                     fieldLabel: 'Estado',
                     allowBlank: true,
                     anchor: '80%',
-                    gwidth: 150,
+                    gwidth: 180,
                     readOnly :true,
                     style: 'background-image: none; border: 0; color: #0C07F1; font-weight: bold;',
                     renderer: function(value,p,record){
@@ -202,6 +211,49 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 id_grupo: 6,
                 grid:true,
                 form:true
+            },
+            {
+                config: {
+                    name: 'id_tipo_om',
+                    fieldLabel: 'Tipo OM',
+                    allowBlank: false,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/Parametro/listarParametro',
+                        id: 'id_parametro',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'valor_parametro',
+                            direction: 'DESC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'prm.id_tipo_parametro',tipo_parametro:'TIPO_OPORTUNIDAD_MEJORA'}
+                    }),
+                    valueField: 'id_parametro',
+                    displayField: 'valor_parametro',
+                    gdisplayField: 'desc_tipo_om',
+                    hiddenName: 'id_tipo_om',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '80%',
+                    gwidth: 200,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('<div class="gridmultiline">{0}</div>', record.data['desc_tipo_om']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {pfiltro: 'movtip.nombre',type: 'string'},
+                grid: true,
+                form: true
             },
             {
                 config: {
@@ -255,6 +307,49 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 grid: true,
                 form: true,
                 bottom_filter:true
+            },
+            {
+                config: {
+                    name: 'id_gconsultivo',
+                    fieldLabel: 'Grupo Consultivo',
+                    allowBlank: true,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/GrupoConsultivo/listarGrupoConsultivo',
+                        id: 'id_gconsultivo',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'nombre_gconsultivo',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_gconsultivo', 'nombre_gconsultivo','requiere_programacion','requiere_formulario','nombre_programacion','nombre_formulario'],//208
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'gct.nombre_gconsultivo'}
+                    }),
+                    valueField: 'id_gconsultivo',
+                    displayField: 'nombre_gconsultivo',
+                    gdisplayField: 'nombre_gconsultivo',
+                    hiddenName: 'id_gconsultivo',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '80%',
+                    gwidth: 200,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['nombre_gconsultivo']);
+                    }
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {pfiltro: 'movtip.nombre',type: 'string'},
+                grid: false,
+                form: true
             },
             {
                 config:{
@@ -499,92 +594,6 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 id_grupo:1,
                 grid:false,
                 form:false
-            },
-            {
-                config: {
-                    name: 'id_gconsultivo',
-                    fieldLabel: 'Grupo Consultivo',
-                    allowBlank: true,
-                    emptyText: 'Elija una opción...',
-                    store: new Ext.data.JsonStore({
-                        url: '../../sis_auditoria/control/GrupoConsultivo/listarGrupoConsultivo',
-                        id: 'id_gconsultivo',
-                        root: 'datos',
-                        sortInfo: {
-                            field: 'nombre_gconsultivo',
-                            direction: 'ASC'
-                        },
-                        totalProperty: 'total',
-                        fields: ['id_gconsultivo', 'nombre_gconsultivo','requiere_programacion','requiere_formulario','nombre_programacion','nombre_formulario'],//208
-                        remoteSort: true,
-                        baseParams: {par_filtro: 'gct.nombre_gconsultivo'}
-                    }),
-                    valueField: 'id_gconsultivo',
-                    displayField: 'nombre_gconsultivo',
-                    gdisplayField: 'nombre_gconsultivo',
-                    hiddenName: 'id_gconsultivo',
-                    forceSelection: true,
-                    typeAhead: false,
-                    triggerAction: 'all',
-                    lazyRender: true,
-                    mode: 'remote',
-                    pageSize: 15,
-                    queryDelay: 1000,
-                    anchor: '60%',
-                    gwidth: 200,
-                    minChars: 2,
-                    renderer : function(value, p, record) {
-                        return String.format('{0}', record.data['nombre_gconsultivo']);
-                    }
-                },
-                type: 'ComboBox',
-                id_grupo: 0,
-                filters: {pfiltro: 'movtip.nombre',type: 'string'},
-                grid: false,
-                form: true
-            },
-            {
-                config: {
-                    name: 'id_tipo_om',
-                    fieldLabel: 'Tipo OM',
-                    allowBlank: false,
-                    emptyText: 'Elija una opción...',
-                    store: new Ext.data.JsonStore({
-                        url: '../../sis_auditoria/control/Parametro/listarParametro',
-                        id: 'id_parametro',
-                        root: 'datos',
-                        sortInfo: {
-                            field: 'valor_parametro',
-                            direction: 'DESC'
-                        },
-                        totalProperty: 'total',
-                        fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
-                        remoteSort: true,
-                        baseParams: {par_filtro: 'prm.id_tipo_parametro',tipo_parametro:'TIPO_OPORTUNIDAD_MEJORA'}
-                    }),
-                    valueField: 'id_parametro',
-                    displayField: 'valor_parametro',
-                    gdisplayField: 'desc_tipo_om',
-                    hiddenName: 'id_tipo_om',
-                    forceSelection: true,
-                    typeAhead: false,
-                    triggerAction: 'all',
-                    lazyRender: true,
-                    mode: 'remote',
-                    pageSize: 15,
-                    queryDelay: 1000,
-                    anchor: '60%',
-                    gwidth: 200,
-                    minChars: 2,
-                    renderer : function(value, p, record) {
-                        return String.format('<div class="gridmultiline">{0}</div>', record.data['desc_tipo_om']);
-                    }
-                },
-                type: 'ComboBox',
-                id_grupo: 0,
-                filters: {pfiltro: 'movtip.nombre',type: 'string'},
-                grid: true,
-                form: true
             },
             {
                 config: {

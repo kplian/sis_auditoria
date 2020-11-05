@@ -15,23 +15,7 @@ header("content-type: text/javascript; charset=UTF-8");
         require:'../../../sis_auditoria/vista/auditoria_oportunidad_mejora/AuditoriaOportunidadMejora.php',
         requireclase:'Phx.vista.AuditoriaOportunidadMejora',
         nombreVista: 'OportunidadMejora',
-        dblclickEdit: false,
-        gruposBarraTareas:[
-            {name:'programada',title:'<h1 align="center">Programadas</h1>',grupo:0,height:0},
-            {name:'aprobado_responsable',title:'<h1 align="left">Aprobado por Resp.</h1>',grupo:1,height:0}
-        ],
-        tam_pag:50,
-        actualizarSegunTab: function(name, indice){
-            if (this.finCons) {
-                this.store.baseParams.pes_estado = name;
-                this.load({params: {start: 0, limit: this.tam_pag}});
-            }
-        },
-        bnewGroups:[0],
-        bactGroups:[0,1,2],
-        bdelGroups:[0],
-        beditGroups:[0],
-        bexcelGroups:[0,1,2],
+        dblclickEdit: true,
         constructor: function(config) {
             this.eventoGrill();
             this.idContenedor = config.idContenedor;
@@ -45,6 +29,19 @@ header("content-type: text/javascript; charset=UTF-8");
         onButtonNew: function () {
             Phx.vista.OportunidadMejora.superclass.onButtonNew.call(this);
             this.Cmp.id_tipo_auditoria.setValue(2);
+            Ext.Ajax.request({
+                url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getCorrelativo',
+                params: {id_tipo_auditoria: 2},
+                success: function(resp){
+                    const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                    this.Cmp.nro_tramite.setValue(reg.ROOT.datos.correlativo);
+                    this.Cmp.axuliar.setValue('Estado :');
+                    this.Cmp.nombre_estado.setValue('Programada');
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
         },
         onButtonEdit:function(){
             Phx.vista.OportunidadMejora.superclass.onButtonEdit.call(this);
@@ -125,8 +122,6 @@ header("content-type: text/javascript; charset=UTF-8");
             };
             this.store.reload({ params: this.store.baseParams});
         },
-        fwidth: '45%',
-        fheight: '60%',
         iniciarEventoOM:function () {
            //  this.ocultarComponente(this.Cmp.id_tipo_om);
             this.ocultarComponente(this.Cmp.lugar);
@@ -134,11 +129,58 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ocultarComponente(this.Cmp.id_tobjeto);
             // this.ocultarComponente(this.Cmp.id_gconsultivo);
 
-            this.ocultarComponente(this.Cmp.fecha_prev_inicio);
-            this.ocultarComponente(this.Cmp.fecha_prev_fin);
+            this.ocultarComponente(this.Cmp.fecha_prog_inicio);
+            this.ocultarComponente(this.Cmp.fecha_prog_fin);
             this.ocultarComponente(this.Cmp.fecha_eje_inicio);
             this.ocultarComponente(this.Cmp.fecha_eje_fin);
         },
+        fwidth: 600,
+        fheight: '60%',
+        Grupos:[
+            {
+                layout: 'column',
+                border: false,
+                defaults: {
+                    border: false
+                },
+                items : [{
+                    bodyStyle : 'padding-left:5px;padding-left:5px;',
+                    border : false,
+                    defaults : {
+                        border : false
+                    },
+                    width : 560,
+                    items: [
+                        {
+                            items: [{
+                                xtype: 'fieldset',
+                                autoHeight: true,
+                                items: [
+                                    {
+                                        xtype: 'compositefield',
+                                        msgTarget : 'side',
+                                        fieldLabel: 'Codigo',
+                                        defaults: {
+                                            flex: 1,
+                                            padding: 5
+                                        },
+                                        items: [],
+                                        id_grupo: 6
+                                    },
 
+                                ]
+                            }]
+                        },
+                        {
+                            items: [{
+                                xtype: 'fieldset',
+                                autoHeight: true,
+                                items: [],
+                                id_grupo:0
+                            }]
+                        }]
+                }] //
+            }
+        ]
     };
 </script>

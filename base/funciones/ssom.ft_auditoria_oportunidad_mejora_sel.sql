@@ -64,7 +64,7 @@ BEGIN
                             aom.descrip_aom1,
                             aom.estado_reg,
                             aom.estado_wf,
-                            te.nombre_estado,----
+                            te.etapa as nombre_estado,----
                             aom.fecha_eje_inicio,
                             aom.fecha_eje_fin,
                             aom.lugar,
@@ -92,7 +92,8 @@ BEGIN
                             aom.id_destinatario,
                             df.desc_funcionario1 as desc_funcionario_destinatario,
                             aom.resumen,
-                            aom.id_gestion
+                            aom.id_gestion,
+                            aom.nro_tramite
                             from ssom.tauditoria_oportunidad_mejora aom
                             inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
                             inner join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
