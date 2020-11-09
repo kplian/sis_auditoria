@@ -70,7 +70,6 @@ header("content-type: text/javascript; charset=UTF-8");
     },
     onCrearFormulario:function() {
         Phx.CP.loadingShow();
-
       const me = this;
       const maestro = this.sm.getSelected().data;
        this.tienda = new Ext.data.JsonStore({
@@ -99,21 +98,38 @@ header("content-type: text/javascript; charset=UTF-8");
         this.tienda.baseParams.id_aom = maestro.id_aom;
         this.tienda.load();
         const noConformidad = new Ext.grid.GridPanel({
-                  layout: 'fit',
-                  store: this.tienda,
-                  region: 'center',
-                  trackMouseOver: false,
-                  split: true,
-                  border: true,
-                  plain: true,
-                  stripeRows: true,
-                  tbar: [{
+                    store: this.tienda,
+                    layout: 'fit',
+                    region:'center',
+                    anchor: '100%',
+                    split: true,
+                    border: false,
+                    plain: true,
+                    stripeRows: true,
+                    trackMouseOver: false,
+                  tbar: [
+                      {
+                          xtype: 'box',
+                          autoEl: {
+                              tag: 'a',
+                              html: 'Crear nueva NO Conformidad'
+                          },
+                          style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                          listeners: {
+                              render: function(component) {
+                                  component.getEl().on('click', function(e) {
+                                      me.formularioNoConformidad(null);
+                                      me.ventanaNoConformidad.show();
+                                  });
+                              }
+                          }
+                      }
+                      /*{
                       text:'<button class="btn"><i class="fa fa-plus fa-lg"></i>&nbsp;&nbsp;<b>Asignar</b></button>',
                       scope: this,
                       width: '100',
                       handler: function() {
-                         me.formularioNoConformidad(null);
-                         me.ventanaNoConformidad.show();
+
                       },
                   },
                   {
@@ -149,7 +165,7 @@ header("content-type: text/javascript; charset=UTF-8");
                               scope: this
                           })
                       }
-                  }
+                  }*/
                 ],
                   columns: [
                       new Ext.grid.RowNumberer(),
@@ -159,7 +175,7 @@ header("content-type: text/javascript; charset=UTF-8");
                            align: 'center',
                            width: 100,
                           renderer : function(value, p, record) {
-                              return String.format('<div class="gridmultiline" style=" font-size: 10px; ">{0}</div>', record.data['valor_parametro']);
+                              return String.format('<div class="gridmultiline" style=" font-size: 12px; ">{0}</div>', record.data['valor_parametro']);
                           }
                        },
                        {
@@ -168,197 +184,238 @@ header("content-type: text/javascript; charset=UTF-8");
                            align: 'justify',
                            width: 400,
                            renderer : function(value, p, record) {
-                               return String.format('<div class="gridmultiline" style=" font-size: 10px; ">{0}</div>', record.data['descrip_nc']);
+                               return String.format('<div class="gridmultiline" style=" font-size: 12px; "><a>{0}</a></div>', record.data['descrip_nc']);
                            }
                        },
+                      {
+                          header: 'Eliminar',
+                          dataIndex: 'eliminar',
+                          width: 50,
+                          renderer : function(value, p, record) {
+                              return String.format('<a style="display: flex; justify-content: center; align-items: center"><i class="fa fa-trash fa-lg" style="cursor:pointer;"></i></a>', record.data['lista_funcionario']);
+                          }
+                      },
                        {
                            header: 'Estado',
                            dataIndex: 'estado_wf',
                            align: 'center',
                            width: 150,
                            renderer : function(value, p, record) {
-                               return String.format('<div class="gridmultiline" style=" font-size: 10px; ">{0}</div>', record.data['estado_wf']);
+                               return String.format('<div class="gridmultiline" style=" font-size: 12px; ">{0}</div>', record.data['estado_wf']);
                            }
                        }
                   ]
               });
+        noConformidad.addListener('cellclick', this.oncellclickNc,this);
         this.form = new Ext.form.FormPanel({
            items: [{ region: 'center',
                     layout: 'column',
                     border: false,
                     autoScroll: true,
                     items: [{
-                           xtype: 'tabpanel',
-                           plain: true,
-                           activeTab: 0,
-                           height: 600,
-                           deferredRender: false,
+                            xtype: 'tabpanel',
+                            plain: true,
+                            activeTab: 0,
+                            height: 610,
+                            width: 600,
+                            deferredRender: false,
+                            autoScroll: false,
                            items: [{
                                title: 'Datos Principales',
-                               layout: 'form',
-                               defaults: {
-                                 width: 600,
-                               },
-                               autoScroll: true,
+                               layout: 'fit',
                                defaultType: 'textfield',
                                items: [
                                  new Ext.form.FieldSet({
                                          collapsible: false,
                                          border : false,
                                           items: [
-                                              new Ext.form.FieldSet({
-                                                  collapsible: false,
-                                                  border: true,
-                                                  layout: 'form',
-                                                  defaults: {width: 500},
-                                                  items: [
-                                                    new Ext.form.FieldSet({
-                                                        collapsible: false,
-                                                        border: false,
-                                                        layout: 'column',
-                                                        defaults: { width: 500},
-                                                            items: [    
-                                                                        new Ext.form.FieldSet({
-                                                                        collapsible: false,
-                                                                        border: false,
-                                                                        layout: 'form',
-                                                                        columnWidth: .50,
-                                                                            items: [
+                                      new Ext.form.FieldSet({
+                                          collapsible: false,
+                                          border: true,
+                                          layout: 'form',
+                                          defaults: {width: 500},
+                                          items: [
+                                            new Ext.form.FieldSet({
+                                                collapsible: false,
+                                                border: false,
+                                                layout: 'column',
+                                                defaults: { width: 500},
+                                                    items: [
+                                                                new Ext.form.FieldSet({
+                                                                collapsible: false,
+                                                                border: false,
+                                                                layout: 'form',
+                                                                columnWidth: .50,
+                                                                    items: [
+                                                                {
+                                                                    xtype: 'field',
+                                                                    name: 'nro_tramite_wf',
+                                                                    fieldLabel: 'Codigo',
+                                                                    anchor: '100%',
+                                                                    readOnly :true,
+                                                                    style: 'background-image: none; border: 0;font-weight: bold;',
+                                                                }]
+                                                                }),
+                                                                new Ext.form.FieldSet({
+                                                                collapsible: false,
+                                                                border: false,
+                                                                layout: 'form',
+                                                                columnWidth: .50,
+                                                                    items: [
                                                                         {
                                                                             xtype: 'field',
-                                                                            name: 'nro_tramite_wf',
-                                                                            fieldLabel: 'Codigo',
-                                                                            anchor: '100%',
-                                                                            readOnly :true,
-                                                                            style: 'background-image: none; margin-right: 5px'
-                                                                        },
-                                                                        {
-                                                                            xtype: 'field',
-                                                                            name: 'estado_wf',
+                                                                            name: 'nombre_estado',
                                                                             fieldLabel: 'Estado',
                                                                             anchor: '100%',
                                                                             readOnly :true,
-                                                                            style: 'background-image: none; margin-right: 5px'
-                                                                        },
-                                                                        {
-                                                                            xtype: 'datefield',
-                                                                            fieldLabel: 'Inicio Real',
-                                                                            name: 'fecha_prog_inicio',
-                                                                            disabled: false,
-                                                                            readOnly :true,
-                                                                            anchor: '98%',
-                                                                            style: 'background-image: none; margin-right: 5px'
-                                                                        },
-                                                                            ]
-                                                                        }),
-                                                                        new Ext.form.FieldSet({
-                                                                        collapsible: false,
-                                                                        border: false,
-                                                                        layout: 'form',
-                                                                        columnWidth: .50,
-                                                                            items: [
-                                                                                {
-                                                                                    xtype: 'combo',
-                                                                                    fieldLabel: 'Tipo de Auditoria',
-                                                                                    name: 'id_tnorma',
-                                                                                    allowBlank: true,
-                                                                                    emptyText: 'Elija una opción...',
-                                                                                    store: new Ext.data.JsonStore({
-                                                                                        url: '../../sis_auditoria/control/Parametro/listarParametro',
-                                                                                        id: 'id_parametro',
-                                                                                        root: 'datos',
-                                                                                        fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
-                                                                                        totalProperty: 'total',
-                                                                                        sortInfo: {
-                                                                                            field: 'valor_parametro',
-                                                                                            direction: 'ASC'
-                                                                                        },
-                                                                                        baseParams:{
-                                                                                            tipo_parametro:'TIPO_NORMA',
-                                                                                            par_filtro:'prm.id_tipo_parametro'
-                                                                                        }
-                                                                                    }),
-                                                                                    valueField: 'id_parametro',
-                                                                                    displayField: 'valor_parametro',
-                                                                                    gdisplayField: 'desc_tipo_norma',
-                                                                                    hiddenName: 'id_parametro',
-                                                                                    mode: 'remote',
-                                                                                    triggerAction: 'all',
-                                                                                    lazyRender: true,
-                                                                                    pageSize: 15,
-                                                                                    minChars: 2,
-                                                                                    readOnly :true,
-                                                                                    anchor: '100%',
-                                                                                    style: 'background-image: none;'
-                                                                                    },
-                                                                                    {
-                                                                                        xtype: 'combo',
-                                                                                        fieldLabel: 'Objeto Auditoria',
-                                                                                        name: 'id_tobjeto',
-                                                                                        allowBlank: true,
-                                                                                        emptyText: 'Elija una opción...',
-                                                                                        store: new Ext.data.JsonStore({
-                                                                                            url: '../../sis_auditoria/control/Parametro/listarParametro',
-                                                                                            id: 'id_parametro',
-                                                                                            root: 'datos',
-                                                                                            fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
-                                                                                            totalProperty: 'total',
-                                                                                            sortInfo: {
-                                                                                                field: 'valor_parametro',
-                                                                                                direction: 'ASC'
-                                                                                            },
-                                                                                            baseParams:{
-                                                                                                tipo_parametro:'OBJETO_AUDITORIA',
-                                                                                                par_filtro:'prm.id_parametro'
-                                                                                            }
-                                                                                        }),
-                                                                                        valueField: 'id_parametro',
-                                                                                        displayField: 'valor_parametro',
-                                                                                        gdisplayField: 'desc_tipo_objeto',
-                                                                                        mode: 'remote',
-                                                                                        triggerAction: 'all',
-                                                                                        lazyRender: true,
-                                                                                        pageSize: 15,
-                                                                                        minChars: 2,
-                                                                                        readOnly :true,
-                                                                                        anchor: '100%',
-                                                                                        style: 'background-image: none;'
-                                                                                    },
-                                                                                    {
-                                                                                        xtype: 'datefield',
-                                                                                        fieldLabel: 'Fin Real',
-                                                                                        name: 'fecha_prog_fin',
-                                                                                        disabled: false,
-                                                                                        readOnly :true,
-                                                                                        anchor: '100%',
-                                                                                        style: 'background-image: none;'
-                                                                                    },
-                                                                            ]
-                                                                        })
-                                                            ]
+                                                                            style: 'background-image: none; border: 0; color: #0C07F1; font-weight: bold;',
+                                                                        }
+                                                                    ]
+                                                                })
+                                                    ]
                                              }),
-                                              {
-                                                  xtype: 'field',
-                                                  fieldLabel: 'Area',
-                                                  name: 'nombre_unidad',
-                                                  anchor: '100%',
-                                                  readOnly :true,
-                                                  style: 'background-image: none;'
-                                              },
-                                              {
-                                                 xtype: 'field',
-                                                 fieldLabel: 'Nombre',
-                                                 name: 'nombre_aom1',
-                                                 anchor: '100%',
-                                                 readOnly :true,
-                                                  style: 'background-image: none;'
-                                              },
+                                              new Ext.form.FieldSet({
+                                                  collapsible: false,
+                                                  border: false,
+                                                  layout: 'form',
+                                                  items: [
+                                                              {
+                                                                  xtype: 'field',
+                                                                  fieldLabel: 'Area',
+                                                                  name: 'nombre_unidad',
+                                                                  anchor: '100%',
+                                                                  readOnly :true,
+                                                                  style: 'background-image: none; border: 0;font-weight: bold;',
+                                                              },
+                                                              {
+                                                                 xtype: 'field',
+                                                                 fieldLabel: 'Nombre',
+                                                                 name: 'nombre_aom1',
+                                                                 anchor: '100%',
+                                                                 readOnly :true,
+                                                                  style: 'background-image: none; border: 0;font-weight: bold;',
+                                                              }
+                                              ]
+                                              }),
+                                              new Ext.form.FieldSet({
+                                                  collapsible: false,
+                                                  border: false,
+                                                  layout: 'column',
+                                                  defaults: { width: 500},
+                                                  items: [
+                                                      new Ext.form.FieldSet({
+                                                          collapsible: false,
+                                                          border: false,
+                                                          layout: 'form',
+                                                          columnWidth: .50,
+                                                          items: [
+                                                              {
+                                                                  xtype: 'combo',
+                                                                  fieldLabel: 'Tipo de Auditoria',
+                                                                  name: 'id_tnorma',
+                                                                  allowBlank: true,
+                                                                  emptyText: 'Elija una opción...',
+                                                                  store: new Ext.data.JsonStore({
+                                                                      url: '../../sis_auditoria/control/Parametro/listarParametro',
+                                                                      id: 'id_parametro',
+                                                                      root: 'datos',
+                                                                      fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                                                                      totalProperty: 'total',
+                                                                      sortInfo: {
+                                                                          field: 'valor_parametro',
+                                                                          direction: 'ASC'
+                                                                      },
+                                                                      baseParams:{
+                                                                          tipo_parametro:'TIPO_NORMA',
+                                                                          par_filtro:'prm.id_tipo_parametro'
+                                                                      }
+                                                                  }),
+                                                                  valueField: 'id_parametro',
+                                                                  displayField: 'valor_parametro',
+                                                                  gdisplayField: 'desc_tipo_norma',
+                                                                  hiddenName: 'id_parametro',
+                                                                  mode: 'remote',
+                                                                  triggerAction: 'all',
+                                                                  lazyRender: true,
+                                                                  pageSize: 15,
+                                                                  minChars: 2,
+                                                                  readOnly :true,
+                                                                  anchor: '100%',
+                                                                  style: 'background-image: none; border: 0;font-weight: bold;',
+                                                              },
+                                                              {
+                                                                  xtype: 'combo',
+                                                                  fieldLabel: 'Objeto Auditoria',
+                                                                  name: 'id_tobjeto',
+                                                                  allowBlank: true,
+                                                                  emptyText: 'Elija una opción...',
+                                                                  store: new Ext.data.JsonStore({
+                                                                      url: '../../sis_auditoria/control/Parametro/listarParametro',
+                                                                      id: 'id_parametro',
+                                                                      root: 'datos',
+                                                                      fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                                                                      totalProperty: 'total',
+                                                                      sortInfo: {
+                                                                          field: 'valor_parametro',
+                                                                          direction: 'ASC'
+                                                                      },
+                                                                      baseParams:{
+                                                                          tipo_parametro:'OBJETO_AUDITORIA',
+                                                                          par_filtro:'prm.id_parametro'
+                                                                      }
+                                                                  }),
+                                                                  valueField: 'id_parametro',
+                                                                  displayField: 'valor_parametro',
+                                                                  gdisplayField: 'desc_tipo_objeto',
+                                                                  mode: 'remote',
+                                                                  triggerAction: 'all',
+                                                                  lazyRender: true,
+                                                                  pageSize: 15,
+                                                                  minChars: 2,
+                                                                  readOnly :true,
+                                                                  anchor: '100%',
+                                                                  style: 'background-image: none; border: 0;font-weight: bold;',
+                                                              }
+                                                          ]
+                                                      }),
+                                                      new Ext.form.FieldSet({
+                                                          collapsible: false,
+                                                          border: false,
+                                                          layout: 'form',
+                                                          columnWidth: .50,
+                                                          items: [
+                                                              {
+                                                                  xtype: 'datefield',
+                                                                  fieldLabel: 'Inicio Real',
+                                                                  name: 'fecha_prog_inicio',
+                                                                  disabled: false,
+                                                                  readOnly :true,
+                                                                  anchor: '98%',
+                                                                  style: 'background-image: none; border: 0;font-weight: bold;',
+                                                              },
+                                                              {
+                                                                  xtype: 'datefield',
+                                                                  fieldLabel: 'Fin Real',
+                                                                  name: 'fecha_prog_fin',
+                                                                  disabled: false,
+                                                                  readOnly :true,
+                                                                  anchor: '100%',
+                                                                  style: 'background-image: none; border: 0;font-weight: bold;',
+                                                              }
+                                                              ]
+                                                      })
+                                                  ]
+                                              }),
+                                              new Ext.form.FieldSet({
+                                                  collapsible: false,
+                                                  border: false,
+                                                  layout: 'form',
+                                                  items: [
                                                   {
                                                    xtype: 'combo',
                                                    name: 'id_funcionario',
                                                    fieldLabel: 'Auditor Reponsable',
                                                    allowBlank: true,
-                                                   emptyText: 'Elija una opción...',
                                                    emptyText: 'Elija una opción...',
                                                    store: new Ext.data.JsonStore({
                                                        url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListFuncionario',
@@ -384,9 +441,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                                    pageSize: 15,
                                                    minChars: 2,
                                                    readOnly :true,
-                                                      style: 'background-image: none;'
-                                                 },
-                                                      ]}),
+                                                   style: 'background-image: none; border: 0;font-weight: bold;',
+                                                 }
+                                                 ]
+                                              })
+                                                ]
+                                             }),
                                               new Ext.form.FieldSet({
                                                   collapsible: false,
                                                   border: true,
@@ -501,7 +561,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                                   ]})
                                          ]
                                  }),
-
                                 ]
                           },
                           {
@@ -521,7 +580,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                    ]
                            },
                            {
-                               title: 'Recomendacion',
+                               title: 'Recomendaciones',
                                layout: 'column',
                                defaults: {width: 600},
                                autoScroll: true,
@@ -554,7 +613,6 @@ header("content-type: text/javascript; charset=UTF-8");
            autoScroll: true,
            region: 'center'
         });
-
         Ext.Ajax.request({
             url: '../../sis_auditoria/control/NoConformidad/listarRespAreaGerente',
             params: {
@@ -574,6 +632,7 @@ header("content-type: text/javascript; charset=UTF-8");
            width: 640,
            height: 700,
            modal: false,
+            autoScroll: true,
            closeAction: 'hide',
            labelAlign: 'top',
            title: 'Informe Auditoria',
@@ -821,14 +880,6 @@ header("content-type: text/javascript; charset=UTF-8");
         if(data){
             this.punto.baseParams.id_nc = data?data.id_nc:this.id_no_conformidad;
             this.punto.load();
-            console.log(this.punto.getCount())
-            console.log(this.punto.getAt(this.punto.getCount()))
-
-
-            /*for(var i = this.punto.getCount()-1; i >= 0; i--){
-                const record = this.punto.getAt(i);
-                console.log(this.punto.getCount()-)
-            }*/
         }
         this.documentos  = new Ext.data.JsonStore({
             url: '../../sis_workflow/control/DocumentoWf/listarDocumentoWf',
@@ -945,7 +996,11 @@ header("content-type: text/javascript; charset=UTF-8");
                                         scope: this,
                                         width: '100',
                                         handler: function() {
-                                            this.onFormularioDocumento(data);
+                                            if(this.id_no_conformidad !==  null || data){
+                                                this.onFormularioDocumento(data);
+                                            }else{
+                                                alert('Tiene que registrar la no conformidad')
+                                            }
                                         }
                                     },
                                     {
@@ -1078,7 +1133,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 anchor: '100%',
                                                 value: maestro.nro_tramite_wf,
                                                 readOnly :true,
-                                                style: 'background-image: none; background: #eeeeee;'
+                                                style: 'background-image: none; border: 0; font-weight: bold;',
                                              },
                                             {
                                                 xtype: 'field',
@@ -1087,7 +1142,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 anchor: '100%',
                                                 value: maestro.nombre_aom1,
                                                 readOnly :true,
-                                                style: 'background-image: none; background: #eeeeee;'
+                                                style: 'background-image: none; border: 0; font-weight: bold;',
                                             },
                                             {
                                                 xtype: 'combo',
@@ -1255,7 +1310,8 @@ header("content-type: text/javascript; charset=UTF-8");
                                             fieldLabel: 'Observacion Consultor',
                                             allowBlank: true,
                                             anchor: '100%',
-                                            gwidth: 150
+                                            gwidth: 150,
+                                            disabled: true
                                         },
                                         table
                                     ]
@@ -1298,7 +1354,7 @@ header("content-type: text/javascript; charset=UTF-8");
            isForm.getForm().findField('sistemas_integrados').setRawValue(this.onBool(data.sistemas_integrados));
        }
         let id_funcionario = null;
-          Ext.Ajax.request({
+        Ext.Ajax.request({
                 url:'../../sis_auditoria/control/NoConformidad/getUo',
                 params:{ id_uo: maestro.id_uo },
                 success:function(resp){
@@ -1312,7 +1368,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 timeout:this.timeout,
                 scope:this
           });
-
         isForm.getForm().findField('id_uo').on('select', function(combo, record, index){
                 Ext.Ajax.request({
                     url:'../../sis_auditoria/control/NoConformidad/getUo',
@@ -1728,8 +1783,37 @@ header("content-type: text/javascript; charset=UTF-8");
 	       		alert('No se ha subido ningun archivo para este documento');
 	       	} 
 	    }
-		
     },
+
+        oncellclickNc : function(grid, rowIndex, columnIndex, e) {
+
+            const record = this.tienda.getAt(rowIndex),
+                  fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
+            if (fieldName === 'descrip_nc' ) {
+                this.formularioNoConformidad(record.json);
+                this.ventanaNoConformidad.show();
+            }
+            if (fieldName === 'eliminar' ) {
+                console.log(record)
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                    url: '../../sis_auditoria/control/NoConformidad/eliminarNoConformidad',
+                    params: {
+                        id_nc : record.json.id_nc
+                    },
+                    isUpload: false,
+                    success: function(a,b,c){
+                        Phx.CP.loadingHide();
+                        this.tienda.load();
+                    },
+                    argument: this.argumentSave,
+                    failure: this.conexionFailure,
+                    timeout: this.timeout,
+                    scope: this
+                })
+            }
+
+        },
     SubirArchivo : function(rec){     
         const objecto = rec.data;
         objecto.reload_documento = this.documentos;

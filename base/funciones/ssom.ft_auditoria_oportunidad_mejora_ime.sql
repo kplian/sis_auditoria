@@ -83,6 +83,8 @@ DECLARE
     v_id_destinatarios varchar;
     v_equipo		text;
     v_no_conformindad	record;
+    v_codigo_aud		varchar;
+    v_correlativo		varchar;
 
 BEGIN
 
@@ -146,6 +148,17 @@ BEGIN
                '',
                null);
 
+
+
+               select tip.codigo_tpo_aom into v_codigo_aud
+               from ssom.ttipo_auditoria tip
+               where tip.id_tipo_auditoria  = v_parametros.id_tipo_auditoria;
+
+
+               -- raise exception '%',v_codigo_aud;
+
+
+
       --Sentencia de la insercion
     insert into ssom.tauditoria_oportunidad_mejora( id_proceso_wf,
         											nro_tramite_wf,
@@ -170,7 +183,8 @@ BEGIN
                                                     id_gestion,
                                                     id_gconsultivo,
                                                     fecha_prev_inicio,
-                                                    fecha_prev_fin
+                                                    fecha_prev_fin,
+                                                    nro_tramite
       												)values(
                                                     v_id_proceso_wf,
                                                     v_num_tramite,
@@ -195,7 +209,9 @@ BEGIN
                                                     v_id_gestion,
                                                     v_parametros.id_gconsultivo,
                                                     v_parametros.fecha_prev_inicio,
-                                                    v_parametros.fecha_prev_fin
+                                                    v_parametros.fecha_prev_fin,
+                                                    ssom.f_generar_correlativo (v_codigo_aud,
+  													                            EXTRACT(YEAR FROM current_date)::integer,true)
                                                     )RETURNING id_aom into v_id_aom;
 
 
@@ -939,7 +955,35 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
+	end;
+
+      /*********************************
+ 	#TRANSACCION:  'SSOM_CORREL_IME'
+ 	#DESCRIPCION:	Generara correlativo
+ 	#AUTOR:		MMV
+ 	#FECHA:		4/11/2020
+	***********************************/
+
+	elsif(p_transaccion='SSOM_CORREL_IME')then
+
+		begin
+
+
+             select tip.codigo_tpo_aom into v_codigo_aud
+             from ssom.ttipo_auditoria tip
+        	 where tip.id_tipo_auditoria  = v_parametros.id_tipo_auditoria;
+
+       	     v_correlativo = ssom.f_generar_correlativo (v_codigo_aud, EXTRACT(YEAR FROM current_date)::integer,false);
+
+            --Definicion de la respuesta
+             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de decuentos recuperados con exito');
+             v_resp = pxp.f_agrega_clave(v_resp,'correlativo',v_correlativo::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
 		end;
+
 
   else
 

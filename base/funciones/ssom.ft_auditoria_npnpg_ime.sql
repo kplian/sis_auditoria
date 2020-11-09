@@ -32,6 +32,7 @@ DECLARE
 	v_id_anpnpg	integer;
 
 	v_cantidad				integer = 0;
+    v_id_pregunta			integer;
 
 BEGIN
 
@@ -45,19 +46,18 @@ BEGIN
  	#FECHA:		25-07-2019 21:34:47
 	***********************************/
 
-	select count(id_anpnpg) into v_cantidad from ssom.tauditoria_npnpg where id_anpn = v_parametros.id_anpn and id_pregunta = v_parametros.id_pregunta;
-
-	if(v_cantidad > 0) then
-		RAISE EXCEPTION ' Ya tiene Registrado la pregunta no es posible asignar mas de una ves a un Punto de Norma...!!! ';
-	end if;
-
 	if(p_transaccion='SSOM_APNP_INS')then
 
 		begin
 			--Sentencia de la insercion
+            	delete from ssom.tauditoria_npnpg
+			where id_aom=v_parametros.id_aom;
+
+           foreach v_id_pregunta IN  array (string_to_array(v_parametros.id_pregunta::varchar,','))  loop
+
 			insert into ssom.tauditoria_npnpg(
-				pg_valoracion,
-				obs_pg,
+				--pg_valoracion,
+				--obs_pg,
 				id_pregunta,
 				estado_reg,
 				id_anpn,
@@ -66,23 +66,23 @@ BEGIN
 				usuario_ai,
 				id_usuario_reg,
 				id_usuario_mod,
-				fecha_mod
-			) values(
-								v_parametros.pg_valoracion,
-								v_parametros.obs_pg,
-								v_parametros.id_pregunta,
-								'activo',
-								v_parametros.id_anpn,
-								v_parametros._id_usuario_ai,
-								now(),
-								v_parametros._nombre_usuario_ai,
-								p_id_usuario,
-								null,
-								null
+				fecha_mod,
+                id_aom
+				) values(
+                --v_parametros.pg_valoracion,
+                --v_parametros.obs_pg,
+                v_id_pregunta,
+                'activo',
+                v_parametros.id_anpn,
+                v_parametros._id_usuario_ai,
+                now(),
+                v_parametros._nombre_usuario_ai,
+                p_id_usuario,
+                null,
+                null,
+                v_parametros.id_aom);
 
-
-
-							)RETURNING id_anpnpg into v_id_anpnpg;
+            end loop;
 
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Auditoria Puntos Norma Pregunta almacenado(a) con exito (id_anpnpg'||v_id_anpnpg||')');

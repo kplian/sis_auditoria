@@ -60,19 +60,20 @@ BEGIN
 						usu2.cuenta as usr_mod,
                         pnor.nombre_pn,
                         pnor.id_pn,
-                        preg.descrip_pregunta
+                        preg.descrip_pregunta,
+                        apnp.id_aom
 						from ssom.tauditoria_npnpg apnp
 						inner join segu.tusuario usu1 on usu1.id_usuario = apnp.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = apnp.id_usuario_mod
-                        join ssom.tpregunta preg on apnp.id_pregunta = preg.id_pregunta
-                        join ssom.tauditoria_npn anpn on apnp.id_anpn = anpn.id_anpn
-                        join ssom.tpunto_norma pnor on anpn.id_pn = pnor.id_pn
+                        inner join ssom.tpunto_norma pnor on pnor.id_pn = apnp.id_anpnpg
+                        inner join ssom.tpregunta preg on apnp.id_pregunta = preg.id_pregunta
+                        left join segu.tusuario usu2 on usu2.id_usuario = apnp.id_usuario_mod
 				        where  ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			--Devuelve la respuesta
+
 			return v_consulta;
 
 		end;
@@ -91,10 +92,9 @@ BEGIN
 			v_consulta:='select count(id_anpnpg)
 					    from ssom.tauditoria_npnpg apnp
 					    inner join segu.tusuario usu1 on usu1.id_usuario = apnp.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = apnp.id_usuario_mod
-                        join ssom.tpregunta preg on apnp.id_pregunta = preg.id_pregunta
-                        join ssom.tauditoria_npn anpn on apnp.id_anpn = anpn.id_anpn
-                        join ssom.tpunto_norma pnor on anpn.id_pn = pnor.id_pn
+                        inner join ssom.tpunto_norma pnor on pnor.id_pn = apnp.id_anpnpg
+                        inner join ssom.tpregunta preg on apnp.id_pregunta = preg.id_pregunta
+                        left join segu.tusuario usu2 on usu2.id_usuario = apnp.id_usuario_mod
 					    where ';
 
 			--Definicion de la respuesta

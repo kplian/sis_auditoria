@@ -282,7 +282,7 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                     gdisplayField: 'nombre_unidad',
                     hiddenName: 'id_uo',
                     tpl:'<tpl for="."><div class="x-combo-list-item">' +
-                        '<p><b>NOMBRE </b><span style="color: mediumblue"><b>{nombre_unidad}</b></span></p> ' +
+                        '<p><b>NOMBRE </b><span style="color: mediumblue;"><b>{nombre_unidad}</b></span></p> ' +
                         '<p><b>CODIGO </b><span style="color: #533005"><b>{codigo}</b></span></p>' +
                         '</div>' +
                         '</tpl>',

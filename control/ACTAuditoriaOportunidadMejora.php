@@ -46,7 +46,7 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
 
 
         if($this->objParam->getParametro('interfaz')== 'PlanificarAuditoria'){
-            $this->objParam->addFiltro("aom.estado_wf in (''planificacion'',''aprobado_responsable'') and tau.codigo_tpo_aom = ''AETR''");
+            $this->objParam->addFiltro("aom.estado_wf not in (''programada'') and tau.codigo_tpo_aom = ''AETR''");
         }
 
         if($this->objParam->getParametro('interfaz')== 'OportunidadMejora'){
@@ -73,7 +73,7 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
         }
 
         if($this->objParam->getParametro('interfaz')== 'InformeAuditoria'){
-            $this->objParam->addFiltro("aom.estado_wf in (''ejecutada'')");
+            $this->objParam->addFiltro("aom.estado_wf not in (''programada'')");
         }
         if($this->objParam->getParametro('interfaz')== 'OportunidadMejoraInforme'){
             $this->objParam->addFiltro("aom.estado_wf = ''ejecutada'' and tau.codigo_tpo_aom = ''OM''");

@@ -11,7 +11,8 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.PlanificarAuditoria = {
+    let siglass = '';
+    Phx.vista.PlanificarAuditoria = {
     require:'../../../sis_auditoria/vista/auditoria_oportunidad_mejora/AuditoriaOportunidadMejora.php',
     requireclase:'Phx.vista.AuditoriaOportunidadMejora',
     title:'Formulario Planificacion de Auditoria',
@@ -25,7 +26,7 @@ Phx.vista.PlanificarAuditoria = {
     storePuntoNorma:{},
     storeCronograma:{},
     storePregunta:{},
-    sigla:'',
+
     constructor: function(config) {
         this.Atributos[this.getIndAtributo('id_destinatario')].grid=false;
         this.Atributos[this.getIndAtributo('recomendacion')].grid=false;
@@ -129,13 +130,13 @@ Phx.vista.PlanificarAuditoria = {
               id: 'id_anpnpg',
               root: 'datos',
               sortInfo: {
-                  field: 'id_anpnpg',
+                  field: 'nombre_pn',
                   direction: 'ASC'
               },
               totalProperty: 'total',
-              fields: ['id_anpnpg','descrip_pregunta','estado_reg','usr_reg','fecha_reg'
+              fields: ['id_anpnpg','nombre_pn','estado_reg','usr_reg','fecha_reg','descrip_pregunta'
               ],remoteSort: true,
-              baseParams: {dir:'ASC',sort:'id_anpnpg',limit:'100',start:'0'}
+              baseParams: {dir:'ASC',sort:'id_aom',limit:'100',start:'0'}
           });
 
           const detalleCronograma = new Ext.ux.grid.RowEditor({
@@ -158,9 +159,8 @@ Phx.vista.PlanificarAuditoria = {
                    'estado_reg','usr_reg','fecha_reg'],remoteSort: true,
                baseParams: {dir:'ASC',sort:'id_cronograma',limit:'100',start:'0'}
          });
-        const me = this;
-
-        const procesos = new Ext.grid.GridPanel({
+          const me = this;
+          const procesos = new Ext.grid.GridPanel({
             store:  this.storeProceso,
             layout: 'fit',
             region:'center',
@@ -224,7 +224,7 @@ Phx.vista.PlanificarAuditoria = {
                 }
             ]
         });
-        const responsable = new Ext.grid.GridPanel({
+          const responsable = new Ext.grid.GridPanel({
             store:  this.storeEquipo,
             layout: 'fit',
             region:'center',
@@ -287,7 +287,7 @@ Phx.vista.PlanificarAuditoria = {
                 }
             ]
         })
-        const puntoNorma =  new Ext.grid.GridPanel({
+          const puntoNorma =  new Ext.grid.GridPanel({
             store:  this.storePuntoNorma,
             layout: 'fit',
             region:'center',
@@ -305,12 +305,11 @@ Phx.vista.PlanificarAuditoria = {
                     width: 150,
                     sortable: false,
                     renderer:function(value, p, record){
-                        let resultao = '';
-                        if(this.sigla !== record.data['sigla_norma']){
-                            resultao = String.format('<b>{0}</b>', record.data['sigla_norma']);
-                            this.sigla =  record.data['sigla_norma']
+                        if( siglass !== record.data['sigla_norma'] ){
+                            siglass =  record.data['sigla_norma'];
+                            return  String.format('<b>{0}</b>', siglass);
                         }
-                        return resultao
+
                     }
                 },
                 {
@@ -369,7 +368,70 @@ Phx.vista.PlanificarAuditoria = {
                     }
                 }]
         });
-        const crorograma = new Ext.grid.GridPanel({
+          const pregunta = new Ext.grid.GridPanel({
+            store:  this.storePregunta,
+            layout: 'fit',
+            region:'center',
+            anchor: '100%',
+            split: true,
+            border: false,
+            plain: true,
+            stripeRows: true,
+            trackMouseOver: false,
+            columns: [
+                new Ext.grid.RowNumberer(),
+                {
+                    header: 'Punto de Norma',
+                    dataIndex: 'id_pn',
+                    width: 300,
+                    sortable: false,
+                    renderer:function(value, p, record){return String.format('<b>{0}</b>', record.data['nombre_pn'])},
+                },
+                {
+                    header: 'Pregunta',
+                    dataIndex: 'id_pregunta',
+                    width: 300,
+                    sortable: false,
+                    renderer:function(value, p, record){return String.format('<a>{0}</a>', record.data['descrip_pregunta'])},
+                },
+                {
+                    header: 'Estado Reg.',
+                    dataIndex: 'estado_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Creado por.',
+                    dataIndex: 'usr_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Fecha creación',
+                    dataIndex: 'fecha_reg',
+                    align: 'center',
+                    width: 110
+                }
+            ],
+            tbar: [
+                {
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'a',
+                        html: 'Asignar Preguntas'
+                    },
+                    style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                    listeners: {
+                        render: function(component) {
+                            component.getEl().on('click', function(e) {
+                                me.formularioPregunta();
+                                me.ventanaPregunta.show();
+                            });
+                        }
+                    }
+                }]
+        })
+          const crorograma = new Ext.grid.GridPanel({
             store:  this.storeCronograma,
             trackMouseOver: false,
             layout: 'fit',
@@ -464,10 +526,11 @@ Phx.vista.PlanificarAuditoria = {
                     width: 110
                 }]
         });
-        procesos.addListener('cellclick', this.oncellclick,this);
-        responsable.addListener('cellclick', this.oncellclick,this);
-        puntoNorma.addListener('cellclick', this.oncellclick,this);
-        crorograma.addListener('cellclick', this.oncellclick,this);
+          procesos.addListener('cellclick', this.oncellclick,this);
+          responsable.addListener('cellclick', this.oncellclick,this);
+          puntoNorma.addListener('cellclick', this.oncellclick,this);
+          pregunta.addListener('cellclick', this.oncellclick,this);
+          crorograma.addListener('cellclick', this.oncellclick,this);
 
         this.form = new Ext.form.FormPanel({
              id: this.idContenedor + '_formulario_aud',
@@ -500,34 +563,62 @@ Phx.vista.PlanificarAuditoria = {
                                                      autoScroll: true,
                                                      // defaults: {width: 550},
                                                      items: [
-                                                         {
-                                                             xtype: 'field',
-                                                             fieldLabel: 'Código',
-                                                             name: 'nro_tramite_wf',
-                                                             anchor: '100%',
-                                                             disabled: true,
-                                                             id: this.idContenedor + '_nro_tramite_wf',
-                                                             // style: 'background-image: none;'
-                                                         },
-                                                         {
-                                                             xtype: 'field',
-                                                             fieldLabel: 'Area',
-                                                             name: 'nombre_unidad',
-                                                             anchor: '100%',
-                                                             disabled: true,
-                                                             id: this.idContenedor + '_nombre_unidad',
-                                                             // style: 'background-image: none;'
-                                                         },
-                                                         {
-                                                             xtype: 'field',
-                                                             fieldLabel: 'Nombre',
-                                                             name: 'nombre_aom1',
-                                                             anchor: '100%',
-                                                             disabled: true,
-                                                             id: this.idContenedor + '_nombre_aom1',
-                                                             // style: 'background-image: none;'
-                                                         },
-                                                     ]
+                                                         new Ext.form.FieldSet({
+                                                             collapsible: false,
+                                                             layout: "column",
+                                                             border: true,
+
+                                                             defaults: {
+                                                                 flex: 1
+                                                             },
+                                                             items: [
+                                                                 new Ext.form.Label({
+                                                                     text: 'Código :',
+                                                                     style: 'margin: 4px; font-size: 12px'
+                                                                 }),
+                                                                 {
+                                                                     xtype: 'field',
+                                                                     fieldLabel: 'Código',
+                                                                     name: 'nro_tramite_wf',
+                                                                     anchor: '100%',
+                                                                     readOnly: true,
+                                                                     id: this.idContenedor + '_nro_tramite_wf',
+                                                                     style: 'background-image: none; border: 0;',
+
+                                                                 },
+                                                                 new Ext.form.Label({
+                                                                     text: 'Estado :',
+                                                                     style: 'margin: 4px; font-size: 12px'
+                                                                 }),
+                                                                 {
+                                                                     xtype: 'field',
+                                                                     fieldLabel: 'Estado',
+                                                                     name: 'nombre_estado',
+                                                                     anchor: '100%',
+                                                                     readOnly: true,
+                                                                     id: this.idContenedor + '_nombre_estado',
+                                                                     style: 'background-image: none; border: 0; color: #0C07F1; font-weight: bold;',
+                                                                 }
+                                                             ]
+                                                            }),
+                                                             {
+                                                                 xtype: 'field',
+                                                                 fieldLabel: 'Area',
+                                                                 name: 'nombre_unidad',
+                                                                 anchor: '100%',
+                                                                 readOnly: true,
+                                                                 id: this.idContenedor + '_nombre_unidad',
+                                                                 style: 'background-image: none; border: 0;',
+                                                             },
+                                                             {
+                                                                 xtype: 'field',
+                                                                 fieldLabel: 'Nombre',
+                                                                 name: 'nombre_aom1',
+                                                                 anchor: '100%',
+                                                                 readOnly: true,
+                                                                 id: this.idContenedor + '_nombre_aom1',
+                                                             }
+                                                         ]
                                                  }),
                                                  new Ext.form.FieldSet({
                                                      collapsible: false,
@@ -613,17 +704,19 @@ Phx.vista.PlanificarAuditoria = {
                                                              xtype: 'datefield',
                                                              fieldLabel: 'Inicio Prev',
                                                              name: 'fecha_prev_inicio',
-                                                             disabled: true,
+                                                             readOnly: true,
                                                              anchor: '100%',
-                                                             id: this.idContenedor+'_fecha_prev_inicio'
+                                                             id: this.idContenedor+'_fecha_prev_inicio',
+                                                             style: 'background-image: none; border: 0;'
                                                          },
                                                          {
                                                              xtype: 'datefield',
                                                              fieldLabel: 'Fin Prev',
                                                              name: 'fecha_prev_fin',
-                                                             disabled: true,
+                                                             readOnly: true,
                                                              anchor: '100%',
-                                                             id: this.idContenedor+'_fecha_prev_fin'
+                                                             id: this.idContenedor+'_fecha_prev_fin',
+                                                             style: 'background-image: none; border: 0;'
                                                          },
                                                          {
                                                              xtype: 'datefield',
@@ -676,76 +769,7 @@ Phx.vista.PlanificarAuditoria = {
                                      layout: 'fit',
                                      region:'center',
                                      items: [
-                                         new Ext.grid.GridPanel({
-                                             store:  this.storePregunta,
-                                             layout: 'fit',
-                                             region:'center',
-                                             anchor: '100%',
-                                             split: true,
-                                             border: false,
-                                             plain: true,
-                                             stripeRows: true,
-                                             trackMouseOver: false,
-                                             columns: [
-                                                 new Ext.grid.RowNumberer(),
-                                                 {
-                                                     header: 'Norma',
-                                                     dataIndex: 'id_norma',
-                                                     width: 150,
-                                                     sortable: false,
-                                                     renderer:function(value, p, record){return String.format('{0}', record.data['sigla_norma'])},
-                                                 },
-                                                 {
-                                                     header: 'Punto de Norma',
-                                                     dataIndex: 'id_pn',
-                                                     width: 300,
-                                                     sortable: false,
-                                                     renderer:function(value, p, record){return String.format('<a>{0}</a>', record.data['nombre_pn'])},
-                                                 },
-                                                 {
-                                                     header: 'Pregunta',
-                                                     dataIndex: 'id_pregunta',
-                                                     width: 300,
-                                                     sortable: false,
-                                                     renderer:function(value, p, record){return String.format('<a>{0}</a>', record.data['descrip_pregunta'])},
-                                                 },
-                                                 {
-                                                     header: 'Estado Reg.',
-                                                     dataIndex: 'estado_reg',
-                                                     width: 100,
-                                                     sortable: false
-                                                 },
-                                                 {
-                                                     header: 'Creado por.',
-                                                     dataIndex: 'usr_reg',
-                                                     width: 100,
-                                                     sortable: false
-                                                 },
-                                                 {
-                                                     header: 'Fecha creación',
-                                                     dataIndex: 'fecha_reg',
-                                                     align: 'center',
-                                                     width: 110
-                                                 }
-                                             ],
-                                             tbar: [
-                                                 {
-                                                     xtype: 'box',
-                                                     autoEl: {
-                                                         tag: 'a',
-                                                         html: 'Asignar Preguntas'
-                                                     },
-                                                     style: 'cursor:pointer; font-size: 13px; margin: 10px;',
-                                                     listeners: {
-                                                         render: function(component) {
-                                                             component.getEl().on('click', function(e) {
-                                                                 me.formularioPregunta();
-                                                                 me.ventanaPregunta.show();
-                                                             });
-                                                         }
-                                                     }
-                                                 }]
-                                         })
+                                         pregunta
                                      ]
                                  },
                                  {
@@ -850,20 +874,30 @@ Phx.vista.PlanificarAuditoria = {
         this.storePuntoNorma.baseParams.id_aom = record.id_aom;
         this.storePuntoNorma.load();
 
+        this.storePregunta.baseParams.id_aom = record.id_aom;
+        this.storePregunta.load();
+
         this.storeCronograma.baseParams.id_aom = record.id_aom;
         this.storeCronograma.load();
     },
     formularioProceso:function(){
         const maestro = this.sm.getSelected().data;
         const isForm = new Ext.form.FormPanel({
-            items: [{
+            items: [
+                new Ext.form.FieldSet({
+                    collapsible: false,
+                    border: true,
+                    layout: 'form',
+                    autoScroll: true,
+                    items: [
+                {
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
                         name: 'nro_tramite_wf',
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
-                        disabled :true,
-                        // style: 'background-image: none;'
+                        readOnly :true,
+                        style: 'background-image: none; border: 0; font-weight: bold;',
                     },
                     {
                           xtype: 'field',
@@ -871,9 +905,11 @@ Phx.vista.PlanificarAuditoria = {
                           name: 'nombre_aom1',
                           anchor: '100%',
                           value: maestro.nombre_aom1,
-                          disabled :true,
-                          // style: 'background-image: none;'
+                          readOnly :true,
+                          style: 'background-image: none; border: 0; font-weight: bold;',
                     },
+                        ]
+                }),
                     {
                             anchor: '100%',
                             bodyStyle: 'padding:10px;',
@@ -961,7 +997,7 @@ Phx.vista.PlanificarAuditoria = {
        });
         this.procesoVentana = new Ext.Window({
          width: 700,
-         height: 450,
+         height: 480,
          modal: true,
          autoScroll:true,
          closeAction: 'hide',
@@ -1025,13 +1061,21 @@ Phx.vista.PlanificarAuditoria = {
         const maestro = this.sm.getSelected().data;
         const me = this;
         const isForm = new Ext.form.FormPanel({
-            items: [{
+            items: [
+                new Ext.form.FieldSet({
+                    collapsible: false,
+                    border: true,
+                    layout: 'form',
+                    autoScroll: true,
+                    items: [
+                {
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
                         name: 'nro_tramite_wf',
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
-                        disabled :true,
+                        readOnly :true,
+                        style: 'background-image: none; border: 0;font-weight: bold;',
                     },
                     {
                           xtype: 'field',
@@ -1039,7 +1083,8 @@ Phx.vista.PlanificarAuditoria = {
                           name: 'nombre_aom1',
                           anchor: '100%',
                           value: maestro.nombre_aom1,
-                          disabled :true,
+                          readOnly :true,
+                          style: 'background-image: none; border: 0; font-weight: bold;',
                     },
                     {
                                xtype: 'combo',
@@ -1071,6 +1116,7 @@ Phx.vista.PlanificarAuditoria = {
                                pageSize: 15,
                                minChars: 2,
                       },
+                        ]}),
                     {
                             anchor: '100%',
                             bodyStyle: 'padding:10px;',
@@ -1249,7 +1295,7 @@ Phx.vista.PlanificarAuditoria = {
 
       this.ventanaEquipo = new Ext.Window({
          width: 700,
-         height: 570,
+         height: 580,
          modal: true,
          closeAction: 'hide',
          autoScroll:true,
@@ -1308,17 +1354,25 @@ Phx.vista.PlanificarAuditoria = {
     },
     formularioPuntoNorma:function(record){
       const maestro = this.sm.getSelected().data;
+      siglass = '';
       const me = this;
         const isForm = new Ext.form.FormPanel({
           id: this.idContenedor + '_formulario_punto_norm',
-            items: [{
+            items: [
+                new Ext.form.FieldSet({
+                    collapsible: false,
+                    border: true,
+                    layout: 'form',
+                    autoScroll: true,
+                    items: [
+                    {
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
                         name: 'nro_tramite_wf',
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
-                        disabled :true,
-                        // style: 'background-image: none;'
+                        readOnly :true,
+                        style: 'background-image: none; border: 0;font-weight: bold;',
                     },
                     {
                           xtype: 'field',
@@ -1326,15 +1380,14 @@ Phx.vista.PlanificarAuditoria = {
                           name: 'nombre_aom1',
                           anchor: '100%',
                           value: maestro.nombre_aom1,
-                          disabled :true,
-                          // style: 'background-image: none;'
+                          readOnly :true,
+                          style: 'background-image: none; border: 0;font-weight: bold;',
                     },
                     {
                                xtype: 'combo',
                                name: 'id_norma',
                                fieldLabel: 'Norma',
                                allowBlank: false,
-                              // id: this.idContenedor+'_id_norma',
                                emptyText: 'Elija una opción...',
                                store: new Ext.data.JsonStore({
                                    url: '../../sis_auditoria/control/Norma/listarNorma',
@@ -1357,6 +1410,8 @@ Phx.vista.PlanificarAuditoria = {
                                pageSize: 15,
                                minChars: 2
                       },
+                    ]
+                }),
                       {
                           anchor: '100%',
                           bodyStyle: 'padding:10px;',
@@ -1378,10 +1433,6 @@ Phx.vista.PlanificarAuditoria = {
                                       url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNormaMulti',
                                       id: 'id_pn',
                                       root: 'datos',
-                                      sortInfo: {
-                                          field: 'nombre_descrip',
-                                          direction: 'ASC'
-                                      },
                                       totalProperty: 'total',
                                       fields: ['id_pn', 'nombre_pn','nombre_descrip'],
                                       remoteSort: true,
@@ -1412,7 +1463,7 @@ Phx.vista.PlanificarAuditoria = {
                                         totalProperty: 'total',
                                         fields: ['id_pn', 'nombre_pn','nombre_descrip'],
                                         remoteSort: true,
-                                        baseParams: {dir:'ASC',sort:'id_aom',limit:'100',start:'0', id_aom: maestro.id_aom}
+                                        baseParams: {dir:'ASC',sort:'id_pn',limit:'100',start:'0', id_aom: maestro.id_aom}
                                     }),
                                     tbar:[{
                                         text: 'Limpiar',
@@ -1442,7 +1493,7 @@ Phx.vista.PlanificarAuditoria = {
                 isForm.getForm().items.items[2].setRawValue(record.json.sigla_norma);
                 isForm.getForm().items.items[3].multiselects[0].store.baseParams = {
                     dir: "ASC",
-                    sort: "id_aom",
+                    sort: "id_pn",
                     limit: "100",
                     start: "0",
                     id_norma: record.json.id_norma,
@@ -1451,7 +1502,7 @@ Phx.vista.PlanificarAuditoria = {
                 isForm.getForm().items.items[3].multiselects[0].store.load();
                 isForm.getForm().items.items[3].multiselects[1].store.baseParams = {
                     dir: "ASC",
-                    sort: "id_aom",
+                    sort: "id_pn",
                     limit: "100",
                     start: "0",
                     id_aom: maestro.id_aom,
@@ -1463,8 +1514,9 @@ Phx.vista.PlanificarAuditoria = {
             },1000)
         }
          isForm.getForm().items.items[2].on('select', function(combo, record, index){
-               isForm.getForm().items.items[3].multiselects[0].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_norma: record.data.id_norma,item :maestro.id_aom};
-               isForm.getForm().items.items[3].multiselects[1].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_aom: maestro.id_aom,id_norma: record.data.id_norma};
+               isForm.getForm().items.items[3].multiselects[0].store.baseParams = {dir: "ASC", sort: "id_pn", limit: "100", start: "0", id_norma: record.data.id_norma,item :maestro.id_aom};
+               isForm.getForm().items.items[3].multiselects[1].store.baseParams = {dir: "ASC", sort: "id_pn", limit: "100", start: "0", id_aom: maestro.id_aom,id_norma: record.data.id_norma};
+               isForm.getForm().items.items[3].multiselects[0].store.load();
                isForm.getForm().items.items[3].multiselects[1].store.load();
                isForm.getForm().items.items[3].modificado = true;
                isForm.getForm().items.items[3].reset();
@@ -1526,25 +1578,32 @@ Phx.vista.PlanificarAuditoria = {
              text: 'Declinar',
              handler: function() {
                  this.ventanaPuntoNorma.hide();
-                 this.storePuntoNorma.load();
+                 //this.storePuntoNorma.load();
              },
              scope: this
          }]
       });
     },
-    formularioPregunta:function(){
+    formularioPregunta:function(record){
       const maestro = this.sm.getSelected().data;
       const me = this;
         const isForm = new Ext.form.FormPanel({
           id: this.idContenedor + '_formulario_pregunta',
-            items: [{
+            items: [
+                new Ext.form.FieldSet({
+                    collapsible: false,
+                    border: true,
+                    layout: 'form',
+                    autoScroll: true,
+                    items: [
+                    {
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
                         name: 'nro_tramite_wf',
                         anchor: '100%',
                         value: maestro.nro_tramite_wf,
-                        disabled :true,
-                        // style: 'background-image: none;'
+                        readOnly :true,
+                        style: 'background-image: none; border: 0;font-weight: bold;',
                     },
                     {
                           xtype: 'field',
@@ -1552,40 +1611,70 @@ Phx.vista.PlanificarAuditoria = {
                           name: 'nombre_aom1',
                           anchor: '100%',
                           value: maestro.nombre_aom1,
-                          disabled :true,
-                          // style: 'background-image: none;'
+                          readOnly :true,
+                          style: 'background-image: none; border: 0;font-weight: bold;',
                     },
-                    {
+                        new Ext.form.FieldSet({
+                            collapsible: false,
+                            layout: "column",
+                            border: true,
+                            defaults: {
+                                flex: 1
+                            },
+                            items: [
+                                new Ext.form.Label({
+                                    text: 'Punto Norma :',
+                                    style: 'margin: 5px; font-size: 12px;'
+                                }),
+                                {
                                xtype: 'combo',
-                               name: 'id_norma',
-                               fieldLabel: 'Norma',
+                               name: 'id_pn',
+                               fieldLabel: 'Punto Norma',
                                allowBlank: false,
                                emptyText: 'Elija una opción...',
-                               store: new Ext.data.JsonStore({
-                                   url: '../../sis_auditoria/control/Norma/listarNorma',
-                                   id: 'id_norma',
-                                   root: 'datos',
-                                   sortInfo: {
-                                       field: 'nombre_norma',
-                                       direction: 'ASC'
-                                   },
-                                   totalProperty: 'total',
-                                   fields: ['id_norma', 'id_tipo_norma','nombre_norma','sigla_norma','descrip_norma'],
-                                   remoteSort: true,
-                                   baseParams: {par_filtro: 'nor.sigla_norma'}
-                               }),
-                               valueField: 'id_norma',
-                               displayField: 'sigla_norma',
-                               gdisplayField: 'sigla_norma',
-                               tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color:#01010a">{sigla_norma} - {nombre_norma}</p></div></tpl>',
-                               hiddenName: 'id_norma',
-                               mode: 'remote',
-                                anchor: '100%',
-                               triggerAction: 'all',
-                               lazyRender: true,
-                               pageSize: 15,
-                               minChars: 2
-                      },
+                                store: new Ext.data.JsonStore({
+                                    url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNorma',
+                                    id: 'id_pn',
+                                    root: 'datos',
+                                    sortInfo: {
+                                        field: 'sigla_norma',
+                                        direction: 'ASC'
+                                    },
+                                    totalProperty: 'total',
+                                    fields: ['id_pn', 'nombre_pn','nombre_pn','sigla_norma'],
+                                    remoteSort: true,
+                                    baseParams: {dir:'ASC',sort:'id_pn',limit:'100',start:'0'}
+                                }),
+                                displayField: 'nombre_pn',
+                                valueField: 'id_pn',
+                                tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color:#01010a">{sigla_norma} - {nombre_pn}</p></div></tpl>',
+                                hiddenName: 'id_pn',
+                                mode: 'remote',
+                                width: 300,
+                                triggerAction: 'all',
+                                lazyRender: true,
+                                pageSize: 50,
+                                minChars: 2
+                            },
+                            {
+                            xtype: 'box',
+                            autoEl: {
+                                tag: 'button',
+                                html: 'Sugerir Pregunta'
+                            },
+                             style: 'cursor:pointer; margin-left: 8px',
+                            listeners: {
+                                render: function(component) {
+                                    component.getEl().on('click', function(e) {
+                                        me.asignarPregunta();
+                                        me.preguntaPnVentana.show();
+                                    });
+                                }
+                            }
+                        }
+                        ]})
+                     ]
+                     }),
                       {
                             anchor: '100%',
                             bodyStyle: 'padding:10px;',
@@ -1605,10 +1694,6 @@ Phx.vista.PlanificarAuditoria = {
                                       url: '../../sis_auditoria/control/Pregunta/listarPregunta',
                                       id: 'id_pregunta',
                                       root: 'datos',
-                                      sortInfo: {
-                                          field: 'nro_pregunta',
-                                          direction: 'ASC'
-                                      },
                                       totalProperty: 'total',
                                       fields: ['id_pregunta', 'nro_pregunta','descrip_pregunta'],
                                       remoteSort: true,
@@ -1629,7 +1714,8 @@ Phx.vista.PlanificarAuditoria = {
                                     }],
                                     displayField: 'descrip_pregunta',
                                     valueField: 'id_pregunta',
-                                },{
+                                    },
+                                    {
                                     width: 300,
                                     height: 250,
                                     store: new Ext.data.JsonStore({
@@ -1639,7 +1725,7 @@ Phx.vista.PlanificarAuditoria = {
                                         totalProperty: 'total',
                                         fields: ['id_pregunta', 'descrip_pregunta'],
                                         remoteSort: true,
-                                        baseParams: {dir:'ASC',sort:'id_aom',limit:'100',start:'0', id_aom: maestro.id_aom}
+                                        baseParams: {dir:'ASC',sort:'id_pregunta',limit:'100',start:'0'}
                                     }),
                                     tbar:[{
                                         text: 'Limpiar',
@@ -1661,12 +1747,55 @@ Phx.vista.PlanificarAuditoria = {
           autoScroll: true,
           region: 'center'
        });
-        isForm.getForm().findField('id_norma').on('select', function(combo, record, index){
-              // isForm.getForm().items.items[3].multiselects[0].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_norma: record.data.id_norma,item :maestro.id_aom};
-              // isForm.getForm().items.items[3].multiselects[1].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_aom: maestro.id_aom,id_norma: record.data.id_norma};
-              // isForm.getForm().items.items[3].multiselects[1].store.load();
-               isForm.getForm().findField('id_pregunta').modificado = true;
-               isForm.getForm().findField('id_pregunta').reset();
+        if(record){
+            console.log(record.json)
+            Phx.CP.loadingShow();
+            setTimeout(() => {
+                isForm.getForm().items.items[2].setValue(record.json.id_pn);
+                isForm.getForm().items.items[2].setRawValue(record.json.nombre_pn);
+
+                isForm.getForm().items.items[3].multiselects[0].store.baseParams = {
+                    dir: "ASC",
+                    sort: "id_pregunta",
+                    limit: "100",
+                    start: "0",
+                    item :maestro.id_aom
+                };
+                isForm.getForm().items.items[3].multiselects[0].store.load();
+                isForm.getForm().items.items[3].multiselects[1].store.baseParams = {
+                    dir: "ASC",
+                    sort: "id_pregunta",
+                    limit: "100",
+                    start: "0",
+                    id_aom: maestro.id_aom
+                };
+                isForm.getForm().items.items[3].multiselects[1].store.load();
+                isForm.getForm().findField('id_pregunta').modificado = true;
+                Phx.CP.loadingHide();
+            },2000)
+        }
+         isForm.getForm().findField('id_pn').on('select', function(combo, record){
+                isForm.getForm().items.items[3].multiselects[0].store.baseParams = {
+                    dir: "ASC",
+                    sort: "id_pregunta",
+                    limit: "100",
+                    start: "0",
+                    id_pn: record.data.id_pn,
+                    item :maestro.id_aom
+                };
+                isForm.getForm().items.items[3].multiselects[0].store.load();
+                isForm.getForm().items.items[3].multiselects[1].store.baseParams = {
+                    dir: "ASC",
+                    sort: "id_pregunta",
+                    limit: "100",
+                    start: "0",
+                    id_aom: maestro.id_aom
+                };
+                isForm.getForm().items.items[3].multiselects[1].store.load();
+
+                isForm.getForm().findField('id_pregunta').modificado = true;
+                isForm.getForm().findField('id_pregunta').reset();
+
          },this);
 
       this.ventanaPregunta = new Ext.Window({
@@ -1695,27 +1824,26 @@ Phx.vista.PlanificarAuditoria = {
                                submit[obj.name]=obj.getValue();
                            }
                        },this);
-                 /* Phx.CP.loadingShow();
-                Ext.Ajax.request({
-                     url: '../../sis_auditoria/control/AuditoriaNpn/insertarItemAuditoriaNpn',
+
+                 Phx.CP.loadingShow();
+                 Ext.Ajax.request({
+                     url: '../../sis_auditoria/control/AuditoriaNpnpg/insertarAuditoriaNpnpg',
                      params: {
-                         id_aom :maestro.id_aom,
-                         id_norma:  submit.id_norma,
-                         id_pn: submit.id_pn
+
+                         id_pregunta: submit.id_pregunta,
+                         id_anpn : submit.id_pn,
+                         id_aom :maestro.id_aom
                      },
                      isUpload: false,
                      success: function(a,b,c){
                          Phx.CP.loadingHide();
-                         me.ventanaPregunta.hide();
                          me.storePuntoNorma.load();
-
                      },
                      argument: this.argumentSave,
                      failure: this.conexionFailure,
                      timeout: this.timeout,
                      scope: this
-                 });*/
-                 me.ventanaPregunta.hide();
+                 });
              },
              scope: this
              },
@@ -1827,8 +1955,10 @@ Phx.vista.PlanificarAuditoria = {
                     }
                 ],
             });
-            const isForm = new Ext.form.FormPanel({
-              //  id: this.idContenedor + '_formulario_crorogrma',
+            const desde = this.formatoFecha(maestro.fecha_prev_inicio);
+            const hasta = this.formatoFecha(maestro.fecha_prev_fin);
+
+        const isForm = new Ext.form.FormPanel({
                 items: [
                     new Ext.form.FieldSet({
                             collapsible: false,
@@ -1855,15 +1985,23 @@ Phx.vista.PlanificarAuditoria = {
                                                         fieldLabel: '*Fecha',
                                                         allowBlank: false,
                                                         format: 'd/m/Y'
-                                                    }/*,
-                                                    {
-                                                        xtype: 'datefield',
-                                                        anchor: '85%',
-                                                        name: 'fecha_fin_activ',
-                                                        fieldLabel: '*Fecha Fin',
-                                                        allowBlank: false,
-                                                        format: 'd/m/Y',
-                                                    },*/
+                                                    },
+                                                    new Ext.form.Label({
+                                                        text: 'Del :',
+                                                        style: 'margin: 10px'
+                                                    }),
+                                                    new Ext.form.Label({
+                                                        text: desde,
+                                                        style: 'margin: 10px'
+                                                    }),
+                                                    new Ext.form.Label({
+                                                        text: 'Al :',
+                                                        style: 'margin: 10px'
+                                                    }),
+                                                    new Ext.form.Label({
+                                                        text: hasta,
+                                                        style: 'margin: 10px'
+                                                    })
                                                 ]
                                             }),
                                             new Ext.form.FieldSet({
@@ -2041,6 +2179,15 @@ Phx.vista.PlanificarAuditoria = {
                                             }
                                         }]
                                     },
+                                    new Ext.form.Label({
+                                        text: 'Cronograma de Actividades de la Auditoria: '+ maestro.nombre_aom1,
+                                        style: 'font-size: 14px; margin-bottom: 10px;'
+                                    }),
+                                    {
+                                        xtype: 'field',
+                                        fieldLabel: '',
+                                        style: 'background-image: none; border: 0;',
+                                    },
                                     table
                                 ]})
                 ],
@@ -2104,6 +2251,158 @@ Phx.vista.PlanificarAuditoria = {
              scope: this
          }]
       });
+    },
+    asignarPregunta:function (){
+        const maestro = this.sm.getSelected().data;
+        const isForm = new Ext.form.FormPanel({
+            items: [
+                new Ext.form.FieldSet({
+                    collapsible: false,
+                    border: true,
+                    layout: 'form',
+                    autoScroll: true,
+                    items: [
+                        {
+                            xtype: 'combo',
+                            name: 'id_norma',
+                            fieldLabel: 'Norma',
+                            allowBlank: false,
+                            emptyText: 'Elija una opción...',
+                            store: new Ext.data.JsonStore({
+                                url: '../../sis_auditoria/control/Norma/listarNorma',
+                                id: 'id_norma',
+                                root: 'datos',
+                                totalProperty: 'total',
+                                fields: ['id_norma', 'id_tipo_norma','nombre_norma','sigla_norma','descrip_norma'],
+                                remoteSort: true,
+                                baseParams: {par_filtro: 'nor.sigla_norma'}
+                            }),
+                            valueField: 'id_norma',
+                            displayField: 'sigla_norma',
+                            gdisplayField: 'sigla_norma',
+                            tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color:#01010a">{sigla_norma} - {nombre_norma}</p></div></tpl>',
+                            hiddenName: 'id_norma',
+                            mode: 'remote',
+                            anchor: '100%',
+                            triggerAction: 'all',
+                            lazyRender: true,
+                            pageSize: 15,
+                            minChars: 2
+                        },
+                        {
+                            xtype: 'combo',
+                            name: 'id_pn',
+                            fieldLabel: 'Punto Norma',
+                            allowBlank: false,
+                            emptyText: 'Elija una opción...',
+                            store: new Ext.data.JsonStore({
+                                url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNorma',
+                                id: 'id_pn',
+                                root: 'datos',
+                                sortInfo: {
+                                    field: 'codigo_pn',
+                                    direction: 'ASC'
+                                },
+                                totalProperty: 'total',
+                                fields: ['id_pn', 'nombre_pn','nombre_pn','sigla_norma','codigo_pn'],
+                                remoteSort: true,
+                                baseParams: {dir:'ASC',sort:'id_pn',limit:'100',start:'0'}
+                            }),
+                            displayField: 'nombre_pn',
+                            valueField: 'id_pn',
+                            tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color:#01010a">{codigo_pn} - {nombre_pn}</p></div></tpl>',
+                            hiddenName: 'id_pn',
+                            mode: 'remote',
+                            anchor: '100%',
+                            triggerAction: 'all',
+                            lazyRender: true,
+                            pageSize: 50,
+                            minChars: 2
+                        },
+                        {
+                            xtype: 'textarea',
+                            fieldLabel: 'Pregunta',
+                            name: 'descrip_pregunta',
+                            anchor: '100%'
+                        },
+                    ]
+                })
+            ],
+
+            padding: this.paddingForm,
+            bodyStyle: this.bodyStyleForm,
+            border: this.borderForm,
+            frame: this.frameForm,
+            autoDestroy: false,
+            autoScroll: true,
+            region: 'center'
+        });
+        isForm.getForm().items.items[0].on('select', function(combo, record, index){
+            isForm.getForm().items.items[1].store.baseParams = {dir:'ASC',sort:'id_pn',limit:'100',start:'0',id_norma: record.data.id_norma}
+            isForm.getForm().items.items[1].store.load();
+            isForm.getForm().items.items[1].modificado = true;
+            isForm.getForm().items.items[1].reset();
+        },this);
+        this.preguntaPnVentana = new Ext.Window({
+            width: 600,
+            height: 240,
+            modal: true,
+            autoScroll:true,
+            closeAction: 'hide',
+            labelAlign: 'bottom',
+            title: 'PREGUNTA - PUNTO DE NORMA',
+            bodyStyle: 'padding:5px',
+            layout: 'form',
+            items: [
+                isForm  //   this.form_pro
+            ],
+            buttons: [{
+                text: 'Guardar',
+                handler: function(){
+                    const submit={};
+                    Ext.each(isForm.getForm().items.keys, function(element, index){
+                        obj = Ext.getCmp(element);
+                        if(obj.items){
+                            Ext.each(obj.items.items, function(elm, ind){
+                                submit[elm.name]=elm.getValue();
+                            },this)
+                        } else {
+                            submit[obj.name]=obj.getValue();
+                        }
+                    },this);
+                    console.log(submit)
+
+                    Ext.Ajax.request({
+                        url: '../../sis_auditoria/control/Pregunta/insertarPregunta',
+                        params: {
+                            nro_pregunta: '0',
+                            descrip_pregunta : submit.descrip_pregunta,
+                            id_pn: submit.id_pn
+                        },
+                        isUpload: false,
+                        success: function(a,b,c){
+                            Phx.CP.loadingHide();
+                            isForm.getForm().items.items[0].reset();
+                            isForm.getForm().items.items[1].reset();
+                            isForm.getForm().items.items[2].reset();
+                        },
+                        argument: this.argumentSave,
+                        failure: this.conexionFailure,
+                        timeout: this.timeout,
+                        scope: this
+                    });
+                },
+                scope: this
+            },
+                {
+                    text: 'Cerrar',
+                    handler: function() {
+                        this.preguntaPnVentana.hide();
+                        // this.storeProceso.load();
+                    },
+                    scope: this
+                }]
+        });
     },
     cargaFormulario: function(data){
       var obj,key;
@@ -2197,6 +2496,11 @@ Phx.vista.PlanificarAuditoria = {
             this.formularioEquipo();
             this.ventanaEquipo.show();
         }
+        if (fieldName === 'id_pregunta') {
+            const record = this.storePregunta.getAt(rowIndex);
+            this.formularioPregunta(record);
+            this.ventanaPregunta.show();
+        }
         if (fieldName === 'codigo_pn' || fieldName === 'id_pn') {
             const record = this.storePuntoNorma.getAt(rowIndex);
             this.formularioPuntoNorma(record);
@@ -2232,7 +2536,19 @@ Phx.vista.PlanificarAuditoria = {
     bnew:false,
     bdel:false,
     bedit:true,
-    tabsouth:[
+    formatoFecha:function (date){
+
+        let day = date.getDate()
+        let month = date.getMonth() + 1
+        let year = date.getFullYear()
+
+        if(month < 10){
+            return  `${day}/0${month}/${year}`
+        }else{
+            return  `${day}/${month}/${year}`
+        }
+    }
+    /*tabsouth:[
       {
           url:'../../../sis_auditoria/vista/auditoria_proceso/AuditoriaProceso.php',
           title:'Procesos',
@@ -2257,5 +2573,8 @@ Phx.vista.PlanificarAuditoria = {
           height : '50%',
           cls:'Cronograma',
       }
-]};
+    ]*/
+
+
+    };
 </script>

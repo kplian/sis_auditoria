@@ -11,13 +11,12 @@ class ACTAuditoriaNpnpg extends ACTbase{
 			
 	function listarAuditoriaNpnpg(){
 		$this->objParam->defecto('ordenacion','id_anpnpg');
-
 		$this->objParam->defecto('dir_ordenacion','asc');
+        if($this->objParam->getParametro('id_aom')!=''){
+            $this->objParam->addFiltro("apnp.id_aom = ".$this->objParam->getParametro('id_aom'));
+        }
 
-        //*** Metodo que filtra acorde al id del padre
-        if($this->objParam->getParametro('id_anpn')!=''){
-            $this->objParam->addFiltro("apnp.id_anpn = ".$this->objParam->getParametro('id_anpn'));
-        }// Fin*****
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODAuditoriaNpnpg','listarAuditoriaNpnpg');

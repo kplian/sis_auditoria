@@ -37,7 +37,7 @@ class MODAuditoriaNpnpg extends MODbase{
 		$this->captura('nombre_pn','varchar');
 		$this->captura('id_pn','int4');
 		$this->captura('descrip_pregunta','text');
-
+        $this->captura('id_aom','int4');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -55,9 +55,10 @@ class MODAuditoriaNpnpg extends MODbase{
 		//Define los parametros para la funcion
 		$this->setParametro('pg_valoracion','pg_valoracion','varchar');
 		$this->setParametro('obs_pg','obs_pg','text');
-		$this->setParametro('id_pregunta','id_pregunta','int4');
+		$this->setParametro('id_pregunta','id_pregunta','text');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('id_anpn','id_anpn','int4');
+		$this->setParametro('id_aom','id_aom','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
