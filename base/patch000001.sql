@@ -1,5 +1,4 @@
 /***********************************I-SCP-MCCH-SSOM-0-26/12/2019*****************************************/
-    begin ;
     CREATE TABLE ssom.taccion_propuesta (
     id_ap SERIAL,
     id_nc INTEGER,
@@ -547,7 +546,6 @@
 
     ALTER TABLE ssom.ttipo_ro
     OWNER TO postgres;
-  commit
 /***********************************F-SCP-MCCH-SSOM-0-26/12/2019*****************************************/
 
 
