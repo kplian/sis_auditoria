@@ -57,9 +57,11 @@ BEGIN
 						ptonor.fecha_mod,
 						ptonor.id_usuario_mod,
 						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod
+						usu2.cuenta as usr_mod,
+                        nr.sigla_norma
 						from ssom.tpunto_norma ptonor
 						inner join segu.tusuario usu1 on usu1.id_usuario = ptonor.id_usuario_reg
+                        inner join ssom.tnorma nr on nr.id_norma = ptonor.id_norma
 						left join segu.tusuario usu2 on usu2.id_usuario = ptonor.id_usuario_mod
 				        where  ';
 
@@ -86,6 +88,7 @@ BEGIN
 			v_consulta:='select count(id_pn)
 					    from ssom.tpunto_norma ptonor
 					    inner join segu.tusuario usu1 on usu1.id_usuario = ptonor.id_usuario_reg
+                        inner join ssom.tnorma nr on nr.id_norma = ptonor.id_norma
 						left join segu.tusuario usu2 on usu2.id_usuario = ptonor.id_usuario_mod
 					    where ';
 
