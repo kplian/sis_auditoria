@@ -12,6 +12,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
     let siglass = '';
+    let pnNorma = '';
     Phx.vista.PlanificarAuditoria = {
     require:'../../../sis_auditoria/vista/auditoria_oportunidad_mejora/AuditoriaOportunidadMejora.php',
     requireclase:'Phx.vista.AuditoriaOportunidadMejora',
@@ -26,14 +27,13 @@ header("content-type: text/javascript; charset=UTF-8");
     storePuntoNorma:{},
     storeCronograma:{},
     storePregunta:{},
-
     constructor: function(config) {
         this.Atributos[this.getIndAtributo('id_destinatario')].grid=false;
         this.Atributos[this.getIndAtributo('recomendacion')].grid=false;
         this.Atributos[this.getIndAtributo('id_tipo_om')].grid=false;
 
         Phx.vista.PlanificarAuditoria.superclass.constructor.call(this,config);
-        this.getBoton('ant_estado').setVisible(false);
+       // this.getBoton('ant_estado').setVisible(false);
         this.getBoton('btnChequeoDocumentosWf').setVisible(false);
         this.addButton('sig_estado',{
               text:'Ejecutar',
@@ -385,7 +385,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     dataIndex: 'id_pn',
                     width: 300,
                     sortable: false,
-                    renderer:function(value, p, record){return String.format('<b>{0}</b>', record.data['nombre_pn'])},
+                    // renderer:function(value, p, record){return String.format('<b>{0}</b>', record.data['nombre_pn'])},
+                    renderer:function(value, p, record){
+                        if( pnNorma !== record.data['nombre_pn'] ){
+                            pnNorma =  record.data['nombre_pn'];
+                            return  String.format('<b>{0}</b>', pnNorma);
+                        }
+
+                    }
                 },
                 {
                     header: 'Pregunta',
@@ -1586,8 +1593,9 @@ header("content-type: text/javascript; charset=UTF-8");
     },
     formularioPregunta:function(record){
       const maestro = this.sm.getSelected().data;
+        pnNorma = '';
       const me = this;
-        const isForm = new Ext.form.FormPanel({
+        this.isFormp = new Ext.form.FormPanel({
           id: this.idContenedor + '_formulario_pregunta',
             items: [
                 new Ext.form.FieldSet({
@@ -1627,50 +1635,56 @@ header("content-type: text/javascript; charset=UTF-8");
                                     style: 'margin: 5px; font-size: 12px;'
                                 }),
                                 {
-                               xtype: 'combo',
-                               name: 'id_pn',
-                               fieldLabel: 'Punto Norma',
-                               allowBlank: false,
-                               emptyText: 'Elija una opción...',
-                                store: new Ext.data.JsonStore({
-                                    url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNorma',
-                                    id: 'id_pn',
-                                    root: 'datos',
-                                    sortInfo: {
-                                        field: 'sigla_norma',
-                                        direction: 'ASC'
-                                    },
-                                    totalProperty: 'total',
-                                    fields: ['id_pn', 'nombre_pn','nombre_pn','sigla_norma'],
-                                    remoteSort: true,
-                                    baseParams: {dir:'ASC',sort:'id_pn',limit:'100',start:'0'}
-                                }),
-                                displayField: 'nombre_pn',
-                                valueField: 'id_pn',
-                                tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color:#01010a">{sigla_norma} - {nombre_pn}</p></div></tpl>',
-                                hiddenName: 'id_pn',
-                                mode: 'remote',
-                                width: 300,
-                                triggerAction: 'all',
-                                lazyRender: true,
-                                pageSize: 50,
-                                minChars: 2
-                            },
-                            {
-                            xtype: 'box',
-                            autoEl: {
-                                tag: 'button',
-                                html: 'Sugerir Pregunta'
-                            },
-                             style: 'cursor:pointer; margin-left: 8px',
-                            listeners: {
-                                render: function(component) {
-                                    component.getEl().on('click', function(e) {
-                                        me.asignarPregunta();
-                                        me.preguntaPnVentana.show();
-                                    });
+                                   xtype: 'combo',
+                                   name: 'id_pn',
+                                   fieldLabel: 'Punto Norma',
+                                   allowBlank: false,
+                                   emptyText: 'Elija una opción...',
+                                    store: new Ext.data.JsonStore({
+                                        url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNorma',
+                                        id: 'id_pn',
+                                        root: 'datos',
+                                        sortInfo: {
+                                            field: 'sigla_norma',
+                                            direction: 'ASC'
+                                        },
+                                        totalProperty: 'total',
+                                        fields: ['id_pn', 'nombre_pn','sigla_norma','codigo_pn'],
+                                        remoteSort: true,
+                                        baseParams: {par_filtro: 'ptonor.nombre_pn#ptonor.codigo_pn',dir:'ASC',sort:'id_pn',limit:'100',start:'0'}
+
+                                    }),
+                                    displayField: 'nombre_pn',
+                                    valueField: 'id_pn',
+                                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{sigla_norma} - {codigo_pn} - {nombre_pn}</p></div></tpl>',
+                                    hiddenName: 'id_pn',
+                                    forceSelection: true,
+                                    typeAhead: false,
+                                    mode: 'remote',
+                                    width: 400,
+                                    triggerAction: 'all',
+                                    lazyRender: true,
+                                    pageSize: 200,
+                                    minChars: 2
+                                },
+                                {
+                                    xtype: 'box',
+                                    autoEl: {
+                                        tag: 'button',
+                                        html: 'Sugerir Pregunta'
+                                },
+                                 style: 'cursor:pointer; margin-left: 8px',
+                                listeners: {
+                                    render: function(component) {
+                                        component.getEl().on('click', function(e) {
+                                            me.asignarPregunta({
+                                                id : me.isFormp.getForm().findField('id_pn').getValue(),
+                                                name : me.isFormp.getForm().findField('id_pn').getRawValue()
+                                            });
+                                            me.preguntaPnVentana.show();
+                                        });
+                                    }
                                 }
-                            }
                         }
                         ]})
                      ]
@@ -1702,8 +1716,8 @@ header("content-type: text/javascript; charset=UTF-8");
                                     tbar:[{
                                         text: 'Todo',
                                         handler:function(){
-                                            const toStore  = isForm.getForm().findField('id_pregunta').multiselects[0].store;
-                                            const fromStore   = isForm.getForm().findField('id_pregunta').multiselects[1].store;
+                                            const toStore  = me.isFormp.getForm().findField('id_pregunta').multiselects[0].store;
+                                            const fromStore   = me.isFormp.getForm().findField('id_pregunta').multiselects[1].store;
                                             for(var i = toStore.getCount()-1; i >= 0; i--)
                                             {
                                                 const record = toStore.getAt(i);
@@ -1730,7 +1744,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                     tbar:[{
                                         text: 'Limpiar',
                                         handler:function(){
-                                            isForm.getForm().findField('id_pregunta').reset();
+                                            me.isFormp.getForm().findField('id_pregunta').reset();
                                         }
                                     }],
                                      displayField: 'descrip_pregunta',
@@ -1748,34 +1762,35 @@ header("content-type: text/javascript; charset=UTF-8");
           region: 'center'
        });
         if(record){
-            console.log(record.json)
             Phx.CP.loadingShow();
             setTimeout(() => {
-                isForm.getForm().items.items[2].setValue(record.json.id_pn);
-                isForm.getForm().items.items[2].setRawValue(record.json.nombre_pn);
+                this.isFormp.getForm().items.items[2].setValue(record.json.id_pn);
+                this.isFormp.getForm().items.items[2].setRawValue(record.json.nombre_pn);
 
-                isForm.getForm().items.items[3].multiselects[0].store.baseParams = {
+                this.isFormp.getForm().items.items[3].multiselects[0].store.baseParams = {
                     dir: "ASC",
                     sort: "id_pregunta",
                     limit: "100",
                     start: "0",
+                    id_pn: record.json.id_pn,
                     item :maestro.id_aom
                 };
-                isForm.getForm().items.items[3].multiselects[0].store.load();
-                isForm.getForm().items.items[3].multiselects[1].store.baseParams = {
+                this.isFormp.getForm().items.items[3].multiselects[0].store.load();
+                this.isFormp.getForm().items.items[3].multiselects[1].store.baseParams = {
                     dir: "ASC",
                     sort: "id_pregunta",
                     limit: "100",
                     start: "0",
+                    id_pn: record.json.id_pn,
                     id_aom: maestro.id_aom
                 };
-                isForm.getForm().items.items[3].multiselects[1].store.load();
-                isForm.getForm().findField('id_pregunta').modificado = true;
+                this.isFormp.getForm().items.items[3].multiselects[1].store.load();
+                this.isFormp.getForm().findField('id_pregunta').modificado = true;
                 Phx.CP.loadingHide();
             },2000)
         }
-         isForm.getForm().findField('id_pn').on('select', function(combo, record){
-                isForm.getForm().items.items[3].multiselects[0].store.baseParams = {
+        this.isFormp.getForm().findField('id_pn').on('select', function(combo, record){
+            this.isFormp.getForm().items.items[3].multiselects[0].store.baseParams = {
                     dir: "ASC",
                     sort: "id_pregunta",
                     limit: "100",
@@ -1783,18 +1798,20 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_pn: record.data.id_pn,
                     item :maestro.id_aom
                 };
-                isForm.getForm().items.items[3].multiselects[0].store.load();
-                isForm.getForm().items.items[3].multiselects[1].store.baseParams = {
+            this.isFormp.getForm().items.items[3].multiselects[0].store.load();
+             // console.log(record.data.id_pn);
+            this.isFormp.getForm().items.items[3].multiselects[1].store.baseParams = {
                     dir: "ASC",
                     sort: "id_pregunta",
                     limit: "100",
                     start: "0",
+                    id_pn: record.data.id_pn,
                     id_aom: maestro.id_aom
                 };
-                isForm.getForm().items.items[3].multiselects[1].store.load();
+            this.isFormp.getForm().items.items[3].multiselects[1].store.load();
 
-                isForm.getForm().findField('id_pregunta').modificado = true;
-                isForm.getForm().findField('id_pregunta').reset();
+            this.isFormp.getForm().findField('id_pregunta').modificado = true;
+            this.isFormp.getForm().findField('id_pregunta').reset();
 
          },this);
 
@@ -1808,13 +1825,13 @@ header("content-type: text/javascript; charset=UTF-8");
          bodyStyle: 'padding:5px',
          layout: 'form',
          items: [
-          isForm
+             this.isFormp
          ],
          buttons: [{
              text: 'Guardar',
              handler: function(){
                        const submit={};
-                       Ext.each(isForm.getForm().items.keys, function(element, index){
+                       Ext.each(this.isFormp.getForm().items.keys, function(element, index){
                            obj = Ext.getCmp(element);
                            if(obj.items){
                                Ext.each(obj.items.items, function(elm, ind){
@@ -1824,7 +1841,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                submit[obj.name]=obj.getValue();
                            }
                        },this);
-
                  Phx.CP.loadingShow();
                  Ext.Ajax.request({
                      url: '../../sis_auditoria/control/AuditoriaNpnpg/insertarAuditoriaNpnpg',
@@ -1837,7 +1853,7 @@ header("content-type: text/javascript; charset=UTF-8");
                      isUpload: false,
                      success: function(a,b,c){
                          Phx.CP.loadingHide();
-                         me.storePuntoNorma.load();
+                         me.storePregunta.load();
                      },
                      argument: this.argumentSave,
                      failure: this.conexionFailure,
@@ -2252,8 +2268,7 @@ header("content-type: text/javascript; charset=UTF-8");
          }]
       });
     },
-    asignarPregunta:function (){
-        const maestro = this.sm.getSelected().data;
+    asignarPregunta:function (formulario){
         const isForm = new Ext.form.FormPanel({
             items: [
                 new Ext.form.FieldSet({
@@ -2328,7 +2343,6 @@ header("content-type: text/javascript; charset=UTF-8");
                     ]
                 })
             ],
-
             padding: this.paddingForm,
             bodyStyle: this.bodyStyleForm,
             border: this.borderForm,
@@ -2337,6 +2351,35 @@ header("content-type: text/javascript; charset=UTF-8");
             autoScroll: true,
             region: 'center'
         });
+        if (formulario){
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url:'../../sis_auditoria/control/Norma/listarNorma',
+                params:{
+                    dir : 'ASC',
+                    sort :'id_norma',
+                    limit : '1',
+                    start : '0',
+                    id_pn : formulario.id
+                },
+                success:function(resp){
+                    const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                    const  record = reg.datos;
+                    setTimeout(()=> {
+                        isForm.getForm().items.items[0].setValue(record[0].id_norma);
+                        isForm.getForm().items.items[0].setRawValue(record[0].sigla_norma);
+                        Phx.CP.loadingHide();
+                    },1000);
+                },
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+            setTimeout(()=> {
+                isForm.getForm().items.items[1].setValue(formulario.id);
+                isForm.getForm().items.items[1].setRawValue(formulario.name);
+            },1000);
+        }
         isForm.getForm().items.items[0].on('select', function(combo, record, index){
             isForm.getForm().items.items[1].store.baseParams = {dir:'ASC',sort:'id_pn',limit:'100',start:'0',id_norma: record.data.id_norma}
             isForm.getForm().items.items[1].store.load();
@@ -2370,8 +2413,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             submit[obj.name]=obj.getValue();
                         }
                     },this);
-                    console.log(submit)
-
+                    Phx.CP.loadingShow();
                     Ext.Ajax.request({
                         url: '../../sis_auditoria/control/Pregunta/insertarPregunta',
                         params: {
@@ -2381,10 +2423,10 @@ header("content-type: text/javascript; charset=UTF-8");
                         },
                         isUpload: false,
                         success: function(a,b,c){
-                            Phx.CP.loadingHide();
-                            isForm.getForm().items.items[0].reset();
-                            isForm.getForm().items.items[1].reset();
                             isForm.getForm().items.items[2].reset();
+                            this.isFormp.getForm().items.items[3].multiselects[0].store.load();
+                            Phx.CP.loadingHide();
+
                         },
                         argument: this.argumentSave,
                         failure: this.conexionFailure,
@@ -2533,9 +2575,6 @@ header("content-type: text/javascript; charset=UTF-8");
             })
         }
     },
-    bnew:false,
-    bdel:false,
-    bedit:true,
     formatoFecha:function (date){
 
         let day = date.getDate()
@@ -2547,34 +2586,10 @@ header("content-type: text/javascript; charset=UTF-8");
         }else{
             return  `${day}/${month}/${year}`
         }
-    }
-    /*tabsouth:[
-      {
-          url:'../../../sis_auditoria/vista/auditoria_proceso/AuditoriaProceso.php',
-          title:'Procesos',
-          height : '50%',
-          cls:'AuditoriaProceso'
-      },
-      {
-          url:'../../../sis_auditoria/vista/equipo_responsable/EquipoResponsable.php',
-          title:'Responsables',
-          height : '50%',
-          cls:'EquipoResponsable',
-      },
-      {
-          url:'../../../sis_auditoria/vista/auditoria_npn/AuditoriaNpn.php',
-          title:'Puntos de Norma',
-          height : '50%',
-          cls:'AuditoriaNpn',
-      },
-      {
-          url:'../../../sis_auditoria/vista/cronograma/Cronograma.php',
-          title:'Cronograma',
-          height : '50%',
-          cls:'Cronograma',
-      }
-    ]*/
-
+    },
+    bnew:false,
+    bdel:false,
+    bedit:true,
 
     };
 </script>

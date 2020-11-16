@@ -19,15 +19,6 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
         this.init();
         this.finCons = true;
         this.filtroVentana();
-		this.addButton('ant_estado', {
-            argument: {estado: 'anterior'},
-            text:'Anterior',
-            grupo:[3],
-            iconCls: 'batras',
-            disabled:true,
-            handler:this.antEstado,
-            tooltip: '<b>Pasar al Anterior Estado</b>'
-        });
         this.addBotonesGantt();
         this.addButton('btnChequeoDocumentosWf',
             {	text: 'Documentos',
@@ -44,6 +35,15 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
             disabled: true,
             handler: this.sigEstado,
             tooltip: '<b>Pasar al Siguiente Estado</b>'
+        });
+        this.addButton('ant_estado', {
+            argument: {estado: 'anterior'},
+            text:'Estado Anterior',
+            grupo:[3],
+            iconCls: 'batras',
+            disabled:true,
+            handler:this.antEstado,
+            tooltip: '<b>Pasar al Anterior Estado</b>'
         });
 	},
     addBotonesGantt: function() {

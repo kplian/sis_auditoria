@@ -64,7 +64,7 @@ BEGIN
                         apnp.id_aom
 						from ssom.tauditoria_npnpg apnp
 						inner join segu.tusuario usu1 on usu1.id_usuario = apnp.id_usuario_reg
-                        inner join ssom.tpunto_norma pnor on pnor.id_pn = apnp.id_anpnpg
+                        inner join ssom.tpunto_norma pnor on pnor.id_pn = apnp.id_anpn
                         inner join ssom.tpregunta preg on apnp.id_pregunta = preg.id_pregunta
                         left join segu.tusuario usu2 on usu2.id_usuario = apnp.id_usuario_mod
 				        where  ';
@@ -73,7 +73,7 @@ BEGIN
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			--Devuelve la respuesta
-
+        	raise notice '%',v_consulta;
 			return v_consulta;
 
 		end;

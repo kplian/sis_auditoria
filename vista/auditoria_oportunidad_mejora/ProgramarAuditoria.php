@@ -20,7 +20,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.eventoGrill();
             this.idContenedor = config.idContenedor;
             Phx.vista.ProgramarAuditoria.superclass.constructor.call(this,config);
-            this.getBoton('ant_estado').setVisible(false);
+            // this.getBoton('ant_estado').setVisible(false);
             this.getBoton('btnChequeoDocumentosWf').setVisible(false);
             this.getBoton('diagrama_gantt').setVisible(false);
 

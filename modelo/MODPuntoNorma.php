@@ -109,9 +109,8 @@ class MODPuntoNorma extends MODbase{
 		$this->procedimiento='ssom.ft_punto_norma_sel';
 		$this->transaccion='SSOM_PTOM_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
 		
-		        $this->setCount(false);
-
 		//Definicion de la lista del resultado del query
 		$this->captura('id_pn','int4');
 		$this->captura('id_norma','int4');

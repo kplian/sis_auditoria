@@ -27,10 +27,8 @@ header("content-type: text/javascript; charset=UTF-8");
     storePunto: {},
     tienda:{},
     punto:{},
-
-     id_no_conformidad : null,
-     id_proceso_no_conformidad : null,
-
+    id_no_conformidad : null,
+    id_proceso_no_conformidad : null,
     constructor: function(config) {
         this.Atributos[this.getIndAtributo('id_tipo_om')].grid=false;
         this.Atributos[this.getIndAtributo('fecha_eje_inicio')].grid=false;
@@ -38,7 +36,7 @@ header("content-type: text/javascript; charset=UTF-8");
         this.idContenedor = config.idContenedor;
         Phx.vista.InformeAuditoria.superclass.constructor.call(this,config);
         this.getBoton('sig_estado').setVisible(false);
-        this.getBoton('ant_estado').setVisible(false);
+       // this.getBoton('ant_estado').setVisible(false);
         this.getBoton('btnChequeoDocumentosWf').setVisible(false);
 
         this.recomendacionForm();
@@ -69,9 +67,9 @@ header("content-type: text/javascript; charset=UTF-8");
       this.formularioVentana.show();
     },
     onCrearFormulario:function() {
-        Phx.CP.loadingShow();
-      const me = this;
-      const maestro = this.sm.getSelected().data;
+       Phx.CP.loadingShow();
+       const me = this;
+       const maestro = this.sm.getSelected().data;
        this.tienda = new Ext.data.JsonStore({
            url: '../../sis_auditoria/control/NoConformidad/listarNoConformidad',
            id: 'id_nc',
@@ -728,10 +726,9 @@ header("content-type: text/javascript; charset=UTF-8");
             },this);
     },
     preparaMenu:function(n){
-        var tb =this.tbar;
+        const tb =this.tbar;
         Phx.vista.InformeAuditoria.superclass.preparaMenu.call(this,n);
         this.getBoton('notifcar_respo').enable();
-      //  this.getBoton('btnChequeoDocumentosWf').enable();
         this.getBoton('diagrama_gantt').enable();
         this.getBoton('ant_estado').enable();
         return tb
@@ -740,7 +737,6 @@ header("content-type: text/javascript; charset=UTF-8");
         var tb = Phx.vista.InformeAuditoria.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('notifcar_respo').disable();
-       //     this.getBoton('btnChequeoDocumentosWf').disable();
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('ant_estado').disable();
         }
@@ -1502,6 +1498,7 @@ header("content-type: text/javascript; charset=UTF-8");
         this.reload();
     },
     formularioPuntoNorma:function(data){
+        console.log('<>',data);
             const maestro = this.sm.getSelected().data;
             const me = this;
             const isForm = new Ext.form.FormPanel({
@@ -1540,7 +1537,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             totalProperty: 'total',
                             fields: ['id_norma', 'id_tipo_norma','nombre_norma','sigla_norma','descrip_norma'],
                             remoteSort: true,
-                            baseParams: {par_filtro: 'nor.sigla_norma'}
+                            baseParams: {par_filtro: 'nor.sigla_norma',id_nc_aom: maestro.id_aom}
                         }),
                         valueField: 'id_norma',
                         displayField: 'sigla_norma',
@@ -1628,9 +1625,24 @@ header("content-type: text/javascript; charset=UTF-8");
                 autoScroll: true,
                 region: 'center'
             });
+
             isForm.getForm().findField('id_norma').on('select', function(combo, record, index){
-                isForm.getForm().findField('id_pn').multiselects[0].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_norma: record.data.id_norma,item :maestro.id_aom};
-                isForm.getForm().findField('id_pn').multiselects[1].store.baseParams = {dir: "ASC", sort: "id_aom", limit: "100", start: "0", id_nc: data ? data.id_nc: this.id_no_conformidad , id_norma: record.data.id_norma};
+                isForm.getForm().findField('id_pn').multiselects[0].store.baseParams = {
+                    dir: "ASC",
+                    sort: "id_aom",
+                    limit: "100",
+                    start: "0",
+                    id_norma: record.data.id_norma,
+                    itemNc : data ? data.id_nc: this.id_no_conformidad,
+                };
+                isForm.getForm().findField('id_pn').multiselects[1].store.baseParams = {
+                    dir: "ASC",
+                    sort: "id_aom",
+                    limit: "100",
+                    start: "0",
+                    id_nc: data ? data.id_nc: this.id_no_conformidad,
+                    id_norma: record.data.id_norma
+                };
                 isForm.getForm().findField('id_pn').multiselects[1].store.load();
                 isForm.getForm().findField('id_pn').modificado = true;
                 isForm.getForm().findField('id_pn').reset();
@@ -1669,13 +1681,10 @@ header("content-type: text/javascript; charset=UTF-8");
                         }else{
                             id_nc= this.id_no_conformidad
                         }
-
                         Ext.Ajax.request({
                             url: '../../sis_auditoria/control/PnormaNoconformidad/insertarItemAuditoriaNpn',
                             params: {
-
-
-                                id_nc :id_nc,  // negrito
+                                id_nc :id_nc,
                                 id_norma:  submit.id_norma,
                                 id_pn: submit.id_pn
                             },
@@ -1703,24 +1712,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         scope: this
                     }]
             });
-        },
-
-        /*arrayDefaultColumHidden:['nombre_aom1','nombre_unidad','desc_funcionario_resp',
-        'nro_tramite','descrip_nc','lugar','desc_tipo_norma','desc_tipo_objeto',
-    'desc_funcionario_destinatario','resumen','recomendacion'],
-    rowExpander: new Ext.ux.grid.RowExpander({
-        tpl : new Ext.Template(
-            '<br>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Nombre Auditoria:&nbsp;&nbsp;</b> {nombre_aom1}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Area:&nbsp;&nbsp;</b> {nombre_unidad}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Responsable Auditoria:&nbsp;&nbsp;</b> {desc_funcionario2}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Tipo Norma:&nbsp;&nbsp;</b> {desc_tipo_norma}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Lugar:&nbsp;&nbsp;</b> {lugar}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Objeto Auditoria:&nbsp;&nbsp;</b> {desc_tipo_objeto}</p>',
-            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Destinatario:&nbsp;&nbsp;</b> {desc_funcionario_destinatario}</p>',
-        )
-    }),*/
-    oncellclick : function(grid, rowIndex, columnIndex, e) {
+    },
+    oncellclick : function(grid, rowIndex, columnIndex, e){
 		
 	    var record = this.documentos.getAt(rowIndex),
 	        fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
@@ -1784,8 +1777,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	       	} 
 	    }
     },
-
-        oncellclickNc : function(grid, rowIndex, columnIndex, e) {
+    oncellclickNc : function(grid, rowIndex, columnIndex, e){
 
             const record = this.tienda.getAt(rowIndex),
                   fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name

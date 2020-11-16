@@ -18,6 +18,9 @@ class ACTPnormaNoconformidad extends ACTbase{
         if($this->objParam->getParametro('id_aom')!=''){
             $this->objParam->addFiltro("no.id_aom = ".$this->objParam->getParametro('id_aom'));
         }
+        if($this->objParam->getParametro('id_norma')!=''){
+            $this->objParam->addFiltro("pnnc.id_norma = ".$this->objParam->getParametro('id_norma'));
+        }
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODPnormaNoconformidad','listarPnormaNoconformidad');

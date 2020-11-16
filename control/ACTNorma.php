@@ -16,6 +16,12 @@ class ACTNorma extends ACTbase{
         if($this->objParam->getParametro('id_parametro')!=''){
             $this->objParam->addFiltro("nor.id_parametro = ".$this->objParam->getParametro('id_parametro'));
         }
+
+        if($this->objParam->getParametro('id_nc_aom')!=''){
+            $this->objParam->addFiltro("nor.id_norma in ( select an.id_norma
+                                                from ssom.tauditoria_npn an
+                                                where an.id_aom = ".$this->objParam->getParametro('id_nc_aom').")");
+        }
       //  var_dump($this->objParam->getParametro('p_codigo_parametro'));exit;
         if($this->objParam->getParametro('p_codigo_parametro')!=''){
 

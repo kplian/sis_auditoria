@@ -46,7 +46,7 @@ BEGIN
 			v_consulta:='select
 						ptonor.id_pn,
 						ptonor.id_norma,
-						ptonor.nombre_pn,
+						upper(ptonor.nombre_pn)::varchar as nombre_pn,
 						ptonor.codigo_pn,
 						ptonor.descrip_pn,
 						ptonor.estado_reg,
@@ -68,7 +68,6 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -135,6 +134,7 @@ BEGIN
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			--Devuelve la respuesta
+            raise notice '%',v_consulta;
 			return v_consulta;
 
 		end;

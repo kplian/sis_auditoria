@@ -160,14 +160,12 @@ BEGIN
 
 		begin
 
+        delete from ssom.tpnorma_noconformidad no
+        where no.id_nc = v_parametros.id_nc and no.id_norma = v_parametros.id_norma;
 
-       -- raise exception '%',v_parametros.id_pn;
-			--Sentencia de la modificacion
 		foreach v_id_pn in array string_to_array(v_parametros.id_pn,',')
 
         	loop
-
-           -- raise exception '%',v_id_pn;
 
                          insert into ssom.tpnorma_noconformidad(  id_nc,
                                                                   estado_reg,
