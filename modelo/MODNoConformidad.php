@@ -416,6 +416,7 @@ class MODNoConformidad extends MODbase{
         $this->tipo_procedimiento='IME';
         //Define los parametros para la funcion
         $this->setParametro('id_aom','id_aom','int4');
+        $this->setParametro('id_funcionario_nc','id_funcionario_nc','int4');
 
         //Ejecuta la instruccion
         $this->armarConsulta();

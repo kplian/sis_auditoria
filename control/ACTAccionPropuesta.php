@@ -22,6 +22,9 @@ class ACTAccionPropuesta extends ACTbase{
         if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaImplementadas' ){
             $this->objParam->addFiltro("accpro.estado_wf in (''implementadas'') ");
         }
+        if($this->objParam->getParametro('interfaz') == 'AccionesProImplementaVoBo' ){
+            $this->objParam->addFiltro("accpro.estado_wf not in (''propuesta'',''responsable'',''auditor'') ");
+        }
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODAccionPropuesta','listarAccionPropuesta');

@@ -36,14 +36,14 @@ header("content-type: text/javascript; charset=UTF-8");
             });
 
             this.addBotonesGantt();
-            this.addButton('btnChequeoDocumentosWf',
+          /*  this.addButton('btnChequeoDocumentosWf',
                 {	text: 'Documentos',
                     grupo:[0,1],
                     iconCls: 'bchecklist',
                     disabled: true,
                     handler: this.loadCheckDocumentosRecWf,
                     tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.'
-                });
+                });*/
 
             this.load({params:{start:0, limit:this.tam_pag}})
         },
@@ -143,7 +143,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     fieldLabel: 'Codigo',
                     allowBlank: true,
                     anchor: '75%',
-                    gwidth: 150
+                    gwidth: 150,
+                    renderer:function(value, p, record){return String.format('<a style="cursor:pointer;">{0}</a>', value);},
+
                 },
                 type:'Field',
                 filters:{pfiltro:'noconf.codigo_nc',type:'string'},
@@ -160,7 +162,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     gwidth: 1000,
                     renderer: function(value, metaData, record, rowIndex, colIndex, store) {
                         metaData.css = 'multilineColumn';
-                        return String.format('<div style="font-color:blue; align-self: center" class="gridmultiline">{0}</div>', value);
+                        return String.format('<div style="font-color:blue; align-self: center" class="gridmultiline"><a style="cursor:pointer;">{0}</a></div>', value);
                     }
                 },
                 type:'TextArea',
@@ -542,7 +544,7 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.NoConformidadSuper.superclass.preparaMenu.call(this,n);
             this.getBoton('siguiente').enable();
             this.getBoton('atras').enable();
-            this.getBoton('btnChequeoDocumentosWf').enable();
+            // this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
             return tb
         },
@@ -551,7 +553,7 @@ header("content-type: text/javascript; charset=UTF-8");
             if(tb){
                 this.getBoton('siguiente').disable();
                 this.getBoton('atras').disable();
-                this.getBoton('btnChequeoDocumentosWf').disable();
+                // this.getBoton('btnChequeoDocumentosWf').disable();
                 this.getBoton('diagrama_gantt').disable();
             }
             return tb

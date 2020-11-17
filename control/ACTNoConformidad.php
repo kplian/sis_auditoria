@@ -24,13 +24,16 @@ class ACTNoConformidad extends ACTbase{
         if($this->objParam->getParametro('interfaz') == 'NoConformidadSinAcciones'){
            $this->objParam->addFiltro("noconf.estado_wf in (''correccion'')");
         }
+        if($this->objParam->getParametro('interfaz') == 'NoConformidadAccion'){
+            $this->objParam->addFiltro("noconf.estado_wf in (''correccion'') and (select count(a.id_ap)
+                                                                                    from ssom.taccion_propuesta a
+                                                                                        where a.id_nc = noconf.id_nc) > 0 ");
+        }
        /* if($this->objParam->getParametro('interfaz') == 'NoConformidadSeg'){
             $this->objParam->addFiltro("noconf.estado_wf in (''correccion'')");
         }
 
-        if($this->objParam->getParametro('interfaz') == 'NoConformidadAccion'){
-            $this->objParam->addFiltro("noconf.estado_wf in (''acciones_propuestas_responsable'') and noconf.revisar in (''si'')");
-        }
+        
         if($this->objParam->getParametro('interfaz') == 'NoConformidadImplementar'){
             $this->objParam->addFiltro("noconf.estado_wf in (''acciones_propuestas_responsable'') and noconf.revisar in (''si'')");
         }

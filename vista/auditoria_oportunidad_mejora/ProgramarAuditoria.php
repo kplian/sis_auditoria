@@ -20,10 +20,9 @@ header("content-type: text/javascript; charset=UTF-8");
             this.eventoGrill();
             this.idContenedor = config.idContenedor;
             Phx.vista.ProgramarAuditoria.superclass.constructor.call(this,config);
-            // this.getBoton('ant_estado').setVisible(false);
+            this.getBoton('ant_estado').setVisible(false);
             this.getBoton('btnChequeoDocumentosWf').setVisible(false);
             this.getBoton('diagrama_gantt').setVisible(false);
-
             this.init();
             this.store.baseParams.interfaz = 'ProgramarAuditoria';
             this.iniciarEvento();
@@ -56,19 +55,14 @@ header("content-type: text/javascript; charset=UTF-8");
         preparaMenu:function(n){
             const tb =this.tbar;
             Phx.vista.ProgramarAuditoria.superclass.preparaMenu.call(this,n);
-            /*const rec = this.getSelectedData();
+            const rec = this.getSelectedData();
             if (rec.estado_wf === 'programada'){
                 this.getBoton('sig_estado').enable();
                 this.getBoton('del').enable();
-                this.getBoton('edit').enable();
             }else{
                 this.getBoton('sig_estado').disable();
                 this.getBoton('del').disable();
-                this.getBoton('edit').disable();
-            }*/
-            this.getBoton('sig_estado').enable();
-            this.getBoton('del').enable();
-            this.getBoton('edit').enable();
+            }
             return tb
         },
         liberaMenu:function(){

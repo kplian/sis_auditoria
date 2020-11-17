@@ -36,9 +36,7 @@ header("content-type: text/javascript; charset=UTF-8");
         this.idContenedor = config.idContenedor;
         Phx.vista.InformeAuditoria.superclass.constructor.call(this,config);
         this.getBoton('sig_estado').setVisible(false);
-       // this.getBoton('ant_estado').setVisible(false);
         this.getBoton('btnChequeoDocumentosWf').setVisible(false);
-
         this.recomendacionForm();
         this.store.baseParams.interfaz = this.nombreVista;
         this.init();
@@ -62,7 +60,6 @@ header("content-type: text/javascript; charset=UTF-8");
     abrirVentana: function(tipo){
       if(tipo === 'edit'){
           this.cargaFormulario(this.sm.getSelected().data);
-          // this.onEdit(this.sm.getSelected().data);
       }
       this.formularioVentana.show();
     },
@@ -122,48 +119,6 @@ header("content-type: text/javascript; charset=UTF-8");
                               }
                           }
                       }
-                      /*{
-                      text:'<button class="btn"><i class="fa fa-plus fa-lg"></i>&nbsp;&nbsp;<b>Asignar</b></button>',
-                      scope: this,
-                      width: '100',
-                      handler: function() {
-
-                      },
-                  },
-                  {
-                      text:'<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Editar</b></button>',
-                      scope:this,
-                      width: '100',
-                      handler: function(){
-                          const  s =  noConformidad.getSelectionModel().getSelections();
-                           me.formularioNoConformidad(s[0].data);
-                           me.ventanaNoConformidad.show();
-                      }
-                  },
-                  {
-                      text: '<button class="btn"><i class="fa fa-trash fa-lg"></i>&nbsp;&nbsp;<b>Eliminar</b></button>',
-                      scope:this,
-                      width: '100',
-                      handler: function(){
-                          const  s =  noConformidad.getSelectionModel().getSelections();
-                          Phx.CP.loadingShow();
-                          Ext.Ajax.request({
-                              url: '../../sis_auditoria/control/NoConformidad/eliminarNoConformidad',
-                              params: {
-                                  id_nc : s[0].data.id_nc
-                              },
-                              isUpload: false,
-                              success: function(a,b,c){
-                                  Phx.CP.loadingHide();
-                                  me.tienda.load();
-                              },
-                              argument: this.argumentSave,
-                              failure: this.conexionFailure,
-                              timeout: this.timeout,
-                              scope: this
-                          })
-                      }
-                  }*/
                 ],
                   columns: [
                       new Ext.grid.RowNumberer(),
@@ -496,7 +451,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                           drawBotIcon:false,
                                                           multiselects: [{
                                                             width: 250,
-                                                            height: 200,
+                                                            height: 150,
                                                               store: new Ext.data.JsonStore({
                                                                   url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarFuncionarioVigentes',
                                                                   id: 'id_funcionario',
@@ -529,7 +484,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                           },
                                                           {
                                                               width: 250,
-                                                              height: 200,
+                                                              height: 150,
                                                               store: new Ext.data.JsonStore({
                                                                   url: '../../sis_auditoria/control/Destinatario/listarDestinatario',
                                                                   id: 'id_funcionario',

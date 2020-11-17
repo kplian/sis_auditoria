@@ -41,7 +41,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: '<b>Aceptar toda las no conformidades...</b>',
                 scope:this
             });
-
         },
         onReloadPage:function(m){
             this.maestro=m;
@@ -56,29 +55,24 @@ header("content-type: text/javascript; charset=UTF-8");
         preparaMenu:function(n){
             const tb =this.tbar;
             Phx.vista.NoConformidadInforme.superclass.preparaMenu.call(this,n);
-            // this.getBoton('btnChequeoDocumentosWf').enable();
             return tb
         },
         liberaMenu:function(){
             const tb = Phx.vista.NoConformidadInforme.superclass.liberaMenu.call(this);
             if(tb){
-                // this.getBoton('btnChequeoDocumentosWf').disable();
             }
             return tb
         },
         oncellclick : function(grid, rowIndex, columnIndex, e) {
             const record = this.store.getAt(rowIndex),
-                fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
+                fieldName = grid.getColumnModel().getDataIndex(columnIndex); 
             if (fieldName === 'revisar' || fieldName === 'rechazar'){
                 this.cambiarAsignacion(record,fieldName);
-
             }
-
         },
         cambiarAsignacion: function(record,name){
             this.columna = name;
             const select = this.getSelectedData();
-            // console.log(select);
             this.descrip_nc = select.descrip_nc;
             this.crearFormResponsableNC(select);
             this.crearFormObservacion(select);
@@ -122,21 +116,9 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
         onAceptar:function () {
-
-            this.crearFormTodo()
-            this.ventanaResponsableTodo.hide();
-            /*Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                url:'../../sis_auditoria/control/NoConformidad/siTodoNoConformidad',
-                params:{ id_aom: this.maestro.id_aom },
-                success: this.successRevisionS,
-                failure: this.conexionFailure,
-                timeout: this.timeout,
-                scope: this
-            });
-            this.reload();*/
+          this.onFormularioTodo();
+          this.ventanaTodoAcep.show();
         },
-
         crearFormResponsableNC:function(record){
             const me = this;
             Phx.CP.loadingShow();
@@ -179,13 +161,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 value: '',
                 maxLength:50
             });
-
             const no_conformidad =  {
                 fieldLabel: 'No Conformidad',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.descrip_nc
+                    html: this.descrip_nc.substr(1,250)+'...'
                 },
                 style: 'cursor:pointer;',
                 listeners: {
@@ -312,6 +293,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 if(this.ventanaObservacion){
                     this.ventanaObservacion.hide();
                 }
+                if(this.ventanaTodoAcep){
+                    this.ventanaTodoAcep.hide();
+                }
                 Phx.CP.loadingHide();
                 this.reload();
             }else{
@@ -321,7 +305,6 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         crearFormObservacion:function(record){
             const me = this;
-
             const informe =  {
                 fieldLabel: 'Informe',
                 xtype: 'box',
@@ -365,7 +348,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.descrip_nc
+                    html: this.descrip_nc.substr(1,250)+'...'
                 },
                 style: 'cursor:pointer;',
                 listeners: {
@@ -423,7 +406,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 buttons: [{
                     text: 'Guardar',
                     handler: this.saveResponsable,
-                    scope: this},
+                    scope: this
+                    },
                     {
                         text: 'Cancelar',
                         handler: function(){ this.ventanaObservacion.hide() },
@@ -1729,10 +1713,10 @@ header("content-type: text/javascript; charset=UTF-8");
         onBool:function(valor){
             return valor === 't';
         },
-        crearFormTodo:function(){
-            const me = this;
-            Phx.CP.loadingShow();
-            const informe =  {
+        onFormularioTodo: function(){
+           const me = this;
+           Phx.CP.loadingShow();
+           const informe =  {
                 fieldLabel: 'Informe',
                 xtype: 'box',
                 autoEl: {
@@ -1768,27 +1752,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 readOnly :true,
                 anchor: '100%',
                 style: 'background-image: none;',
-                value: '',
+                // value: this.maestro.desc_funcionario_destinatario,
                 maxLength:50
             });
-
-            const no_conformidad =  {
-                fieldLabel: 'No Conformidad',
-                xtype: 'box',
-                autoEl: {
-                    tag: 'a',
-                    html: this.descrip_nc
-                },
-                style: 'cursor:pointer;',
-                listeners: {
-                    render: function(component) {
-                        component.getEl().on('click', function(e) {
-
-
-                        });
-                    }
-                }
-            };
             const storeCombo = new Ext.data.JsonStore({
                 url: '../../sis_auditoria/control/NoConformidad/listarFuncionariosUO',
                 id: 'id_funcionario',
@@ -1819,7 +1785,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 resizable : true,
                 enableMultiSelect: false
             });
-            this.formAutoTodo = new Ext.form.FormPanel({
+
+            this.formTodoAceptar = new Ext.form.FormPanel({
                 autoDestroy: true,
                 border: false,
                 layout: 'form',
@@ -1829,39 +1796,40 @@ header("content-type: text/javascript; charset=UTF-8");
                 defaults: { height: 450},
                 items: [
                     new Ext.form.FieldSet({
-                        collapsible: false,
-                        title:'Datos Generales',
-                        border: true,
-                        layout: 'form',
-                        items: [
-                            informe,
-                            area,
-                            responsable_area,
-                            no_conformidad,
-                            combo
-                        ]})
-                ]
+                            collapsible: false,
+                            title:'Datos Generales',
+                            border: true,
+                            layout: 'form',
+                                items: [
+                                        informe,
+                                        area,
+                                        responsable_area,
+                                        combo
+                                ]})
+                    ]
             });
-            this.ventanaResponsableTodo = new Ext.Window({
+
+            this.ventanaTodoAcep = new Ext.Window({
                 title: 'Asignar Responsable No Conformidad',
                 width: 600,
-                height: 400,
+                height: 250,
                 closeAction: 'hide',
                 labelAlign: 'bottom',
-                items: this.formAutoTodo,
+                items: this.formTodoAceptar,
                 modal:true,
                 bodyStyle: 'padding:5px',
                 layout: 'form',
                 buttons: [{
                     text: 'Guardar',
-                    handler: this.saveResponsable,
+                    handler: this.saveResponsableTodo,
                     scope: this},
                     {
                         text: 'Cancelar',
-                        handler: function(){ this.ventanaResponsable.hide() },
+                        handler: function(){ this.ventanaTodoAcep.hide() },
                         scope: this
                     }]
             });
+
             Ext.Ajax.request({
                 url: '../../sis_auditoria/control/NoConformidad/listarRespAreaGerente',
                 params: {
@@ -1869,15 +1837,29 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 success: function(resp){
                     const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                    this.formAutoTodo.getForm().findField('responsable_area').setValue(reg.ROOT.datos.desc_funcionario);
+                    this.formTodoAceptar.getForm().findField('responsable_area').setValue(reg.ROOT.datos.desc_funcionario);
                     Phx.CP.loadingHide();
                 },
                 failure: this.conexionFailure,
                 timeout: this.timeout,
                 scope: this
             });
-       //     this.cmpResponsable = this.formAuto.getForm().findField('id_funcionario_nc');
-
+             this.cmpResponsable = this.formTodoAceptar.getForm().findField('id_funcionario_nc');
         },
+        saveResponsableTodo: function(){
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url:'../../sis_auditoria/control/NoConformidad/siTodoNoConformidad',
+                params:{
+                    id_aom: this.maestro.id_aom,
+                    id_funcionario_nc : this.cmpResponsable.getValue()
+                },
+                success: this.successWizard,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        }
+
     };
 </script>

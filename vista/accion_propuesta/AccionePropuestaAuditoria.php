@@ -82,11 +82,13 @@ header("content-type: text/javascript; charset=UTF-8");
             },this);
         },
         onCrearFormulario:function(){
+
+            const me = this;
             if(this.formularioVentana){
                 this.form.destroy();
                 this.formularioVentana.destroy();
             }
-
+            this.id_ap_master = null;
             this.storeResponsable = new Ext.data.JsonStore({
                 url: '../../sis_auditoria/control/ReponAccion/listarReponAccion',
                 id: 'id_repon_accion',
@@ -103,50 +105,64 @@ header("content-type: text/javascript; charset=UTF-8");
                 trackMouseOver: false,
                 split: true,
                 border: false,
-                plain: true,
+                plain: true, 
                 plugins: [],
                 stripeRows: true,
                 loadMask: true,
-                tbar: [{
-                    text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar Responsable</b></button>',
-                    scope: this,
-                    width: '100',
-                        handler: function() {
-                            const id = this.sm.getSelected()?this.sm.getSelected().data.id_ap:this.id_ap_master;
-                            this.onResponsable(id);
-                            this.ventanaResponsable.show();
-                            /*if(this.id_ap_master){
-                                this.onResponsable(id);
-                                this.ventanaResponsable.show();
-                            }else{
-                                alert('Tiene que registrar una accion')
-                            }*/
-
+                tbar: [
+                    {
+                        xtype: 'box',
+                        autoEl: {
+                            tag: 'a',
+                            html: 'Asignar Responsables'
+                        },
+                        style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                        listeners: {
+                            render: function(component) {
+                                component.getEl().on('click', function(e) {
+                                    let id_ap
+                                    if (me.sm.getSelected()){
+                                        id_ap =  me.sm.getSelected().data.id_ap;    
+                                    }else{
+                                        id_ap = me.id_ap_master 
+                                    }
+                                    console.log(id_ap);
+                                    me.onResponsable(id_ap);
+                                    me.ventanaResponsable.show();
+                                });
                         }
+                    }
                     },
                     {
-                        text: '<button class="btn"><i class="fa fa-trash fa-lg"></i>&nbsp;&nbsp;<b>Eliminar</b></button>',
-                        scope:this,
-                        width: '100',
-                        handler: function(){
-                            const  record =  responsable.getSelectionModel().getSelections();
-                             Phx.CP.loadingShow();
-                              Ext.Ajax.request({
-                                  url: '../../sis_auditoria/control/ReponAccion/eliminarReponAccion',
-                                  params: {
-                                      id_repon_accion : record[0].data.id_repon_accion
-                                  },
-                                  isUpload: false,
-                                  success: function(a,b,c){
-                                      Phx.CP.loadingHide();
-                                      this.storeResponsable.load();
-                                  },
-                                  argument: this.argumentSave,
-                                  failure: this.conexionFailure,
-                                  timeout: this.timeout,
-                                  scope: this
-                              })
-                          }
+                        xtype: 'box',
+                        autoEl: {
+                            tag: 'a',
+                            html: 'Eliminar'
+                        },
+                        style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                        listeners: {
+                            render: function(component) {
+                                component.getEl().on('click', function(e) {
+                                    const  record =  responsable.getSelectionModel().getSelections();
+                                    Phx.CP.loadingShow();
+                                    Ext.Ajax.request({
+                                        url: '../../sis_auditoria/control/ReponAccion/eliminarReponAccion',
+                                        params: {
+                                            id_repon_accion : record[0].data.id_repon_accion
+                                        },
+                                        isUpload: false,
+                                        success: function(a,b,c){
+                                            Phx.CP.loadingHide();
+                                            this.storeResponsable.load();
+                                        },
+                                        argument: this.argumentSave,
+                                        failure: this.conexionFailure,
+                                        timeout: this.timeout,
+                                        scope: this
+                                    })
+                                });
+                        }
+                    }
                     }
                 ],
                 columns: [
@@ -432,7 +448,8 @@ header("content-type: text/javascript; charset=UTF-8");
                            this.store.rejectChanges();
                            Phx.CP.loadingHide();
                            const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                           this.id_ap_master = reg.ROOT.datos.id_ap
+                           this.id_ap_master = reg.ROOT.datos.id_ap;
+                           console.log(this.id_ap_master);
                            this.reload();
                        },
                        argument: this.argumentSave,
@@ -511,7 +528,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     }]
             });
             this.cmpResponsable = this.formAuto.getForm().findField('id_funcionario');
-            this.cmpId_ap = id_ap;
+            this.cmpAp = id_ap;
         },
         saveResponsable:function () {
           Phx.CP.loadingShow();
@@ -519,18 +536,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 url: '../../sis_auditoria/control/ReponAccion/insertarReponAccion',
                 params: {
                     obs_dba  : '',
-                    id_ap : this.cmpId_ap,
+                    id_ap :  this.cmpAp,
                     id_funcionario : this.cmpResponsable.getValue(),
                 },
                 isUpload: false,
                 success: function(a,b,c){
                     Phx.CP.loadingHide();
                     this.ventanaResponsable.hide();
-                    this.storeResponsable.baseParams.id_ap = this.cmpId_ap;
-
+                    this.storeResponsable.baseParams.id_ap = this.cmpAp ;
                     this.storeResponsable.load();
-
-
+                    this.cmpAp  = null;
                 },
                 argument: this.argumentSave,
                 failure: this.conexionFailure,

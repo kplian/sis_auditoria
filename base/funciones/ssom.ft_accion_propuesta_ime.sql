@@ -196,7 +196,7 @@ BEGIN
                 v_id_estado_wf,		--integrar con wf new
                 v_nro_tramite,		--integrar con wf new
                 v_codigo_estado,	--integrar con wf new
-                ssom.f_generar_correlativo('ACCPRO', EXTRACT(YEAR FROM current_date)::integer)
+                ssom.f_generar_correlativo('ACCPRO', EXTRACT(YEAR FROM current_date)::integer,true)
 			)RETURNING id_ap into v_id_ap;
 
 			--Definicion de la respuesta

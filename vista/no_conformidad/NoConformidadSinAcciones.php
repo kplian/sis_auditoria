@@ -27,18 +27,18 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('rechazar')].grid=false;
             Phx.vista.NoConformidadSinAcciones.superclass.constructor.call(this,config);
 
-            /// this.getBoton('btnChequeoDocumentosWf').setVisible(false);
+            this.getBoton('btnChequeoDocumentosWf').setVisible(false);
             this.getBoton('btnNoram').setVisible(false);
 
             this.store.baseParams.interfaz = this.nombreVista;
             this.init();
-            this.addButton('notifcar_respo',{
+          /*  this.addButton('notifcar_respo',{
                 text:'Notificar Resp.',
                 iconCls: 'bok',
                 disabled: true,
                 handler: this.sigEstado,
                 tooltip: '<b>Pasar al Siguiente Estado</b>'
-            });
+            });*/
 
             this.addButton('atras',{argument: { estado: 'anterior'},
                 text:'Anterior',
@@ -81,14 +81,14 @@ header("content-type: text/javascript; charset=UTF-8");
         preparaMenu:function(n){
             const tb =this.tbar;
             Phx.vista.NoConformidadSinAcciones.superclass.preparaMenu.call(this,n);
-            this.getBoton('notifcar_respo').enable();
+            // this.getBoton('notifcar_respo').enable();
             this.getBoton('atras').enable();
             return tb
         },
         liberaMenu:function(){
             const tb = Phx.vista.NoConformidadSinAcciones.superclass.liberaMenu.call(this);
             if(tb){
-                this.getBoton('notifcar_respo').disable();
+               // this.getBoton('notifcar_respo').disable();
                 this.getBoton('atras').disable();
             }
             return tb
