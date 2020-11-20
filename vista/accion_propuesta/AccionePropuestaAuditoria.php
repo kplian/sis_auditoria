@@ -223,7 +223,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     xtype: 'box',
                                                     autoEl: {
                                                         tag: 'a',
-                                                        html: this.maestro.nombre_aom1,
+                                                        html: this.maestro.auditoria,
                                                     },
                                                     style: 'cursor:pointer;',
                                                     listeners: {
@@ -245,18 +245,18 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     fieldLabel: 'Area',
                                                     name: 'area',
                                                     anchor: '100%',
-                                                    value: this.maestro.nombre_unidad,
+                                                    value: this.maestro.uo_aom,
                                                     readOnly :true,
-                                                    style: 'background-image: none;'
+                                                    style: 'background-image: none; border: 0; font-weight: bold;',
                                                 },
                                                 {
                                                     xtype: 'field',
                                                     fieldLabel: 'Auditor resp',
                                                     name: 'auditor_respo',
                                                     anchor: '100%',
-                                                    value: this.maestro.desc_funcionario_resp,
+                                                    value: this.maestro.aom_funcionario_resp,
                                                     readOnly :true,
-                                                    style: 'background-image: none;'
+                                                    style: 'background-image: none; border: 0; font-weight: bold;',
                                                 },
                                                 {
                                                     fieldLabel: 'No Conformidad',
@@ -281,8 +281,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     allowBlank: true,
                                                     anchor: '100%',
                                                     gwidth: 210,
-                                                    style: 'background-image: none;'
-
                                                 }
                                             ]
                                     }),
@@ -329,8 +327,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 allowBlank: true,
                                                 anchor: '100%',
                                                 gwidth: 210,
-                                                style: 'background-image: none;'
-
                                             },
                                             {
                                                 xtype: 'textarea',
@@ -339,8 +335,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 allowBlank: true,
                                                 anchor: '100%',
                                                 gwidth: 210,
-                                                style: 'background-image: none;'
-
                                             },
                                             {
                                                 xtype: 'datefield',

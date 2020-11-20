@@ -240,7 +240,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                                         items: [
                                                                     {
                                                                         xtype: 'field',
-                                                                        name: 'nro_tramite_wf',
+                                                                        name: 'nro_tramite',
                                                                         fieldLabel: 'Codigo',
                                                                         anchor: '100%',
                                                                         readOnly :true,
@@ -669,34 +669,34 @@ header("content-type: text/javascript; charset=UTF-8");
             },this);
         },
         formularioNoConformidad:function(data){
-        const maestro = this.sm.getSelected().data;
-        const me = this;
-        let evento = 'NEW';
-        let id_modificacion = null;
-        if(data){
-            evento  = 'EDIT';
-            id_modificacion = data.id_nc
-        }
+            const maestro = this.sm.getSelected().data;
+            const me = this;
+            let evento = 'NEW';
+            let id_modificacion = null;
+            if(data){
+                evento  = 'EDIT';
+                id_modificacion = data.id_nc
+            }
 
-        this.punto = new Ext.data.JsonStore({
-            url: '../../sis_auditoria/control/PnormaNoconformidad/listarPnormaNoconformidad',
-            id: 'id_pnnc',
-            root: 'datos',
-            totalProperty: 'total',
-            fields: ['id_pnnc','id_nc','id_pn','id_norma','nombre_pn','desc_norma','nombre_pn','sigla_norma','codigo_pn','nombre_descrip'],
-            remoteSort: true,
-            baseParams: {dir:'ASC',sort:'id_pnnc',limit:'100',start:'0'}
-        });
-        if(data){
-            this.punto.baseParams.id_nc = data?data.id_nc:this.id_no_conformidad;
-            this.punto.load();
-        }
-        this.documentos  = new Ext.data.JsonStore({
-            url: '../../sis_workflow/control/DocumentoWf/listarDocumentoWf',
-            id: 'id_documento_wf',
-            root: 'datos',
-            totalProperty: 'total',
-            fields: [
+            this.punto = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/PnormaNoconformidad/listarPnormaNoconformidad',
+                id: 'id_pnnc',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_pnnc','id_nc','id_pn','id_norma','nombre_pn','desc_norma','nombre_pn','sigla_norma','codigo_pn','nombre_descrip'],
+                remoteSort: true,
+                baseParams: {dir:'ASC',sort:'id_pnnc',limit:'100',start:'0'}
+            });
+            if(data){
+                this.punto.baseParams.id_nc = data?data.id_nc:this.id_no_conformidad;
+                this.punto.load();
+            }
+            this.documentos  = new Ext.data.JsonStore({
+                url: '../../sis_workflow/control/DocumentoWf/listarDocumentoWf',
+                id: 'id_documento_wf',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: [
                 {name:'id_documento_wf', type: 'numeric'},
                 {name:'url', type: 'string'},
                 {name:'num_tramite', type: 'string'},
@@ -1280,10 +1280,10 @@ header("content-type: text/javascript; charset=UTF-8");
             }]
         });
     },
-    onBool:function(valor){
+        onBool:function(valor){
         return valor === 't';
     },
-    formularioPuntoNorma:function(data){
+        formularioPuntoNorma:function(data){
             const maestro = this.sm.getSelected().data;
             const me = this;
             const isForm = new Ext.form.FormPanel({
@@ -1498,7 +1498,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     }]
             });
     },
-    oncellclick : function(grid, rowIndex, columnIndex, e){
+        oncellclick : function(grid, rowIndex, columnIndex, e){
 		
 	    var record = this.documentos.getAt(rowIndex),
 	        fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
@@ -1562,7 +1562,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	       	} 
 	    }
     },
-    oncellclickNc : function(grid, rowIndex, columnIndex, e){
+        oncellclickNc : function(grid, rowIndex, columnIndex, e){
 
             const record = this.tienda.getAt(rowIndex),
                   fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
@@ -1591,7 +1591,7 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
         },
-    SubirArchivo : function(rec){     
+        SubirArchivo : function(rec){
         const objecto = rec.data;
         objecto.reload_documento = this.documentos;
         Phx.CP.loadWindows('../../../sis_auditoria/vista/auditoria_oportunidad_mejora/SubirArchivoWf.php',
@@ -1610,15 +1610,15 @@ header("content-type: text/javascript; charset=UTF-8");
             }    
         );     
     },
-    onSubirDocumento:function(record){
+        onSubirDocumento:function(record){
        this.crearFormDocumento(record);
        this.ventanaDocumento.show();
     },
-    onFormularioDocumento:function(data){
+        onFormularioDocumento:function(data){
         this.crearFormulario(data);
         this.ventanaResponsable.show();
     },
-    crearFormulario:function(record){       
+        crearFormulario:function(record){
             const storeCombo = new Ext.data.JsonStore({
                 url: '../../sis_workflow/control/TipoDocumento/listarTipoDocumento',
 	                    id: 'id_tipo_documento',
@@ -1697,7 +1697,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 scope:this
             });
     },
-    saveDocumento:function(){
+        saveDocumento:function(){
         Phx.CP.loadingShow();
         Ext.Ajax.request({
             url: '../../sis_workflow/control/DocumentoWf/insertarDocumentoWf',
@@ -1711,13 +1711,13 @@ header("content-type: text/javascript; charset=UTF-8");
             scope: this
         });
     },
-    successSinc:function(resp){
+        successSinc:function(resp){
         Phx.CP.loadingHide();
         const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
         this.documentos.load({params:{ start: 0, limit: 50 }});
         this.ventanaResponsable.hide();
     },
-    crearFormDocumento:function(record){
+        crearFormDocumento:function(record){
             const field = new Ext.form.Field({
                 fieldLabel: "Documento (archivo Pdf,Word)",
                 gwidth: 130,
@@ -1766,7 +1766,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.cmpIdDocumento= record.id_documento_wf;
             this.cmpNroTramite = record.nro_tramite;
     },
-    saveDocumentoInsert:function(){
+        saveDocumentoInsert:function(){
         Phx.CP.loadingShow();
         Ext.Ajax.request({
             url: '../../sis_workflow/control/DocumentoWf/subirArchivoWf',
@@ -1782,7 +1782,7 @@ header("content-type: text/javascript; charset=UTF-8");
             scope: this
         });
     },
-    successSincDoc:function(resp){
+        successSincDoc:function(resp){
         Phx.CP.loadingHide();
         const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
         this.documentos.load({params:{ start: 0, limit: 50 }});

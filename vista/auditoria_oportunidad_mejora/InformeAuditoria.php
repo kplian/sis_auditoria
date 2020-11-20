@@ -202,7 +202,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                                     items: [
                                                                 {
                                                                     xtype: 'field',
-                                                                    name: 'nro_tramite_wf',
+                                                                    name: 'nro_tramite',
                                                                     fieldLabel: 'Codigo',
                                                                     anchor: '100%',
                                                                     readOnly :true,
@@ -832,7 +832,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.punto.baseParams.id_nc = data?data.id_nc:this.id_no_conformidad;
             this.punto.load();
         }
-        this.documentos  = new Ext.data.JsonStore({
+        this.documentos = new Ext.data.JsonStore({
             url: '../../sis_workflow/control/DocumentoWf/listarDocumentoWf',
             id: 'id_documento_wf',
             root: 'datos',
@@ -875,6 +875,8 @@ header("content-type: text/javascript; charset=UTF-8");
             remoteSort: true,
             baseParams: {dir:'ASC',sort:'id_documento_wf',limit:'100',start:'0'}
         });
+
+        console.log(this.documentos)
         if(data){
             this.documentos.baseParams.modoConsulta = 'no';
             this.documentos.baseParams.todos_documentos = 'no';
@@ -916,19 +918,27 @@ header("content-type: text/javascript; charset=UTF-8");
                     renderer:function(value, p, record){return String.format('{0}', record.data['nombre_pn'])},
                 },
             ],
-            tbar: [{
-                text: '<button class="btn"><i class="fa fa-edit fa-lg"></i>&nbsp;&nbsp;<b>Asignar / Designar Punto de Norma</b></button>',
-                scope: this,
-                width: '100',
-                handler: function() {
-                        if(this.id_no_conformidad !==  null || data){
-                            me.formularioPuntoNorma(data);
-                            me.ventanaPuntoNorma.show();
-                        }else{
-                            alert('Tiene que registrar la no conformidad')
+            tbar: [
+                {
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'a',
+                        html: 'Asignar/Designar Punto de Norma<'
+                    },
+                    style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                    listeners: {
+                        render: function(component) {
+                            component.getEl().on('click', function(e) {
+                                if(this.id_no_conformidad !==  null || data){
+                                    me.formularioPuntoNorma(data);
+                                    me.ventanaPuntoNorma.show();
+                                }else{
+                                    alert('Tiene que registrar la no conformidad')
+                                }
+                            });
                         }
+                    }
                 }
-            }
         ]
         });
         const grilla =  new Ext.grid.GridPanel({
@@ -1425,7 +1435,7 @@ header("content-type: text/javascript; charset=UTF-8");
     onBool:function(valor){
         return valor === 't';
     },
-    sigEstado:function(){
+    sigEstado : function(){
         Phx.CP.loadingShow();
         const rec = this.sm.getSelected();
         const id_estado_wf = rec.data.id_estado_wf;
@@ -1447,35 +1457,40 @@ header("content-type: text/javascript; charset=UTF-8");
         }
         Phx.CP.loadingHide();
     },
-    successWizard:function(){
+    successWizard : function(){
         Phx.CP.loadingHide();
         alert('El informe ha sido notificado al Responsable de Area Auditada y a los  destinatarios adicionales');
         this.reload();
     },
     formularioPuntoNorma:function(data){
-        console.log('<>',data);
             const maestro = this.sm.getSelected().data;
             const me = this;
             const isForm = new Ext.form.FormPanel({
-                items: [{
+                items: [
+                    new Ext.form.FieldSet({
+                        collapsible: false,
+                        border: true,
+                        layout: 'form',
+                        items: [
+                                {
                     xtype: 'field',
                     fieldLabel: 'Auditoria',
                     name: 'nro_tramite_wf',
                     anchor: '100%',
                     value: '('+maestro.nro_tramite_wf+') '+maestro.nombre_aom1,
                     readOnly :true,
-                    style: 'background-color: #F2F1F0; background-image: none;'
+                    style: 'background-image: none; border: 0;font-weight: bold;',
                     },
-                    {
+                                {
                         xtype: 'field',
                         fieldLabel: 'Tipo',
                         name: 'desc_tipo_norma',
                         anchor: '100%',
                         value: maestro.desc_tipo_norma,
                         readOnly :true,
-                        style: 'background-color: #F2F1F0; background-image: none;'
+                        style: 'background-image: none; border: 0;font-weight: bold;',
                     },
-                    {
+                                {
                         xtype: 'combo',
                         name: 'id_norma',
                         fieldLabel: 'Norma',
@@ -1505,7 +1520,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         lazyRender: true,
                         pageSize: 15,
                         minChars: 2
-                    },
+                    }
+                         ]
+                    }),
                     {
                         anchor: '100%',
                         bodyStyle: 'padding:10px;',
@@ -1670,7 +1687,7 @@ header("content-type: text/javascript; charset=UTF-8");
     },
     oncellclick : function(grid, rowIndex, columnIndex, e){
 		
-	    var record = this.documentos.getAt(rowIndex),
+	    const record = this.documentos.getAt(rowIndex),
 	        fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
 
 	    if (fieldName == 'nro_tramite_ori' && record.data.id_proceso_wf_ori) {

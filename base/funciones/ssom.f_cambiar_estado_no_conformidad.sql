@@ -2,7 +2,8 @@ CREATE OR REPLACE FUNCTION ssom.f_cambiar_estado_no_conformidad (
   p_id_proceso integer,
   p_id_estado integer,
   p_id_usuario integer,
-  p_accion varchar
+  p_revisar varchar,
+  p_rechazar varchar
 )
 RETURNS boolean AS
 $body$
@@ -52,34 +53,30 @@ BEGIN
 
     --Identificación del nombre de la función
     v_nombre_funcion = 'ssom.f_cambiar_estado_no_conformidad';
+
     v_id_estado_new = null;
     v_estado_new = null;
+
     select n.* into v_no_conformidad
     from ssom.tno_conformidad n
     where n.id_proceso_wf = p_id_proceso;
 
-    	--raise exception '%',v_no_conformidad;
+    select
+        pw.id_proceso_wf,
+        ew.id_estado_wf,
+        te.codigo,
+        pw.fecha_ini,
+        te.id_tipo_estado,
+        te.pedir_obs,
+        pw.nro_tramite
+      into
+        v_registro_estado
+      from wf.tproceso_wf pw
+      inner join wf.testado_wf ew  on ew.id_proceso_wf = pw.id_proceso_wf and ew.estado_reg = 'activo'
+      inner join wf.ttipo_estado te on ew.id_tipo_estado = te.id_tipo_estado
+      where pw.id_proceso_wf = p_id_proceso;
 
-    	select
-            pw.id_proceso_wf,
-            ew.id_estado_wf,
-            te.codigo,
-            pw.fecha_ini,
-            te.id_tipo_estado,
-            te.pedir_obs,
-            pw.nro_tramite
-          into
-            v_registro_estado
-          from wf.tproceso_wf pw
-          inner join wf.testado_wf ew  on ew.id_proceso_wf = pw.id_proceso_wf and ew.estado_reg = 'activo'
-          inner join wf.ttipo_estado te on ew.id_tipo_estado = te.id_tipo_estado
-          where pw.id_proceso_wf = p_id_proceso;
-
-
-
-
-
-          select ps_id_tipo_estado,
+      select ps_id_tipo_estado,
                  ps_codigo_estado,
                  ps_disparador,
                  ps_regla,
@@ -91,33 +88,29 @@ BEGIN
                     va_regla,
                     va_prioridad
                 from wf.f_obtener_estado_wf(
-                v_registro_estado.id_proceso_wf,
-                 v_registro_estado.id_estado_wf,
-                 v_registro_estado.id_tipo_estado,
-                 'siguiente',
-                 p_id_usuario);
+                           v_registro_estado.id_proceso_wf,
+                           v_registro_estado.id_estado_wf,
+                           v_registro_estado.id_tipo_estado,
+                           'siguiente',
+                           p_id_usuario);
 
-            v_acceso_directo = '';
-            v_clase = '';
-            v_parametros_ad = '';
-            v_tipo_noti = 'notificacion';
-            v_titulo  = 'Aprobado';
+    if (p_revisar =  'si' and p_rechazar = 'no')then
+   			 v_id_estado_new =  va_id_tipo_estado[1]::integer;
+             v_estado_new = va_codigo_estado[1]::varchar;
+    end if;
 
-
-            if (p_accion = 'rechazar') then
-
-              	v_id_estado_new =  va_id_tipo_estado[2]::integer;
+    if (p_revisar =  'no' and p_rechazar = 'si')then
+    			v_id_estado_new =  va_id_tipo_estado[2]::integer;
                 v_estado_new = va_codigo_estado[2]::varchar;
-            else
-            	v_id_estado_new =  va_id_tipo_estado[1]::integer;
-                v_estado_new = va_codigo_estado[1]::varchar;
+    end if;
 
-            end if;
+      v_acceso_directo = '';
+      v_clase = '';
+      v_parametros_ad = '';
+      v_tipo_noti = 'notificacion';
+      v_titulo  = 'Aprobado';
 
-          	if (v_id_estado_new is null)then
-           	 raise exception 'error % % %',v_registro_estado.id_proceso_wf , v_registro_estado.id_tipo_estado,v_registro_estado.id_estado_wf;
-            end if;
-            v_id_estado_actual = wf.f_registra_estado_wf(   v_id_estado_new, -- va_id_tipo_estado[1]::integer,
+      v_id_estado_actual = wf.f_registra_estado_wf(   v_id_estado_new, -- va_id_tipo_estado[1]::integer,
                                                             v_no_conformidad.id_funcionario_nc,--v_parametros.id_funcionario_wf,
                                                             v_registro_estado.id_estado_wf,
                                                             v_registro_estado.id_proceso_wf,
@@ -160,5 +153,5 @@ SECURITY INVOKER
 PARALLEL UNSAFE
 COST 100;
 
-ALTER FUNCTION ssom.f_cambiar_estado_no_conformidad (p_id_proceso integer, p_id_estado integer, p_id_usuario integer, p_accion varchar)
+ALTER FUNCTION ssom.f_cambiar_estado_no_conformidad (p_id_proceso integer, p_id_estado integer, p_id_usuario integer, p_revisar varchar, p_rechazar varchar)
   OWNER TO dbaamamani;

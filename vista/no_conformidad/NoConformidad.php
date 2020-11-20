@@ -202,7 +202,8 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Nro Tramite',
                 allowBlank: true,
                 anchor: '75%',
-                gwidth: 100
+                gwidth: 100,
+
             },
             type:'TextField',
             filters:{pfiltro:'smt.nro_tramite',type:'string'},
@@ -216,7 +217,10 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Codigo',
 				allowBlank: true,
 				anchor: '75%',
-				gwidth: 150
+				gwidth: 150,
+                renderer : function(value, p, record) {
+                    return String.format('<a>{0}</a>', value);
+                }
 			},
 				type:'Field',
 				filters:{pfiltro:'noconf.codigo_nc',type:'string'},
@@ -258,7 +262,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 90,
 				minChars: 2,
 				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['valor_parametro']);
+					return String.format('<a>{0}</a>', record.data['valor_parametro']);
 				}
 			},
 			type: 'ComboBox',
@@ -273,9 +277,9 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Descripcion',
                 allowBlank: true,
                 width:200,
-                gwidth: 300,
+                gwidth: 400,
                 renderer : function(value, p, record) {
-                    return String.format('<div class="gridmultiline" style="text-align: justify;">{0}</div>', record.data['descrip_nc']);
+                    return String.format('<a>{0}</a>', value);
                 }
             },
             type:'TextArea',
@@ -289,9 +293,8 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                 name: 'estado_wf',
                 fieldLabel: 'Estado',
                 allowBlank: true,
-                gwidth: 100,
-                maxLength:100, // ,
-                renderer: function(value,p,record){
+                gwidth: 200,
+               /* renderer: function(value,p,record){
                     let color = '#1419CC';
 
                     if (record.data['estado_wf'] === 'aceptada_responsable_area'){
@@ -302,7 +305,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                     }
 
                     return '<font color="'+color+'">'+record.data['estado_wf']+'</font>';
-                }
+                }*/
             },
             type:'TextField',
             filters:{pfiltro:'smt.estado',type:'string'},
@@ -688,6 +691,11 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
         {name:'nombre_unidad', type: 'string'},
         {name:'desc_funcionario_resp', type: 'string'},
         {name:'extra', type: 'string'},
+
+        {name:'auditoria', type: 'string'},
+        {name:'uo_aom', type: 'string'},
+        {name:'aom_funcionario_resp', type: 'string'},
+        {name:'funcionario_resp_nc', type: 'string'},
 	],
 	sortInfo:{
 		field: 'id_nc',

@@ -516,7 +516,6 @@ BEGIN
             where ao.id_proceso_wf = v_parametros.id_proceso_wf;
 
 
-
        	for v_no_conformindad in (select  nc.id_nc,
                                           nc.id_proceso_wf,
                                           nc.id_estado_wf,
@@ -525,27 +524,12 @@ BEGIN
                                   from ssom.tno_conformidad nc
                                   where nc.id_aom = v_registros_proc.id_aom)loop
 
-
-        			if (v_no_conformindad.revisar = 'si')then
-
-                    	if ssom.f_cambiar_estado_no_conformidad(v_no_conformindad.id_proceso_wf,
-                                                                  v_no_conformindad.id_estado_wf,
-                                                                  p_id_usuario ,
-                                                                  'revisar') then
-
-     			 		end if;
-
-                    end if;
-        			/*if (v_no_conformindad.rechazar = 'no')then
-
-                    	if ssom.f_cambiar_estado_no_conformidad(v_no_conformindad.id_proceso_wf,
-                                                                v_no_conformindad.id_estado_wf,
-                                                                p_id_usuario ,
-                                                                'rechazar') then
-
-     			 		end if;
-
-                    end if;*/
+        					if ssom.f_cambiar_estado_no_conformidad(v_no_conformindad.id_proceso_wf,
+                                                                    v_no_conformindad.id_estado_wf,
+                                                                    p_id_usuario,
+                                                                    v_no_conformindad.revisar,
+                                                                    v_no_conformindad.rechazar) then
+                            end if;
 
        	end loop;
 

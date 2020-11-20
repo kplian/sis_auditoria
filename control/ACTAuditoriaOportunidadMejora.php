@@ -59,7 +59,7 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
             }
         }
         if($this->objParam->getParametro('interfaz') == 'InformesAuditoriaNotificados'){
-            $this->objParam->addFiltro("aom.estado_wf in (''notificar_responsable'')");
+            $this->objParam->addFiltro("aom.estado_wf in (''notificar_responsable'',''notificar'')");
         }
         if($this->objParam->getParametro('interfaz')== 'AuditorioAportunidadAcepRech'){
             $this->objParam->addFiltro("aom.estado_wf = ''notificar'' and tau.codigo_tpo_aom = ''AETR'' ");

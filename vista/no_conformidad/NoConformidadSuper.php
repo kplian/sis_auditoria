@@ -88,7 +88,7 @@ header("content-type: text/javascript; charset=UTF-8");
             });
         },
         diagramGanttDinamico : function(){
-            var data=this.sm.getSelected().data.id_proceso_wf;
+            const data=this.sm.getSelected().data.id_proceso_wf;
             window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)
         },
         Atributos:[
@@ -222,6 +222,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     gwidth: 180,
                     maxLength:100, // ,
                     renderer: function(value,p,record){
+                        if (record.data['estado_wf'] === 'rechazado_resp'){
+                            return String.format('<font color="red"> {0}</font>', record.data['estado_wf']);
+                        }
                         return String.format('{0}', record.data['estado_wf']);
                     }
                 },
@@ -544,7 +547,6 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.NoConformidadSuper.superclass.preparaMenu.call(this,n);
             this.getBoton('siguiente').enable();
             this.getBoton('atras').enable();
-            // this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
             return tb
         },
@@ -553,7 +555,6 @@ header("content-type: text/javascript; charset=UTF-8");
             if(tb){
                 this.getBoton('siguiente').disable();
                 this.getBoton('atras').disable();
-                // this.getBoton('btnChequeoDocumentosWf').disable();
                 this.getBoton('diagrama_gantt').disable();
             }
             return tb
@@ -1808,7 +1809,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 split: true,
                 border: false,
                 plain: true,
-                plugins: [],
                 stripeRows: true,
                 loadMask: true,
                 tbar: [{
@@ -2126,6 +2126,15 @@ header("content-type: text/javascript; charset=UTF-8");
                                         },
                                         {
                                             xtype: 'textarea',
+                                            name: 'obs_resp_area',
+                                            fieldLabel: 'Observacion Resp.',
+                                            allowBlank: true,
+                                            anchor: '100%',
+                                            gwidth: 150,
+                                            readOnly :true,
+                                        },
+                                        {
+                                            xtype: 'textarea',
                                             name: 'obs_consultor',
                                             fieldLabel: 'Observacion Consultor',
                                             allowBlank: true,
@@ -2164,6 +2173,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 isForm.getForm().findField('descrip_nc').setValue(data.descrip_nc);
                 isForm.getForm().findField('evidencia').setValue(data.evidencia);
                 isForm.getForm().findField('obs_consultor').setValue(data.obs_consultor);
+                isForm.getForm().findField('obs_resp_area').setValue(data.obs_resp_area);
                 setTimeout(() => {
                     isForm.getForm().findField('id_parametro').setValue(data.id_parametro);
                     isForm.getForm().findField('id_parametro').setRawValue(data.valor_parametro);
@@ -2220,7 +2230,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 items: [isForm]
             });
         },
-
         onBool:function(valor){
             return valor === 't';
         },
@@ -2396,7 +2405,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 displayField: 'nombre',
                 gdysplayfield: 'descripcion_tipo_documento',
                 forceSelection: true,
-                allowBlank : false,
                 anchor: '100%',
                 resizable : true,
                 enableMultiSelect: false

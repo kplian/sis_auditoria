@@ -27,6 +27,7 @@ header("content-type: text/javascript; charset=UTF-8");
     storePuntoNorma:{},
     storeCronograma:{},
     storePregunta:{},
+    storeRiesgo:{},
     constructor: function(config) {
         this.Atributos[this.getIndAtributo('id_destinatario')].grid=false;
         this.Atributos[this.getIndAtributo('recomendacion')].grid=false;
@@ -113,7 +114,7 @@ header("content-type: text/javascript; charset=UTF-8");
             ],remoteSort: true,
             baseParams: {dir:'ASC',sort:'id_equipo_responsable',limit:'100',start:'0'}
         });
-          this.storePuntoNorma = new Ext.data.JsonStore({
+        this.storePuntoNorma = new Ext.data.JsonStore({
               url: '../../sis_auditoria/control/AuditoriaNpn/listarAuditoriaNpn',
               id: 'id_anpn',
               root: 'datos',
@@ -124,8 +125,7 @@ header("content-type: text/javascript; charset=UTF-8");
               remoteSort: true,
               baseParams: {dir:'ASC',sort:'id_anpn',limit:'100',start:'0'}
           });
-
-          this.storePregunta = new Ext.data.GroupingStore({
+        this.storePregunta = new Ext.data.GroupingStore({
               url: '../../sis_auditoria/control/AuditoriaNpnpg/listarAuditoriaNpnpg',
               id: 'id_anpnpg',
               root: 'datos',
@@ -138,17 +138,15 @@ header("content-type: text/javascript; charset=UTF-8");
               ],remoteSort: true,
               baseParams: {dir:'ASC',sort:'id_aom',limit:'100',start:'0'}
           });
-
-          const detalleCronograma = new Ext.ux.grid.RowEditor({
+        const detalleCronograma = new Ext.ux.grid.RowEditor({
               saveText: 'Aceptar',
               name: 'btn_editor'
-          });
-
-          detalleCronograma.on('beforeedit', this.onInitAddCronograma, this);
-          detalleCronograma.on('canceledit', this.onCancelAddCronograma, this);
-          detalleCronograma.on('validateedit', this.onUpdateRegisterCronograma, this);
-          detalleCronograma.on('afteredit', this.onAfterEditCronograma, this);
-          this.storeCronograma = new Ext.data.JsonStore({
+        });
+        detalleCronograma.on('beforeedit', this.onInitAddCronograma, this);
+        detalleCronograma.on('canceledit', this.onCancelAddCronograma, this);
+        detalleCronograma.on('validateedit', this.onUpdateRegisterCronograma, this);
+        detalleCronograma.on('afteredit', this.onAfterEditCronograma, this);
+        this.storeCronograma = new Ext.data.JsonStore({
                url: '../../sis_auditoria/control/Cronograma/listarCronograma',
                id: 'id_cronograma',
                root: 'datos',
@@ -159,6 +157,17 @@ header("content-type: text/javascript; charset=UTF-8");
                    'estado_reg','usr_reg','fecha_reg'],remoteSort: true,
                baseParams: {dir:'ASC',sort:'id_cronograma',limit:'100',start:'0'}
          });
+        this.storeRiesgo = new Ext.data.JsonStore({
+            url: '../../sis_auditoria/control/AomRiesgoOportunidad/listarAomRiesgoOportunidad',
+            id: 'id_aom_ro',
+            root: 'datos',
+            totalProperty: 'total',
+            fields: ['id_aom_ro','id_impacto','id_probabilidad','id_tipo_ro','id_ro',
+                'otro_nombre_ro','id_aom','criticidad','nombre_ro','desc_tipo_ro',
+                'nombre_prob','nombre_imp','estado_reg','usr_reg','fecha_reg'],remoteSort: true,
+            baseParams: {dir:'ASC',sort:'id_aom_ro',limit:'100',start:'0'}
+          });
+
           const me = this;
           const procesos = new Ext.grid.GridPanel({
             store:  this.storeProceso,
@@ -223,7 +232,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     width: 110
                 }
             ]
-        });
+          });
           const responsable = new Ext.grid.GridPanel({
             store:  this.storeEquipo,
             layout: 'fit',
@@ -286,7 +295,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     width: 110
                 }
             ]
-        })
+          });
           const puntoNorma =  new Ext.grid.GridPanel({
             store:  this.storePuntoNorma,
             layout: 'fit',
@@ -367,7 +376,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         }
                     }
                 }]
-        });
+           });
           const pregunta = new Ext.grid.GridPanel({
             store:  this.storePregunta,
             layout: 'fit',
@@ -437,7 +446,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         }
                     }
                 }]
-        })
+          });
           const crorograma = new Ext.grid.GridPanel({
             store:  this.storeCronograma,
             trackMouseOver: false,
@@ -533,13 +542,112 @@ header("content-type: text/javascript; charset=UTF-8");
                     width: 110
                 }]
         });
+          const riesgo = new Ext.grid.GridPanel({
+            store:  this.storeRiesgo,
+            trackMouseOver: false,
+            layout: 'fit',
+            region:'center',
+            anchor: '100%',
+            split: true,
+            border: false,
+            plain: true,
+            stripeRows: true,
+            tbar: [
+                {
+                    xtype: 'box',
+                    autoEl: {
+                        tag: 'a',
+                        html: 'Nueva Riesgo Oportunidad'
+                    },
+                    style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                    listeners: {
+                        render: function(component) {
+                            component.getEl().on('click', function(e) {
+                                me.formularioRiego(null);
+                                me.ventanaRiesgo.show();
+                            });
+                        }
+                    }
+                }
+            ],
+            columns: [
+                new Ext.grid.RowNumberer(),
+                {
+                    header: 'Tipo RO',
+                    dataIndex: 'id_tipo_ro',
+                    width: 200,
+                    renderer:function(value, p, record){
+                        return String.format('<a class="gridmultiline" style="cursor:pointer;">{0}</a>', record.data['desc_tipo_ro'])
+                    },
+                },
+                {
+                    header: 'Riesgo Oportunidad',
+                    dataIndex: 'id_ro',
+                    align: 'center',
+                    width: 100,
+                    renderer:function(value, p, record){
+                        return String.format('<a class="gridmultiline" style="cursor:pointer;">{0}</a>', record.data['nombre_ro'])
+                    },
+                },
+                {
+                    header: 'Probabilidad',
+                    dataIndex: 'id_probabilidad',
+                    align: 'center',
+                    width: 80,
+                    renderer:function(value, p, record){
+                        return String.format('<a class="gridmultiline" style="cursor:pointer;">{0}</a>', record.data['nombre_prob'])
+                    },
+                },
+                {
+                    header: 'Impacto',
+                    dataIndex: 'id_impacto',
+                    align: 'center',
+                    width: 80,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['nombre_imp']);
+                    }
+                },
+                {
+                    header: 'Criticidad',
+                    dataIndex: 'criticidad',
+                    width: 50
+                },
+                {
+                    header: 'Eliminar',
+                    dataIndex: 'eliminar_riesgo',
+                    width: 50,
+                    renderer : function(value, p, record) {
+                        return String.format('<a style="display: flex; justify-content: center; align-items: center"><i class="fa fa-trash fa-lg" style="cursor:pointer;"></i></a>', record.data['lista_funcionario']);
+                    }
+                },
+                {
+                    header: 'Estado Reg.',
+                    dataIndex: 'estado_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Creado por.',
+                    dataIndex: 'usr_reg',
+                    width: 100,
+                    sortable: false
+                },
+                {
+                    header: 'Fecha creación',
+                    dataIndex: 'fecha_reg',
+                    align: 'center',
+                    width: 110
+                }]
+        });
+
           procesos.addListener('cellclick', this.oncellclick,this);
           responsable.addListener('cellclick', this.oncellclick,this);
           puntoNorma.addListener('cellclick', this.oncellclick,this);
           pregunta.addListener('cellclick', this.oncellclick,this);
           crorograma.addListener('cellclick', this.oncellclick,this);
+          riesgo.addListener('cellclick', this.oncellclick,this);
 
-        this.form = new Ext.form.FormPanel({
+          this.form = new Ext.form.FormPanel({
              id: this.idContenedor + '_formulario_aud',
              items: [{ region: 'center',
                       layout: 'column',
@@ -586,10 +694,10 @@ header("content-type: text/javascript; charset=UTF-8");
                                                                  {
                                                                      xtype: 'field',
                                                                      fieldLabel: 'Código',
-                                                                     name: 'nro_tramite_wf',
+                                                                     name: 'nro_tramite',
                                                                      anchor: '100%',
                                                                      readOnly: true,
-                                                                     id: this.idContenedor + '_nro_tramite_wf',
+                                                                     id: this.idContenedor + '_nro_tramite',
                                                                      style: 'background-image: none; border: 0;',
 
                                                                  },
@@ -786,19 +894,23 @@ header("content-type: text/javascript; charset=UTF-8");
                                      items: [
                                          crorograma
                                      ]
+                                 },
+                                 {
+                                     title: 'Riesgo Oportunidad',
+                                     layout: 'fit',
+                                     region:'center',
+                                     items: [
+                                         riesgo
+                                     ]
                                  }
                            ]
                          }]
                      }],
-             // padding: this.paddingForm,
-             // bodyStyle: this.bodyStyleForm,
-             // border: this.borderForm,
-             // frame: this.frameForm,
              autoDestroy: true,
              autoScroll: true,
              region: 'center'
         });
-        this.formularioVentana = new Ext.Window({
+          this.formularioVentana = new Ext.Window({
            width: 730,
            height: 590,
            modal: true,
@@ -886,6 +998,9 @@ header("content-type: text/javascript; charset=UTF-8");
 
         this.storeCronograma.baseParams.id_aom = record.id_aom;
         this.storeCronograma.load();
+
+        this.storeRiesgo.baseParams.id_aom = record.id_aom;
+        this.storeRiesgo.load();
     },
     formularioProceso:function(){
         const maestro = this.sm.getSelected().data;
@@ -897,7 +1012,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     layout: 'form',
                     autoScroll: true,
                     items: [
-                {
+                    {
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
                         name: 'nro_tramite_wf',
@@ -1892,7 +2007,7 @@ header("content-type: text/javascript; charset=UTF-8");
          });
           tienda.baseParams.id_aom = maestro.id_aom;
           tienda.load();
-            const table = new Ext.grid.GridPanel({
+          const table = new Ext.grid.GridPanel({
                 layout: 'fit',
                 store: tienda,
                 region: 'center',
@@ -1971,8 +2086,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 ],
             });
-            const desde = this.formatoFecha(maestro.fecha_prev_inicio);
-            const hasta = this.formatoFecha(maestro.fecha_prev_fin);
+          const desde = this.formatoFecha(maestro.fecha_prev_inicio);
+          const hasta = this.formatoFecha(maestro.fecha_prev_fin);
 
         const isForm = new Ext.form.FormPanel({
                 items: [
@@ -2268,6 +2383,267 @@ header("content-type: text/javascript; charset=UTF-8");
          }]
       });
     },
+    formularioRiego:function(record){
+        const maestro = this.sm.getSelected().data;
+        const isForm = new Ext.form.FormPanel({
+            items: [
+                new Ext.form.FieldSet({
+                    collapsible: false,
+                    border: true,
+                    layout: 'form',
+                    items: [
+                        {
+                            xtype: 'combo',
+                            name: 'id_tipo_ro',
+                            fieldLabel: 'Tipo RO',
+                            allowBlank: false,
+                            emptyText: 'Elija una opción...',
+                            store: new Ext.data.JsonStore({
+                                url: '../../sis_auditoria/control/TipoRo/listarTipoRo',
+                                id: 'id_tipo_ro',
+                                root: 'datos',
+                                sortInfo: {
+                                    field: 'desc_tipo_ro',
+                                    direction: 'ASC'
+                                },
+                                totalProperty: 'total',
+                                fields: ['id_tipo_ro', 'tipo_ro','desc_tipo_ro'],
+                                remoteSort: true,
+                                baseParams: {par_filtro: 'tro.desc_tipo_ro'/*,p_tipo_ro:"''RIESGO_PLANIFICACION'',''OPORT_PLANIFICACION''"*/}
+                            }),
+                            valueField: 'id_tipo_ro',
+                            displayField: 'desc_tipo_ro',
+                            gdisplayField: 'desc_tipo_ro',
+                            hiddenName: 'id_tipo_ro',
+                            mode: 'remote',
+                            anchor: '100%',
+                            triggerAction: 'all',
+                            lazyRender: true,
+                            pageSize: 15,
+                            minChars: 2
+                        },
+                        {
+                            xtype: 'combo',
+                            name: 'id_ro',
+                            fieldLabel: 'Riesgo Oportunidad',
+                            allowBlank: false,
+                            emptyText: 'Elija una opción...',
+                            store: new Ext.data.JsonStore({
+                                url: '../../sis_auditoria/control/RiesgoOportunidad/listarRiesgoOportunidad',
+                                id: 'id_ro',
+                                root: 'datos',
+                                sortInfo: {
+                                    field: 'nombre_ro',
+                                    direction: 'DESC'
+                                },
+                                totalProperty: 'total',
+                                fields: ['id_ro', 'nombre_ro','codigo_ro'],
+                                remoteSort: true,
+                                baseParams: {par_filtro: 'rop.nombre_ro'}
+                            }),
+                            valueField: 'id_ro',
+                            displayField: 'nombre_ro',
+                            gdisplayField: 'nombre_ro',
+                            hiddenName: 'id_ro',
+                            mode: 'remote',
+                            anchor: '100%',
+                            triggerAction: 'all',
+                            lazyRender: true,
+                            pageSize: 15,
+                            minChars: 2
+                        },
+                        {
+                            xtype: 'combo',
+                            name: 'id_probabilidad',
+                            fieldLabel: 'Probabilidad',
+                            allowBlank: false,
+                            emptyText: 'Elija una opción...',
+                            store: new Ext.data.JsonStore({
+                                url: '../../sis_auditoria/control/Probabilidad/listarProbabilidad',
+                                id: 'id_probabilidad',
+                                root: 'datos',
+                                sortInfo: {
+                                    field: 'nombre_prob',
+                                    direction: 'ASC'
+                                },
+                                totalProperty: 'total',
+                                fields: ['id_probabilidad', 'nombre_prob'],
+                                remoteSort: true,
+                                baseParams: {par_filtro: 'prob.nombre_prob'}
+                            }),
+                            valueField: 'id_probabilidad',
+                            displayField: 'nombre_prob',
+                            gdisplayField: 'nombre_prob',
+                            hiddenName: 'id_probabilidad',
+                            mode: 'remote',
+                            anchor: '100%',
+                            triggerAction: 'all',
+                            lazyRender: true,
+                            pageSize: 15,
+                            minChars: 2
+                        },
+                        {
+                            xtype: 'combo',
+                            name: 'id_impacto',
+                            fieldLabel: 'Impacto',
+                            allowBlank: false,
+                            emptyText: 'Elija una opción...',
+                            store: new Ext.data.JsonStore({
+                                url: '../../sis_auditoria/control/Impacto/listarImpacto',
+                                id: 'id_impacto',
+                                root: 'datos',
+                                sortInfo: {
+                                    field: 'nombre_imp',
+                                    direction: 'ASC'
+                                },
+                                totalProperty: 'total',
+                                fields: ['id_impacto', 'nombre_imp'],
+                                remoteSort: true,
+                                baseParams: {par_filtro: 'imp.nombre_imp'}
+                            }),
+                            valueField: 'id_impacto',
+                            displayField: 'nombre_imp',
+                            gdisplayField: 'nombre_imp',
+                            hiddenName: 'id_impacto',
+                            mode: 'remote',
+                            anchor: '100%',
+                            triggerAction: 'all',
+                            lazyRender: true,
+                            pageSize: 15,
+                            minChars: 2
+                        },
+                        {
+                            xtype: 'field',
+                            fieldLabel: 'Criticidad',
+                            name: 'criticidad',
+                            anchor: '100%',
+                        },
+                    ]})
+            ],
+            padding: this.paddingForm,
+            bodyStyle: this.bodyStyleForm,
+            border: this.borderForm,
+            frame: this.frameForm,
+            autoDestroy: true,
+            autoScroll: true,
+            region: 'center'
+        });
+        if (record){
+            Phx.CP.loadingShow();
+            setTimeout(() => {
+                isForm.getForm().findField('id_tipo_ro').setValue(record.id_tipo_ro);
+                isForm.getForm().findField('id_tipo_ro').setRawValue(record.desc_tipo_ro);
+
+                isForm.getForm().findField('id_ro').setValue(record.id_ro);
+                isForm.getForm().findField('id_ro').setRawValue(record.nombre_ro);
+
+                isForm.getForm().findField('id_probabilidad').setValue(record.id_probabilidad);
+                isForm.getForm().findField('id_probabilidad').setRawValue(record.nombre_prob);
+
+                isForm.getForm().findField('id_impacto').setValue(record.id_impacto);
+                isForm.getForm().findField('id_impacto').setRawValue(record.nombre_imp);
+                isForm.getForm().findField('criticidad').setValue(record.criticidad);
+
+                Phx.CP.loadingHide();
+
+            }, 1000);
+        }
+        this.ventanaRiesgo= new Ext.Window({
+            width: 500,
+            height: 300,
+            modal: true,
+            autoScroll: true,
+            closeAction: 'hide',
+            labelAlign: 'bottom',
+            title: 'RIESGO OPORTUNIDAD',
+            bodyStyle: 'padding:5px',
+            layout: 'border',
+            items: [
+                isForm,
+            ],
+            buttons: [
+                {
+                    text: 'Guardar',
+                    handler: function(){
+                        const submit={};
+                        Ext.each(isForm.getForm().items.keys, function(element, index){
+                            obj = Ext.getCmp(element);
+                            if(obj.items){
+                                Ext.each(obj.items.items, function(elm, ind){
+                                    submit[elm.name]=elm.getValue();
+                                },this)
+                            } else {
+                                submit[obj.name]=obj.getValue();
+                            }
+                        },this);
+                        console.log(submit)
+                        Phx.CP.loadingShow();
+
+                        if (record){
+                            Ext.Ajax.request({
+                                url: '../../sis_auditoria/control/AomRiesgoOportunidad/insertarAomRiesgoOportunidad',
+                                params: {
+                                    id_aom_ro : record.id_aom_ro,
+                                    id_impacto : submit.id_impacto,
+                                    id_probabilidad : submit.id_probabilidad,
+                                    id_tipo_ro : submit.id_tipo_ro,
+                                    id_ro : submit.id_ro,
+                                    otro_nombre_ro : null,
+                                    id_aom : maestro.id_aom,
+                                    criticidad : submit.criticidad
+                                },
+                                isUpload: false,
+                                success: function(a,b,c){
+                                    this.storeRiesgo.load();
+                                    isForm.getForm().reset();
+                                    this.ventanaRiesgo.hide();
+                                    Phx.CP.loadingHide();
+
+                                },
+                                argument: this.argumentSave,
+                                failure: this.conexionFailure,
+                                timeout: this.timeout,
+                                scope: this
+                            });
+                        }else{
+                            Ext.Ajax.request({
+                                url: '../../sis_auditoria/control/AomRiesgoOportunidad/insertarAomRiesgoOportunidad',
+                                params: {
+                                    id_impacto : submit.id_impacto,
+                                    id_probabilidad : submit.id_probabilidad,
+                                    id_tipo_ro : submit.id_tipo_ro,
+                                    id_ro : submit.id_ro,
+                                    otro_nombre_ro : null,
+                                    id_aom : maestro.id_aom,
+                                    criticidad : submit.criticidad
+                                },
+                                isUpload: false,
+                                success: function(a,b,c){
+                                    this.storeRiesgo.load();
+                                    isForm.getForm().reset();
+                                    Phx.CP.loadingHide();
+
+                                },
+                                argument: this.argumentSave,
+                                failure: this.conexionFailure,
+                                timeout: this.timeout,
+                                scope: this
+                            });
+                        }
+
+                    },
+                    scope: this
+                },
+                {
+                text: 'Cerrar',
+                handler: function(){
+                    this.ventanaRiesgo.hide();
+                    this.storeRiesgo.load();
+                },
+                scope: this
+            }]
+        });
+    },
     asignarPregunta:function (formulario){
         const isForm = new Ext.form.FormPanel({
             items: [
@@ -2553,6 +2929,11 @@ header("content-type: text/javascript; charset=UTF-8");
             this.formularioCroronograma(record);
             this.ventanaCroronograma.show();
         }
+        if (fieldName === 'id_tipo_ro' || fieldName === 'id_ro' || fieldName === 'id_probabilidad') {
+            const record = this.storeRiesgo.getAt(rowIndex);
+            this.formularioRiego(record.json);
+            this.ventanaRiesgo.show();
+        }
         if (fieldName === 'eliminar') {
             const record = this.storeCronograma.getAt(rowIndex);
             Phx.CP.loadingShow();
@@ -2566,6 +2947,27 @@ header("content-type: text/javascript; charset=UTF-8");
                     setTimeout(() => {
                         Phx.CP.loadingHide();
                         this.storeCronograma.load();
+                    },1000)
+                },
+                argument: this.argumentSave,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            })
+        }
+        if (fieldName === 'eliminar_riesgo') {
+            const record = this.storeRiesgo.getAt(rowIndex);
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_auditoria/control/AomRiesgoOportunidad/eliminarAomRiesgoOportunidad',
+                params: {
+                    id_aom_ro : record.json.id_aom_ro
+                },
+                isUpload: false,
+                success: function(a,b,c){
+                    setTimeout(() => {
+                        Phx.CP.loadingHide();
+                        this.storeRiesgo.load();
                     },1000)
                 },
                 argument: this.argumentSave,

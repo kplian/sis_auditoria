@@ -53,13 +53,9 @@ class MODNoConformidad extends MODbase{
 		$this->captura('usr_mod','varchar');
 
 		//*****************************
-        $this->captura('nombreaom','text');
         $this->captura('valor_parametro','varchar');
         $this->captura('gerencia_uo1','varchar');
-		$this->captura('gerencia_uo2','varchar');
         $this->captura('funcionario_uo','text');   
-		$this->captura('contador_estados','int4');
-		$this->captura('funcionario_resp_nc','text');
 
         $this->captura('calidad','bool');
         $this->captura('medio_ambiente','bool');
@@ -69,10 +65,11 @@ class MODNoConformidad extends MODbase{
 
         $this->captura('revisar','varchar');
         $this->captura('rechazar','varchar');
-        $this->captura('nombre_aom1','varchar');
-        $this->captura('nombre_unidad','varchar');
-        $this->captura('desc_funcionario_resp','text');
-        $this->captura('nro_tramite_padre','varchar');
+
+        $this->captura('auditoria','text');
+        $this->captura('uo_aom','varchar');
+        $this->captura('aom_funcionario_resp','text');
+        $this->captura('funcionario_resp_nc','text');
 
 
 		//Ejecuta la instruccion
@@ -402,6 +399,8 @@ class MODNoConformidad extends MODbase{
         $this->setParametro('id_nc','id_nc','int4');
         $this->setParametro('fieldName','fieldName','varchar');
         $this->setParametro('id_funcionario_nc','id_funcionario_nc','int4');
+        $this->setParametro('obs_resp_area','obs_resp_area','varchar');
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();

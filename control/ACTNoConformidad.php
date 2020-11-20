@@ -13,8 +13,9 @@ class ACTNoConformidad extends ACTbase{
 	function listarNoConformidad(){
 		$this->objParam->defecto('ordenacion','id_nc');
 		$this->objParam->defecto('dir_ordenacion','asc');
+
+
         if($this->objParam->getParametro('id_aom')!=''){
-            // var_dump($this->objParam->getParametro('id_aom')); exit;
             $this->objParam->addFiltro("noconf.id_aom = ".$this->objParam->getParametro('id_aom'));
         }
         if($this->objParam->getParametro('id_nc')!=''){
@@ -22,32 +23,14 @@ class ACTNoConformidad extends ACTbase{
         }
 
         if($this->objParam->getParametro('interfaz') == 'NoConformidadSinAcciones'){
-           $this->objParam->addFiltro("noconf.estado_wf in (''correccion'')");
+           $this->objParam->addFiltro("noconf.estado_wf in (''aceptada_resp'')");
         }
         if($this->objParam->getParametro('interfaz') == 'NoConformidadAccion'){
             $this->objParam->addFiltro("noconf.estado_wf in (''correccion'') and (select count(a.id_ap)
                                                                                     from ssom.taccion_propuesta a
                                                                                         where a.id_nc = noconf.id_nc) > 0 ");
         }
-       /* if($this->objParam->getParametro('interfaz') == 'NoConformidadSeg'){
-            $this->objParam->addFiltro("noconf.estado_wf in (''correccion'')");
-        }
-
-        
-        if($this->objParam->getParametro('interfaz') == 'NoConformidadImplementar'){
-            $this->objParam->addFiltro("noconf.estado_wf in (''acciones_propuestas_responsable'') and noconf.revisar in (''si'')");
-        }
-        if($this->objParam->getParametro('interfaz') == 'NoConformidadInforme'){
-            $this->objParam->addFiltro("noconf.estado_wf in (''responsable'')");
-        }
-        if($this->objParam->getParametro('interfaz') == 'NoConformidadAceptada'){
-            $this->objParam->addFiltro("noconf.revisar in (''si'')");
-        }
-
-        if($this->objParam->getParametro('interfaz') == 'NoConformidadAdmin'){
-            $this->objParam->addFiltro("noconf.revisar in (''si'') and noconf.estado_wf in (''aceptada_responsable_area'')  ");
-        }
-*/
+ 
 
 
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
@@ -191,7 +174,7 @@ class ACTNoConformidad extends ACTbase{
         $this->objParam->defecto('dir_ordenacion','asc');
 
         if ($this->objParam->getParametro('tipo_interfaz')  == 'NoConformidadSuper'){
-              $this->objParam->addFiltro("nof.estado_wf in (''acciones'')");
+              $this->objParam->addFiltro("nof.estado_wf in (''aceptada_resp'',''rechazado_resp'')");
         }
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
             $this->objReporte = new Reporte($this->objParam,$this);

@@ -4,19 +4,18 @@ CREATE OR REPLACE FUNCTION ssom.ft_no_conformidad_sel (
   p_tabla varchar,
   p_transaccion varchar
 )
-RETURNS varchar AS
-$body$
+RETURNS varchar AS'
 /**************************************************************************
  SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
  FUNCION: 		ssom.ft_no_conformidad_sel
- DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tno_conformidad'
+ DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla ''ssom.tno_conformidad''
  AUTOR: 		 (szambrana)
  FECHA:	        04-07-2019 19:53:16
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				04-07-2019 19:53:16								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'ssom.tno_conformidad'
+ #0				04-07-2019 19:53:16								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla ''ssom.tno_conformidad''
  #3				04-08-2020 19:53:16								Refactorización No Conformidad
  ***************************************************************************/
 
@@ -33,17 +32,17 @@ DECLARE
 
 BEGIN
 
-	v_nombre_funcion = 'ssom.ft_no_conformidad_sel';
+	v_nombre_funcion = ''ssom.ft_no_conformidad_sel'';
     v_parametros = pxp.f_get_record(p_tabla);
 
 	/*********************************
- 	#TRANSACCION:  'SSOM_NOCONF_SEL'
+ 	#TRANSACCION:  ''SSOM_NOCONF_SEL''
  	#DESCRIPCION:	Consulta de datos
  	#AUTOR:		szambrana
  	#FECHA:		04-07-2019 19:53:16
 	***********************************/
 
-	if(p_transaccion='SSOM_NOCONF_SEL')then
+	if(p_transaccion=''SSOM_NOCONF_SEL'')then
 
     	begin
 
@@ -52,103 +51,90 @@ BEGIN
     		--Sentencia de la consulta
 
 
-			v_consulta:='select
-                        noconf.id_nc,
-                        noconf.obs_consultor,
-                        noconf.estado_reg,
-                        noconf.evidencia,
-                        noconf.id_funcionario,
-                        noconf.id_uo,
-                        noconf.descrip_nc,
-                        noconf.id_parametro,
-                        noconf.obs_resp_area,
-                        noconf.id_aom,
-                        noconf.fecha_reg,
-                        noconf.usuario_ai,
-                        noconf.id_usuario_reg,
-                        noconf.id_usuario_ai,
-                        noconf.id_usuario_mod,
-                        noconf.fecha_mod,
-                        noconf.id_uo_adicional,
-			    		noconf.id_proceso_wf,	--integrar con wf new
-						noconf.id_estado_wf, 	--integrar con wf new
-						noconf.nro_tramite,
-						noconf.estado_wf,
-                        noconf.codigo_nc,
-                        noconf.id_funcionario_nc,
-                        usu1.cuenta as usr_reg,
-                        usu2.cuenta as usr_mod	,
-                        aom1.descrip_aom1 as nombreAom,
-                        param.valor_parametro,
-                        initcap(unorg1.nombre_unidad)::varchar as gerencia_uo1,
-                        unorg2.nombre_unidad as gerencia_uo2,
-                        initcap(ofunc.desc_funcionario1) as funcionario_uo,
-                        (select count(*)
-                               from unnest(id_tipo_estado_wfs) elemento
-                               where elemento = ew.id_tipo_estado)::integer  as contador_estados,
-                               initcap(rfun.desc_funcionario1) as funcionario_resp_nc,
-            			noconf.calidad,
-                        noconf.medio_ambiente,
-                        noconf.seguridad,
-                        noconf.responsabilidad_social,
-                        noconf.sistemas_integrados,
-                        noconf.revisar,
-                        noconf.rechazar,
-                        aom1.nombre_aom1,
-                        mauo.nombre_unidad,
-                        mafun.desc_funcionario1 as desc_funcionario_resp,
-                        aom1.nro_tramite_wf as nro_tramite_padre
-                        from ssom.tno_conformidad noconf
-                        inner join segu.tusuario usu1 on usu1.id_usuario = noconf.id_usuario_reg
-                        left join segu.tusuario usu2 on usu2.id_usuario = noconf.id_usuario_mod
-                        inner join ssom.tauditoria_oportunidad_mejora aom1 on aom1.id_aom = noconf.id_aom
-                        inner join orga.tuo mauo on mauo.id_uo = aom1.id_uo
-                        inner join orga.vfuncionario mafun on mafun.id_funcionario = aom1.id_funcionario
-                        inner join ssom.tparametro param on param.id_parametro = noconf.id_parametro
-                        inner join orga.tuo unorg1 on unorg1.id_uo = noconf.id_uo
-                        left join orga.tuo unorg2 on unorg2.id_uo = noconf.id_uo_adicional --aumentado
-                        left join orga.vfuncionario ofunc on ofunc.id_funcionario = noconf.id_funcionario
-                        left join wf.tproceso_wf pw on pw.id_proceso_wf = noconf.id_proceso_wf  	--borrar
-                        left join wf.testado_wf ew on ew.id_estado_wf = noconf.id_estado_wf 		--para integrar con nuevo wf
-                        left join orga.vfuncionario rfun on rfun.id_funcionario = noconf.id_funcionario_nc
-				        where  ';
+			v_consulta:=''select   noconf.id_nc,
+                                  noconf.obs_consultor,
+                                  noconf.estado_reg,
+                                  noconf.evidencia,
+                                  noconf.id_funcionario,
+                                  noconf.id_uo,
+                                  noconf.descrip_nc,
+                                  noconf.id_parametro,
+                                  noconf.obs_resp_area,
+                                  noconf.id_aom,
+                                  noconf.fecha_reg,
+                                  noconf.usuario_ai,
+                                  noconf.id_usuario_reg,
+                                  noconf.id_usuario_ai,
+                                  noconf.id_usuario_mod,
+                                  noconf.fecha_mod,
+                                  noconf.id_uo_adicional,
+                                  noconf.id_proceso_wf,	--integrar con wf new
+                                  noconf.id_estado_wf, 	--integrar con wf new
+                                  noconf.nro_tramite,
+                                  noconf.estado_wf,
+                                  noconf.codigo_nc,
+                                  noconf.id_funcionario_nc,
+                                  usu1.cuenta as usr_reg,
+                                  usu2.cuenta as usr_mod,
+                                  param.valor_parametro,
+                                  initcap(unorg1.nombre_unidad)::varchar as gerencia_uo1,
+                                  initcap(ofunc.desc_funcionario1) as funcionario_uo,
+                                  noconf.calidad,
+                                  noconf.medio_ambiente,
+                                  noconf.seguridad,
+                                  noconf.responsabilidad_social,
+                                  noconf.sistemas_integrados,
+                                  noconf.revisar,
+                                  noconf.rechazar,
+                                  aom.nro_tramite_wf ||'''' - '''' || aom.nombre_aom1 as auditoria,
+                                  aomuo.nombre_unidad as uo_aom,
+                                  mafun.desc_funcionario1 as aom_funcionario_resp,
+                                  rfun.desc_funcionario1 as funcionario_resp_nc
+                                  from ssom.tno_conformidad noconf
+                                  inner join segu.tusuario usu1 on usu1.id_usuario = noconf.id_usuario_reg
+                                  inner join ssom.tparametro param on param.id_parametro = noconf.id_parametro
+                                  inner join orga.tuo unorg1 on unorg1.id_uo = noconf.id_uo
+                                  inner join ssom.tauditoria_oportunidad_mejora aom on aom.id_aom  = noconf.id_aom
+                                  inner join orga.vfuncionario mafun on mafun.id_funcionario = aom.id_funcionario
+                                  inner join orga.tuo aomuo on aomuo.id_uo = aom.id_uo
+                                  left join segu.tusuario usu2 on usu2.id_usuario = noconf.id_usuario_mod
+                                  left join orga.vfuncionario ofunc on ofunc.id_funcionario = noconf.id_funcionario
+                                  left join orga.vfuncionario rfun on rfun.id_funcionario = noconf.id_funcionario_nc
+				       			  where  '';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			raise notice '%',v_consulta;
+			v_consulta:=v_consulta||'' order by '' ||v_parametros.ordenacion|| '' '' || v_parametros.dir_ordenacion || '' limit '' || v_parametros.cantidad || '' offset '' || v_parametros.puntero;
+			raise notice ''%'',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
 
 	/*********************************
- 	#TRANSACCION:  'SSOM_NOCONF_CONT'
+ 	#TRANSACCION:  ''SSOM_NOCONF_CONT''
  	#DESCRIPCION:	Conteo de registros
  	#AUTOR:		szambrana
  	#FECHA:		04-07-2019 19:53:16
 	***********************************/
 
-	elsif(p_transaccion='SSOM_NOCONF_CONT')then
+	elsif(p_transaccion=''SSOM_NOCONF_CONT'')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
 
-			v_consulta:='select count(id_nc)
+			v_consulta:=''select count(id_nc)
                         from ssom.tno_conformidad noconf
                         inner join segu.tusuario usu1 on usu1.id_usuario = noconf.id_usuario_reg
-                        left join segu.tusuario usu2 on usu2.id_usuario = noconf.id_usuario_mod
-                        inner join ssom.tauditoria_oportunidad_mejora aom1 on aom1.id_aom = noconf.id_aom
-                        inner join orga.tuo mauo on mauo.id_uo = aom1.id_uo
-                        inner join orga.vfuncionario mafun on mafun.id_funcionario = aom1.id_funcionario
                         inner join ssom.tparametro param on param.id_parametro = noconf.id_parametro
                         inner join orga.tuo unorg1 on unorg1.id_uo = noconf.id_uo
-                        left join orga.tuo unorg2 on unorg2.id_uo = noconf.id_uo_adicional --aumentado
+                        inner join ssom.tauditoria_oportunidad_mejora aom on aom.id_aom  = noconf.id_aom
+                        inner join orga.vfuncionario mafun on mafun.id_funcionario = aom.id_funcionario
+                        inner join orga.tuo aomuo on aomuo.id_uo = aom.id_uo
+                        left join segu.tusuario usu2 on usu2.id_usuario = noconf.id_usuario_mod
                         left join orga.vfuncionario ofunc on ofunc.id_funcionario = noconf.id_funcionario
-                        left join wf.tproceso_wf pw on pw.id_proceso_wf = noconf.id_proceso_wf  	--borrar
-                        left join wf.testado_wf ew on ew.id_estado_wf = noconf.id_estado_wf 		--para integrar con nuevo wf
                         left join orga.vfuncionario rfun on rfun.id_funcionario = noconf.id_funcionario_nc
-					    where ';
+					    where '';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -161,16 +147,16 @@ BEGIN
 
 
     /*********************************
- 	#TRANSACCION:  'SSOM_USU_SEL'
+ 	#TRANSACCION:  ''SSOM_USU_SEL''
  	#DESCRIPCION:	sel de registros
  	#AUTOR:		szambrana
  	#FECHA:		04-07-2019 19:53:16
 	***********************************/
-    elsif(p_transaccion='SSOM_USU_SEL')then
+    elsif(p_transaccion=''SSOM_USU_SEL'')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='SELECT
+			v_consulta:=''SELECT
                           ofunc.id_uo_funcionario,
                           ofunc.id_funcionario,
                           ofunc.desc_funcionario1,
@@ -190,30 +176,30 @@ BEGIN
                           ofunc.cargo_codigo,
                           ofunc.nombre_unidad
                           FROM orga.vfuncionario_cargo ofunc
-					      WHERE ';
+					      WHERE '';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			v_consulta:=v_consulta||'' order by '' ||v_parametros.ordenacion|| '' '' || v_parametros.dir_ordenacion || '' limit '' || v_parametros.cantidad || '' offset '' || v_parametros.puntero;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
 	/*********************************
- 	#TRANSACCION:  'SSOM_USU_CONT'
+ 	#TRANSACCION:  ''SSOM_USU_CONT''
  	#DESCRIPCION:	sel de registros
  	#AUTOR:		szambrana
  	#FECHA:		04-07-2019 19:53:16
 	***********************************/
-    elsif(p_transaccion='SSOM_USU_CONT')then
+    elsif(p_transaccion=''SSOM_USU_CONT'')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='SELECT
+			v_consulta:=''SELECT
             				count(ofunc.id_funcionario)
                          FROM orga.vfuncionario_cargo ofunc
-					      where ';
+					      where '';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -225,22 +211,22 @@ BEGIN
 
 
 	/*********************************
- 	#TRANSACCION:  'SSOM_RPT_NOCONF'
+ 	#TRANSACCION:  ''SSOM_RPT_NOCONF''
  	#DESCRIPCION:	reporte de registros
  	#AUTOR:		szambrana
  	#FECHA:		27-09-2019 19:53:16
 	***********************************/
-    elsif(p_transaccion='SSOM_RPT_NOCONF')then
+    elsif(p_transaccion=''SSOM_RPT_NOCONF'')then
 
 		begin
-          -- raise exception '%',v_parametros.id_proceso_wf;
+          -- raise exception ''%'',v_parametros.id_proceso_wf;
 
 
           select aom.id_aom into v_id_aom
           from ssom.tauditoria_oportunidad_mejora aom
           where aom.id_proceso_wf = v_parametros.id_proceso_wf;
 
-            v_consulta:= 'select   au.id_aom,
+            v_consulta:= ''select   au.id_aom,
                                    au.id_proceso_wf,
                                    au.nro_tramite_wf,
                                     au.nombre_aom1,
@@ -256,7 +242,7 @@ BEGIN
                             inner join ssom.tparametro po on po.id_parametro = au.id_tobjeto
                             inner join ssom.tno_conformidad nc on nc.id_aom = au.id_aom
                             inner join ssom.tparametro  pa on pa.id_parametro = nc.id_parametro
-                            where nc.id_aom ='||v_id_aom;
+                            where nc.id_aom =''||v_id_aom;
 
 			--Devuelve la respuesta
 			return v_consulta;
@@ -265,44 +251,44 @@ BEGIN
 
 
     /*********************************
- 	#TRANSACCION:  'SSOM_FUO_SEL'
+ 	#TRANSACCION:  ''SSOM_FUO_SEL''
  	#DESCRIPCION:	sel de registros
  	#AUTOR:		szambrana
  	#FECHA:		04-12-2019 19:53:16
 	***********************************/
-    elsif(p_transaccion='SSOM_FUO_SEL')then
+    elsif(p_transaccion=''SSOM_FUO_SEL'')then
 
 		begin
 
         	--listado de funcionarios de una UO
-			v_consulta:=' SELECT  vfc.id_funcionario,
+			v_consulta:='' SELECT  vfc.id_funcionario,
                                   vfc.desc_funcionario1 as desc_funcionario
                           FROM orga.vfuncionario_cargo vfc
                           WHERE( vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date)
-                              and ';
+                              and '';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			v_consulta:=v_consulta||'' order by '' ||v_parametros.ordenacion|| '' '' || v_parametros.dir_ordenacion || '' limit '' || v_parametros.cantidad || '' offset '' || v_parametros.puntero;
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
         /*********************************
-        #TRANSACCION:  'SSOM_FUO_CONT'
+        #TRANSACCION:  ''SSOM_FUO_CONT''
         #DESCRIPCION:	sel de registros
         #AUTOR:		szambrana
         #FECHA:		04-07-2019 19:53:16
         ***********************************/
 
-    elsif(p_transaccion='SSOM_FUO_CONT')then
+    elsif(p_transaccion=''SSOM_FUO_CONT'')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='SELECT  count(vfc.id_funcionario)
+			v_consulta:=''SELECT  count(vfc.id_funcionario)
                         FROM orga.vfuncionario_cargo vfc
                         WHERE( vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date)
-                        and ';
+                        and '';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -313,17 +299,17 @@ BEGIN
 
 
     /*********************************
- 	#TRANSACCION:  'SSOM_NOCF_SEL'
+ 	#TRANSACCION:  ''SSOM_NOCF_SEL''
  	#DESCRIPCION:	sel de registros
  	#AUTOR:		MMV
  	#FECHA:		2-10-2020
 	***********************************/
-    elsif(p_transaccion='SSOM_NOCF_SEL')then
+    elsif(p_transaccion=''SSOM_NOCF_SEL'')then
 
 		begin
 
         	--listado de funcionarios de una UO
-			v_consulta:='select	nof.id_nc,
+			v_consulta:=''select	nof.id_nc,
                                 nof.obs_consultor,
                                 nof.estado_reg,
                                 nof.evidencia,
@@ -354,7 +340,7 @@ BEGIN
                                 fun.desc_funcionario1 as responsable_auditoria,
                                 uo.nombre_unidad as uo_auditoria,
                                 uono.nombre_unidad as nof_auditoria,
-                                aom.nro_tramite_wf ||'' - '' || aom.nombre_aom1 as auditoria,
+                                aom.nro_tramite_wf ||'''' - '''' || aom.nombre_aom1 as auditoria,
                                 funo.desc_funcionario1 as funcionario_resp_nof,
                                 nof.calidad,
                                 nof.medio_ambiente,
@@ -370,28 +356,28 @@ BEGIN
                                 inner join orga.tuo uono on uono.id_uo = nof.id_uo
                                 left join segu.tusuario usu2 on usu2.id_usuario = nof.id_usuario_mod
                                 left join orga.vfuncionario funo on funo.id_funcionario = nof.id_funcionario_nc
-                                where';
+                                where'';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			v_consulta:=v_consulta||'' order by '' ||v_parametros.ordenacion|| '' '' || v_parametros.dir_ordenacion || '' limit '' || v_parametros.cantidad || '' offset '' || v_parametros.puntero;
 			--Devuelve la respuesta
-            raise notice '%',v_consulta;
+            raise notice ''%'',v_consulta;
 			return v_consulta;
 
 		end;
         /*********************************
-        #TRANSACCION:  'SSOM_NOCF_CONT'
+        #TRANSACCION:  ''SSOM_NOCF_CONT''
         #DESCRIPCION:	sel de registros
         #AUTOR:		MMV
         #FECHA:		2-10-2020
         ***********************************/
 
-    elsif(p_transaccion='SSOM_NOCF_CONT')then
+    elsif(p_transaccion=''SSOM_NOCF_CONT'')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count (nof.id_nc)
+			v_consulta:=''select count (nof.id_nc)
                           from ssom.tno_conformidad nof
                           inner join segu.tusuario usu1 on usu1.id_usuario = nof.id_usuario_reg
                           inner join ssom.tauditoria_oportunidad_mejora aom on aom.id_aom = nof.id_aom
@@ -401,7 +387,7 @@ BEGIN
                           inner join orga.tuo uono on uono.id_uo = nof.id_uo
                           left join segu.tusuario usu2 on usu2.id_usuario = nof.id_usuario_mod
                           left join orga.vfuncionario funo on funo.id_funcionario = nof.id_funcionario_nc
-                          where ';
+                          where '';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -411,21 +397,20 @@ BEGIN
 		end;
 	else
 
-		raise exception 'Transaccion inexistente';
+		raise exception ''Transaccion inexistente'';
 
 	end if;
 
 EXCEPTION
 
 	WHEN OTHERS THEN
-			v_resp='';
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-			raise exception '%',v_resp;
+			v_resp='''';
+			v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',SQLERRM);
+			v_resp = pxp.f_agrega_clave(v_resp,''codigo_error'',SQLSTATE);
+			v_resp = pxp.f_agrega_clave(v_resp,''procedimientos'',v_nombre_funcion);
+			raise exception ''%'',v_resp;
 END;
-$body$
-LANGUAGE 'plpgsql'
+'LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER

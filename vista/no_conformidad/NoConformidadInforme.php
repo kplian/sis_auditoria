@@ -46,7 +46,6 @@ header("content-type: text/javascript; charset=UTF-8");
             this.maestro=m;
             this.store.baseParams = {id_aom: this.maestro.id_aom,interfaz : this.nombreVista};
             this.load({params:{start:0, limit:50}})
-
         },
         loadValoresIniciales: function () {
             Phx.vista.NoConformidadInforme.superclass.loadValoresIniciales.call(this);
@@ -271,12 +270,14 @@ header("content-type: text/javascript; charset=UTF-8");
         saveResponsable: function(){
             Phx.CP.loadingShow();
             const select = this.getSelectedData();
+
             Ext.Ajax.request({
                 url:'../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
                 params:{
                     id_nc: select.id_nc,
                     fieldName: this.columna,
-                    id_funcionario_nc : this.cmpResponsable.getValue()
+                    id_funcionario_nc : this.cmpResponsable.getValue(),
+                    obs_resp_area : this.cmpObservacion.getValue()
                 },
                 success: this.successWizard,
                 failure: this.conexionFailure,
@@ -361,14 +362,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
             };
             const obs_consultor = new Ext.form.TextArea({
-                    name: 'nro_tramite',
+                    name: 'obs_resp_area',
                     msgTarget: 'title',
                     fieldLabel: 'Causa Rechazo',
                     allowBlank: true,
                     anchor: '90%',
                     style: 'background-image: none;',
                     maxLength:50
-                });
+            });
+
             this.formObs = new Ext.form.FormPanel({
                 autoDestroy: true,
                 border: false,
@@ -393,6 +395,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     })
                 ]
             });
+
             this.ventanaObservacion= new Ext.Window({
                 title: 'Rechazar No Conformidad',
                 width: 600,
@@ -410,7 +413,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     },
                     {
                         text: 'Cancelar',
-                        handler: function(){ this.ventanaObservacion.hide() },
+                        handler: function(){
+                            this.ventanaObservacion.hide()
+                        },
                         scope: this
                     }]
             });
@@ -428,6 +433,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 timeout: this.timeout,
                 scope: this
             });
+            this.cmpObservacion = this.formObs.getForm().findField('obs_resp_area');
+
         },
         onCrearAuditoria:function(record){
             if(this.formularioVentana){
@@ -1605,7 +1612,6 @@ header("content-type: text/javascript; charset=UTF-8");
         successNoConformidad: function(resp){
             Phx.CP.loadingHide();
             const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            console.log(reg)
             this.cargaFormulario(reg.datos[0],this.isForm);
         },
         successRevision: function(resp){
