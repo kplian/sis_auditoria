@@ -11,7 +11,6 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
     Phx.vista.NoConformidadSinAcciones = {
-
         require:'../../../sis_auditoria/vista/no_conformidad/NoConformidad.php',
         requireclase:'Phx.vista.NoConformidad',
         title:'No Conformidad',
@@ -20,7 +19,7 @@ header("content-type: text/javascript; charset=UTF-8");
         bnew:false,
         bdel:false,
         dblclickEdit: true,
-        constructor: function(config) {
+        constructor: function(config){
             this.idContenedor = config.idContenedor;
             this.maestro = config;
             this.Atributos[this.getIndAtributo('revisar')].grid=false;
@@ -94,7 +93,6 @@ header("content-type: text/javascript; charset=UTF-8");
             }
         ],
         onButtonAtras : function(res){
-            //console.log("entra atras");
             var rec=this.sm.getSelected();
             Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/AntFormEstadoWf.php',
                 'Estado de Wf',
@@ -607,21 +605,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                     items: [
                                         {
                                             xtype: 'field',
-                                            fieldLabel: 'Código Auditoria',
-                                            name: 'nro_tramite_wf',
-                                            anchor: '100%',
-                                            value: maestro.nro_tramite_wf,
-                                            readOnly :true,
-                                            style: 'background-image: none; background: #eeeeee;'
-                                        },
-                                        {
-                                            xtype: 'field',
                                             fieldLabel: 'Nombre Auditoria',
                                             name: 'nombre_aom1',
                                             anchor: '100%',
-                                            value: maestro.nombre_aom1,
+                                            value: maestro.auditoria,
                                             readOnly :true,
-                                            style: 'background-image: none; background: #eeeeee;'
+                                            style: 'background-image: none; border: 0; font-weight: bold;',
                                         },
                                         {
                                             xtype: 'combo',
@@ -892,6 +881,669 @@ header("content-type: text/javascript; charset=UTF-8");
                 layout: 'border',
                 items: [isForm]
             });
+        },
+        onCrearAuditoria:function(record){
+            if(this.formularioVentana){
+                this.form_auditoria.destroy();
+                this.formularioVentana.destroy();
+            }
+
+            Phx.CP.loadingShow();
+            this.storeProceso = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/AuditoriaProceso/listarAuditoriaProceso',
+                id: 'id_aproceso',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_aom','id_aproceso','proceso','desc_funcionario', 'estado_reg','usr_reg','fecha_reg'],
+                remoteSort: true,
+                baseParams: {dir:'ASC',sort:'id_aom',limit:'100',start:'0'}
+            });
+            this.storeEquipo = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
+                id: 'id_equipo_responsable',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_aom','id_formula_detalle','id_parametro','valor_parametro', 'id_funcionario',
+                    'desc_funcionario1', 'estado_reg','usr_reg','fecha_reg'
+                ],remoteSort: true,
+                baseParams: {dir:'ASC',sort:'id_equipo_responsable',limit:'100',start:'0'}
+            });
+            this.storePuntoNorma = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/AuditoriaNpn/listarAuditoriaNpn',
+                id: 'id_anpn',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_aom','id_anpn','id_norma','sigla_norma',
+                    'id_pn','nombre_pn','codigo_pn','desc_punto_norma',
+                    'usr_reg','estado_reg','fecha_reg','nombre_descrip'],
+                remoteSort: true,
+                baseParams: {dir:'ASC',sort:'id_anpn',limit:'100',start:'0'}
+            });
+            this.storePregunta = new Ext.data.GroupingStore({
+                url: '../../sis_auditoria/control/AuditoriaNpnpg/listarAuditoriaNpnpg',
+                id: 'id_anpnpg',
+                root: 'datos',
+                sortInfo: {
+                    field: 'id_anpnpg',
+                    direction: 'ASC'
+                },
+                totalProperty: 'total',
+                fields: ['id_anpnpg','descrip_pregunta','estado_reg','usr_reg','fecha_reg'
+                ],remoteSort: true,
+                baseParams: {dir:'ASC',sort:'id_anpnpg',limit:'100',start:'0'}
+            });
+            this.storeCronograma = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/Cronograma/listarCronograma',
+                id: 'id_cronograma',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_cronograma','id_aom','id_actividad',
+                    'nueva_actividad','fecha_ini_activ','actividad',
+                    'fecha_fin_activ','hora_ini_activ','hora_fin_activ','lista_funcionario',
+                    'estado_reg','usr_reg','fecha_reg'],remoteSort: true,
+                baseParams: {dir:'ASC',sort:'id_cronograma',limit:'100',start:'0'}
+            });
+
+            Ext.Ajax.request({
+                url:'../../sis_auditoria/control/AuditoriaOportunidadMejora/listarAuditoriaOportunidadMejora',
+                params:{
+                    dir:'ASC',
+                    sort:'id_aom',
+                    limit:'100',
+                    start:'0',
+                    id_aom: record.id_aom
+                },
+                success:this.successRevision,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+            const crorograma = new Ext.grid.GridPanel({
+                layout: 'fit',
+                store:  this.storeCronograma,
+                region: 'center',
+                split: true,
+                border: false,
+                plain: true,
+                trackMouseOver: false,
+                stripeRows: true,
+                columns: [
+                    new Ext.grid.RowNumberer(),
+                    {
+                        header: 'Actividad',
+                        dataIndex: 'id_actividad',
+                        width: 150,
+                        renderer:function(value, p, record){return String.format('{0}', record.data['actividad'])},
+                    },
+                    {
+                        header: 'Funcionarios',
+                        dataIndex: 'lista_funcionario',
+                        width: 210,
+                        renderer : function(value, p, record) {
+                            return String.format('<div class="gridmultiline">{0}</div>', record.data['lista_funcionario']);
+                        }
+                    },
+                    {
+                        header: 'Fecha Inicio',
+                        dataIndex: 'fecha_ini_activ',
+                        align: 'center',
+                        width: 100,
+                        renderer:function (value,p,record){
+                            if (value){
+                                const fecha = value.split("-");
+                                return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
+                            }else{
+                                return '';
+                            }
+
+                        }
+                    },
+                    {
+                        header: 'Hora Inicio',
+                        dataIndex: 'hora_ini_activ',
+                        align: 'center',
+                        width: 100,
+                    },
+                    {
+                        header: 'Hora Fin',
+                        dataIndex: 'hora_fin_activ',
+                        align: 'center',
+                        width: 100,
+                    },
+                    {
+                        header: 'Estado Reg.',
+                        dataIndex: 'estado_reg',
+                        width: 100,
+                        sortable: false
+                    },
+                    {
+                        header: 'Creado por.',
+                        dataIndex: 'usr_reg',
+                        width: 100,
+                        sortable: false
+                    },
+                    {
+                        header: 'Fecha creación',
+                        dataIndex: 'fecha_reg',
+                        align: 'center',
+                        width: 110
+                    }]
+            });
+            this.form_auditoria = new Ext.form.FormPanel({
+                id: this.idContenedor + '_formulario_aud',
+                items: [{ region: 'center',
+                    layout: 'column',
+                    border: false,
+                    autoScroll: true,
+                    items: [{
+                        xtype: 'tabpanel',
+                        plain: true,
+                        activeTab: 0,
+                        height: 400,
+                        deferredRender: false,
+                        items: [{
+                            title: 'Datos Principales',
+                            layout: 'form',
+                            defaults: {width: 700},
+                            autoScroll: true,
+                            defaultType: 'textfield',
+                            items: [
+                                new Ext.form.FieldSet({
+                                    collapsible: false,
+                                    border:false,
+                                    items: [
+                                        new Ext.form.FieldSet({
+                                            collapsible: false,
+                                            border: true,
+                                            layout: 'form',
+                                            items: [
+                                                {
+                                                    xtype: 'field',
+                                                    fieldLabel: 'Código',
+                                                    name: 'nro_tramite_wf',
+                                                    anchor: '100%',
+                                                    readOnly: true,
+                                                    id: this.idContenedor + '_nro_tramite_wf',
+                                                    style: 'background-image: none;',
+                                                },
+                                                {
+                                                    xtype: 'field',
+                                                    fieldLabel: 'Area',
+                                                    name: 'nombre_unidad',
+                                                    anchor: '100%',
+                                                    id: this.idContenedor + '_nombre_unidad',
+                                                    readOnly: true,
+                                                    style: 'background-image: none;',
+                                                },
+                                                {
+                                                    xtype: 'field',
+                                                    fieldLabel: 'Nombre',
+                                                    name: 'nombre_aom1',
+                                                    anchor: '100%',
+                                                    readOnly: true,
+                                                    id: this.idContenedor + '_nombre_aom1',
+                                                    style: 'background-image: none;',
+                                                },
+                                            ]
+                                        }),
+                                        new Ext.form.FieldSet({
+                                            collapsible: false,
+                                            border: true,
+                                            layout: 'form',
+                                            items: [
+                                                {
+                                                    xtype: 'field',
+                                                    fieldLabel: 'Lugar',
+                                                    name: 'lugar',
+                                                    anchor: '100%',
+                                                    allowBlank: false,
+                                                    disabled: false,
+                                                    id: this.idContenedor+'_lugar',
+                                                    readOnly: true,
+                                                    style: 'background-image: none;',
+                                                },
+                                                {
+                                                    xtype: 'combo',
+                                                    fieldLabel: 'Tipo de Auditoria',
+                                                    name: 'id_tnorma',
+                                                    allowBlank: false,
+                                                    id: this.idContenedor+'_id_tnorma',
+                                                    emptyText: 'Elija una opción...',
+                                                    store: new Ext.data.JsonStore({
+                                                        url: '../../sis_auditoria/control/Parametro/listarParametro',
+                                                        id: 'id_parametro',
+                                                        root: 'datos',
+                                                        fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                                                        totalProperty: 'total',
+                                                        sortInfo: {
+                                                            field: 'valor_parametro',
+                                                            direction: 'ASC'
+                                                        },
+                                                        baseParams:{
+                                                            tipo_parametro:'TIPO_NORMA',
+                                                            par_filtro:'prm.id_tipo_parametro'
+                                                        }
+                                                    }),
+                                                    valueField: 'id_parametro',
+                                                    displayField: 'valor_parametro',
+                                                    gdisplayField: 'desc_tipo_norma',
+                                                    hiddenName: 'id_parametro',
+                                                    mode: 'remote',
+                                                    triggerAction: 'all',
+                                                    lazyRender: true,
+                                                    pageSize: 15,
+                                                    minChars: 2,
+                                                    anchor: '100%',
+                                                    readOnly: true,
+                                                    style: 'background-image: none;',
+                                                },
+                                                {
+                                                    xtype: 'combo',
+                                                    fieldLabel: 'Objeto Auditoria',
+                                                    name: 'id_tobjeto',
+                                                    allowBlank: false,
+                                                    id: this.idContenedor+'_id_tobjeto',
+                                                    emptyText: 'Elija una opción...',
+                                                    store: new Ext.data.JsonStore({
+                                                        url: '../../sis_auditoria/control/Parametro/listarParametro',
+                                                        id: 'id_parametro',
+                                                        root: 'datos',
+                                                        fields: ['id_parametro', 'tipo_parametro', 'valor_parametro'],
+                                                        totalProperty: 'total',
+                                                        sortInfo: {
+                                                            field: 'valor_parametro',
+                                                            direction: 'ASC'
+                                                        },
+                                                        baseParams:{
+                                                            tipo_parametro:'OBJETO_AUDITORIA',
+                                                            par_filtro:'prm.id_parametro'
+                                                        }
+                                                    }),
+                                                    valueField: 'id_parametro',
+                                                    displayField: 'valor_parametro',
+                                                    gdisplayField: 'desc_tipo_objeto',
+                                                    mode: 'remote',
+                                                    triggerAction: 'all',
+                                                    lazyRender: true,
+                                                    pageSize: 15,
+                                                    minChars: 2,
+                                                    anchor: '100%',
+                                                    readOnly: true,
+                                                    style: 'background-image: none;',
+                                                },
+                                                {
+                                                    xtype: 'datefield',
+                                                    fieldLabel: 'Inicio Prev',
+                                                    name: 'fecha_prev_inicio',
+                                                    disabled: false,
+                                                    anchor: '100%',
+                                                    id: this.idContenedor+'_fecha_prev_inicio',
+                                                    style: 'background-image: none;',
+                                                    readOnly: true,
+                                                },
+                                                {
+                                                    xtype: 'datefield',
+                                                    fieldLabel: 'Fin Prev',
+                                                    name: 'fecha_prev_fin',
+                                                    disabled: false,
+                                                    anchor: '100%',
+                                                    id: this.idContenedor+'_fecha_prev_fin',
+                                                    style: 'background-image: none;',
+                                                    readOnly: true,
+                                                },
+                                                {
+                                                    xtype: 'datefield',
+                                                    fieldLabel: 'Inicio Real',
+                                                    name: 'fecha_prog_inicio',
+                                                    disabled: false,
+                                                    anchor: '100%',
+                                                    id: this.idContenedor+'_fecha_prog_inicio',
+                                                    style: 'background-image: none;',
+                                                    readOnly: true,
+                                                },
+                                                {
+                                                    xtype: 'datefield',
+                                                    fieldLabel: 'Fin Real',
+                                                    name: 'fecha_prog_fin',
+                                                    disabled: false,
+                                                    anchor: '100%',
+                                                    id: this.idContenedor+'_fecha_prog_fin',
+                                                    style: 'background-image: none;',
+                                                    readOnly: true,
+                                                },
+
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        },
+                            {
+                                title: 'Procesos',
+                                layout: 'fit',
+                                defaults: {width: 400},
+                                items: [
+                                    new Ext.grid.GridPanel({
+                                        layout: 'fit',
+                                        store:  this.storeProceso,
+                                        region: 'center',
+                                        trackMouseOver: false,
+                                        split: true,
+                                        border: false,
+                                        plain: true,
+                                        plugins: [],
+                                        stripeRows: true,
+                                        loadMask: true,
+                                        columns: [
+                                            new Ext.grid.RowNumberer(),
+                                            {
+                                                header: 'Proceso',
+                                                dataIndex: 'id_proceso',
+                                                width: 300,
+                                                sortable: false,
+                                                renderer:function(value, p, record){return String.format('{0}', record.data['proceso']);},
+                                            },
+                                            {
+                                                header: 'Responsable',
+                                                dataIndex: 'desc_funcionario',
+                                                width: 300,
+                                                sortable: false,
+                                                renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario']);},
+                                            },
+                                            {
+                                                header: 'Estado Reg.',
+                                                dataIndex: 'estado_reg',
+                                                width: 100,
+                                                sortable: false
+                                            },
+                                            {
+                                                header: 'Creado por.',
+                                                dataIndex: 'usr_reg',
+                                                width: 100,
+                                                sortable: false
+                                            },
+                                            {
+                                                header: 'Fecha creación',
+                                                dataIndex: 'fecha_reg',
+                                                align: 'center',
+                                                width: 110
+                                            }
+                                        ]
+                                    })
+                                ]
+                            },
+                            {
+                                title: 'Responsables',
+                                layout: 'fit',
+                                region:'center',
+                                items: [
+                                    new Ext.grid.GridPanel({
+                                        layout: 'fit',
+                                        store:  this.storeEquipo,
+                                        region: 'center',
+                                        split: true,
+                                        border: false,
+                                        plain: true,
+                                        plugins: [],
+                                        stripeRows: true,
+                                        trackMouseOver: false,
+                                        columns: [
+                                            new Ext.grid.RowNumberer(),
+                                            {
+                                                header: 'Tipo Auditor',
+                                                dataIndex: 'id_parametro',
+                                                width: 100,
+                                                sortable: false,
+                                                renderer:function(value, p, record){return String.format('{0}', record.data['valor_parametro'])},
+                                            },
+                                            {
+                                                header: 'Funcionario',
+                                                dataIndex: 'id_funcionario',
+                                                width: 200,
+                                                sortable: false,
+                                                renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario1'])},
+                                            },
+                                            {
+                                                header: 'Interno',
+                                                dataIndex: 'id_funcionario_interno',
+                                                width: 150,
+                                                sortable: false,
+                                            },
+                                            {
+                                                header: 'Externo',
+                                                dataIndex: 'exp_tec_externo',
+                                                width: 150,
+                                                sortable: false,
+                                            },
+                                            {
+                                                header: 'Estado Reg.',
+                                                dataIndex: 'estado_reg',
+                                                width: 100,
+                                                sortable: false
+                                            },
+                                            {
+                                                header: 'Creado por.',
+                                                dataIndex: 'usr_reg',
+                                                width: 100,
+                                                sortable: false
+                                            },
+                                            {
+                                                header: 'Fecha creación',
+                                                dataIndex: 'fecha_reg',
+                                                align: 'center',
+                                                width: 110
+                                            }
+                                        ]
+                                    })
+                                ]
+                            },
+                            {
+                                title: 'Punto de Norma',
+                                layout: 'fit',
+                                region:'center',
+                                items: [
+                                    new Ext.grid.GridPanel({
+                                        layout: 'fit',
+                                        store:  this.storePuntoNorma,
+                                        region:  'center',
+                                        margins: '3 3 3 0',
+                                        trackMouseOver: false,
+                                        columns: [
+                                            new Ext.grid.RowNumberer(),
+                                            {
+                                                header: 'Norma',
+                                                dataIndex: 'id_norma',
+                                                width: 150,
+                                                sortable: false,
+                                                renderer:function(value, p, record){
+                                                    let resultao = '';
+                                                    if(this.sigla !== record.data['sigla_norma']){
+                                                        resultao = String.format('<b>{0}</b>', record.data['sigla_norma']);
+                                                        this.sigla =  record.data['sigla_norma']
+                                                    }
+                                                    return resultao
+                                                }
+                                            },
+                                            {
+                                                header: 'Codigo',
+                                                dataIndex: 'codigo_pn',
+                                                width: 100,
+                                                sortable: false,
+                                                renderer:function(value, p, record){
+                                                    return String.format('<span>{0}</span>', record.data['codigo_pn'])
+                                                },
+
+                                            },
+                                            {
+                                                header: 'Punto de Norma',
+                                                dataIndex: 'id_pn',
+                                                width: 350,
+                                                sortable: false,
+                                                renderer:function(value, p, record){
+                                                    return String.format('<span>{0}</span>', record.data['nombre_pn'])
+                                                },
+                                            },
+                                            {
+                                                header: 'Estado Reg.',
+                                                dataIndex: 'estado_reg',
+                                                width: 100,
+                                                sortable: false
+                                            },
+                                            {
+                                                header: 'Creado por.',
+                                                dataIndex: 'usr_reg',
+                                                width: 100,
+                                                sortable: false
+                                            },
+                                            {
+                                                header: 'Fecha creación',
+                                                dataIndex: 'fecha_reg',
+                                                align: 'center',
+                                                width: 110
+                                            }
+                                        ]
+                                    })
+                                ]
+                            },
+                            {
+                                title: 'Lista de Verificación',
+                                layout: 'fit',
+                                region:'center',
+                                items: [
+                                    new Ext.grid.GridPanel({
+                                        layout: 'fit',
+                                        store:  this.storePregunta,
+                                        region:  'center',
+                                        margins: '3 3 3 0',
+                                        trackMouseOver: false,
+                                        columns: [
+                                            new Ext.grid.RowNumberer(),
+                                            {
+                                                header: 'Norma',
+                                                dataIndex: 'id_norma',
+                                                width: 150,
+                                                sortable: false,
+                                                renderer:function(value, p, record){return String.format('{0}', record.data['sigla_norma'])},
+                                            },
+                                            {
+                                                header: 'Punto de Norma',
+                                                dataIndex: 'id_pn',
+                                                width: 300,
+                                                sortable: false,
+                                                renderer:function(value, p, record){return String.format('{0}', record.data['nombre_pn'])},
+                                            },
+                                            {
+                                                header: 'Pregunta',
+                                                dataIndex: 'id_pregunta',
+                                                width: 300,
+                                                sortable: false,
+                                                renderer:function(value, p, record){return String.format('{0}', record.data['descrip_pregunta'])},
+                                            },
+                                            {
+                                                header: 'Estado Reg.',
+                                                dataIndex: 'estado_reg',
+                                                width: 100,
+                                                sortable: false
+                                            },
+                                            {
+                                                header: 'Creado por.',
+                                                dataIndex: 'usr_reg',
+                                                width: 100,
+                                                sortable: false
+                                            },
+                                            {
+                                                header: 'Fecha creación',
+                                                dataIndex: 'fecha_reg',
+                                                align: 'center',
+                                                width: 110
+                                            }
+                                        ]
+                                    })
+                                ]
+                            },
+                            {
+                                title: 'Cronograma',
+                                layout: 'fit',
+                                region:'center',
+                                items: [
+                                    crorograma
+                                ]
+                            }
+                        ]
+                    }]
+                }],
+                padding: this.paddingForm,
+                bodyStyle: this.bodyStyleForm,
+                border: this.borderForm,
+                frame: this.frameForm,
+                autoDestroy: true,
+                autoScroll: true,
+                region: 'center'
+            });
+            this.storeProceso.baseParams.id_aom = record.id_aom;
+            this.storeProceso.load();
+
+            this.storeEquipo.baseParams.id_aom = record.id_aom;
+            this.storeEquipo.load();
+
+            this.storePuntoNorma.baseParams.id_aom = record.id_aom;
+            this.storePuntoNorma.load();
+
+            this.storeCronograma.baseParams.id_aom = record.id_aom;
+            this.storeCronograma.load();
+
+
+            this.formularioVentana = new Ext.Window({
+                width: 750,
+                height: 480,
+                modal: true,
+                closeAction: 'hide',
+                labelAlign: 'top',
+                title: 'Auditoria Planificacion',
+                bodyStyle: 'padding:5px',
+                layout: 'border',
+                items: [this.form_auditoria]
+            });
+        },
+        onBool:function(valor){
+            return valor === 't';
+        },
+        successRevision: function(resp){
+            Phx.CP.loadingHide();
+            const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            this.cargaFormulario(reg.datos[0],this.form_auditoria);
+        },
+        cargaFormulario: function(data, formulario){
+            var obj,key;
+            Ext.each(formulario.getForm().items.keys, function(element, index){
+                obj = Ext.getCmp(element);
+                if(obj&&obj.items){
+                    Ext.each(obj.items.items, function(elm, b, c){
+                        if(elm.getXType()=='combo'&&elm.mode=='remote'&&elm.store!=undefined){
+                            if (!elm.store.getById(data[elm.name])) {
+                                rec = new Ext.data.Record({[elm.displayField]: data[elm.gdisplayField], [elm.valueField]: data[elm.name] },data[elm.name]);
+                                elm.store.add(rec);
+                                elm.store.commitChanges();
+                                elm.modificado = true;
+                            }
+                        }
+                        elm.setValue(data[elm.name]);
+                    },this);
+                } else {
+                    key = element.replace(this.idContenedor+'_','');
+                    if(obj){
+                        if((obj.getXType()=='combo'&&obj.mode=='remote'&&obj.store!=undefined)||key=='id_centro_costo'){
+                            if (!obj.store.getById(data[key])) {
+                                rec = new Ext.data.Record({[obj.displayField]: data[obj.gdisplayField], [obj.valueField]: data[key] },data[key]);
+                                obj.store.add(rec);
+                                obj.store.commitChanges();
+                                obj.modificado = true;
+                            }
+                        }
+                        obj.setValue(data[key]);
+                    }
+                }
+            },this);
         },
     };
 

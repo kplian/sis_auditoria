@@ -876,7 +876,6 @@ header("content-type: text/javascript; charset=UTF-8");
             baseParams: {dir:'ASC',sort:'id_documento_wf',limit:'100',start:'0'}
         });
 
-        console.log(this.documentos)
         if(data){
             this.documentos.baseParams.modoConsulta = 'no';
             this.documentos.baseParams.todos_documentos = 'no';
@@ -923,13 +922,15 @@ header("content-type: text/javascript; charset=UTF-8");
                     xtype: 'box',
                     autoEl: {
                         tag: 'a',
-                        html: 'Asignar/Designar Punto de Norma<'
+                        html: 'Asignar/Designar Punto de Norma'
                     },
                     style: 'cursor:pointer; font-size: 13px; margin: 10px;',
                     listeners: {
                         render: function(component) {
                             component.getEl().on('click', function(e) {
-                                if(this.id_no_conformidad !==  null || data){
+                                console.log(data)
+                                console.log(me.id_no_conformidad)
+                                if(me.id_no_conformidad !==  null || data){
                                     me.formularioPuntoNorma(data);
                                     me.ventanaPuntoNorma.show();
                                 }else{
@@ -949,19 +950,65 @@ header("content-type: text/javascript; charset=UTF-8");
                                     split: true,
                                     border: false,
                                     plain: true,
-                                    plugins: [],
                                     stripeRows: true,
                                     loadMask: true,
-                                    tbar: [{
+                                    tbar: [
+                                        {
+                                            xtype: 'box',
+                                            autoEl: {
+                                                tag: 'a',
+                                                html: 'Nuevo'
+                                            },
+                                            style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                                            listeners: {
+                                                render: function(component) {
+                                                    component.getEl().on('click', function(e) {
+                                                        if(me.id_no_conformidad !==  null || data){
+                                                            me.onFormularioDocumento(data);
+                                                        }else{
+                                                            alert('Tiene que registrar la no conformidad')
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        },
+                                        {
+                                            xtype: 'box',
+                                            autoEl: {
+                                                tag: 'a',
+                                                html: 'Eliminar'
+                                            },
+                                            style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                                            listeners: {
+                                                render: function(component) {
+                                                    component.getEl().on('click', function(e) {
+                                                        const record = grilla.getSelectionModel().getSelections();
+                                                        Phx.CP.loadingShow();
+                                                        Ext.Ajax.request({
+                                                            url: '../../sis_workflow/control/DocumentoWf/eliminarDocumentoWf',
+                                                            params: {
+                                                                id_documento_wf : record[0].data.id_documento_wf
+                                                            },
+                                                            isUpload: false,
+                                                            success: function(a,b,c){
+                                                                Phx.CP.loadingHide();
+                                                                me.documentos.load({params:{ start: 0, limit: 50 }});
+                                                            },
+                                                            argument: me.argumentSave,
+                                                            failure: me.conexionFailure,
+                                                            timeout: me.timeout,
+                                                            scope: me
+                                                        })
+                                                    });
+                                                }
+                                            }
+                                        }
+                                        /*{
                                         text: '<button class="btn">&nbsp;&nbsp;<b>Nuevo</b></button>',
                                         scope: this,
                                         width: '100',
                                         handler: function() {
-                                            if(this.id_no_conformidad !==  null || data){
-                                                this.onFormularioDocumento(data);
-                                            }else{
-                                                alert('Tiene que registrar la no conformidad')
-                                            }
+
                                         }
                                     },
                                     {
@@ -969,25 +1016,9 @@ header("content-type: text/javascript; charset=UTF-8");
                                         scope: this,
                                         width: '100',
                                         handler: function() {
-                                            const record = grilla.getSelectionModel().getSelections();
-                                            Phx.CP.loadingShow();
-                                            Ext.Ajax.request({
-                                                url: '../../sis_workflow/control/DocumentoWf/eliminarDocumentoWf',
-                                                params: {
-                                                    id_documento_wf : record[0].data.id_documento_wf
-                                                },
-                                                isUpload: false,
-                                                success: function(a,b,c){
-                                                    Phx.CP.loadingHide();
-                                                    this.documentos.load({params:{ start: 0, limit: 50 }});
-                                                },
-                                                argument: this.argumentSave,
-                                                failure: this.conexionFailure,
-                                                timeout: this.timeout,
-                                                scope: this
-                                            })
+
                                         }
-                                    }
+                                    }*/
                                     ],
                                     columns: [
                                         new Ext.grid.RowNumberer(),

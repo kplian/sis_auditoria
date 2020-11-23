@@ -11,10 +11,10 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-    Phx.vista.AccionesPropuestaImplementadas = {
+    Phx.vista.AccionesPropuestaAuditor = {
         require:'../../../sis_auditoria/vista/accion_propuesta/AccionPropuesta.php',
         requireclase:'Phx.vista.AccionPropuesta',
-        nombreVista: 'AccionesPropuestaImplementadas',
+        nombreVista: 'AccionesPropuestaAuditor',
         bedit:false,
         bnew:false,
         bsave:false,
@@ -35,7 +35,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('implementar')].grid=false;
             this.Atributos[this.getIndAtributo('revisar')].grid=false;
             this.Atributos[this.getIndAtributo('rechazar')].grid=false;
-            Phx.vista.AccionesPropuestaImplementadas.superclass.constructor.call(this,config);
+            Phx.vista.AccionesPropuestaAuditor.superclass.constructor.call(this,config);
             this.init();
             this.store.baseParams.interfaz = this.nombreVista;
             this.load({params:{start:0, limit:50}});
@@ -383,7 +383,7 @@ header("content-type: text/javascript; charset=UTF-8");
             const rec = this.sm.getSelected();
             const id_estado_wf = rec.data.id_estado_wf;
             const id_proceso_wf = rec.data.id_proceso_wf;
-            if(confirm('¿Acción Aprobada por Responsable?')){
+            if(confirm('¿Acción Aprobada por Auditor?')){
                 Ext.Ajax.request({
                     url:'../../sis_auditoria/control/AccionPropuesta/aprobarEstado',
                     params:{

@@ -11,16 +11,14 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
-    nombreVista :'AccionPropuesta',
-    constructor:function(config){
-		this.maestro = config.maestro; //comentado ahorita
+        nombreVista :'AccionPropuesta',
+        dblclickEdit: true,
 
+        constructor:function(config){
+		this.maestro = config.maestro; //comentado ahorita
 		Phx.vista.AccionPropuesta.superclass.constructor.call(this,config);
         this.init();
         this.grid.addListener('cellclick', this.oncellclick,this);
-
-
-		
 		//insertamos y habilitamos el boton siguiente
 		this.addButton('siguiente',{text:'Aprobar',
 			iconCls: 'bok',
@@ -96,6 +94,16 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
                 labelSeparator:'',
                 inputType:'hidden',
                 name: 'id_proceso_wf'
+            },
+            type:'Field',
+            form:true
+        },
+        {
+            //configuracion del componente -->id_proceso_wf
+            config:{
+                labelSeparator:'',
+                inputType:'hidden',
+                name: 'estado_wf'
             },
             type:'Field',
             form:true
@@ -210,24 +218,88 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		},
         {
+            config: {
+                name: 'id_parametro',
+                fieldLabel: 'Tipo de Accion',
+                allowBlank: true,
+                emptyText: 'Elija una opción...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_auditoria/control/Parametro/listarParametro',
+                    id: 'id_parametro',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'valor_parametro',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_parametro', 'valor_parametro', 'id_tipo_parametro'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'prm.id_parametro#prm.valor_parametro',id_tipo_parametro:1}
+                }),
+                valueField: 'id_parametro',
+                displayField: 'valor_parametro',
+                gdisplayField: 'valor_parametro',
+                hiddenName: 'id_parametro',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,
+                anchor: '40%',
+                gwidth: 150,
+                minChars: 2,
+                renderer : function(value, p, record) {
+                    return String.format('<a style="cursor: pointer">{0}</a>', record.data['valor_parametro']);
+                }
+            },
+            type: 'ComboBox',
+            id_grupo: 0,
+            filters: {pfiltro: 'prm.valor_parametro',type: 'string'},
+            grid: true,
+            form: true
+        },
+        {
             config:{
-                name: 'estado_wf',
-                fieldLabel: 'Estado',
+                name: 'descripcion_ap',
+                fieldLabel: 'Descripcion accion propuesta',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 180,
-                renderer: function(value,p,record){
-                    let color = '#1419CC';
-
-                    if (record.data['estado_wf'] === 'accion_aprobada_responsable'){
-                        color = '#0a7f15';
-                    }
-                    if (record.data['estado_wf'] === 'accion_rechazada_responsable'){
-                        color = '#a20007';
-                    }
-
-                    return '<font color="'+color+'">'+record.data['estado_wf']+'</font>';
+                gwidth: 400,
+                renderer : function(value, p, record) {
+                    return String.format('<a style="cursor: pointer">{0}</a>', record.data['descripcion_ap']);
                 }
+            },
+            type:'TextArea',
+            filters:{pfiltro:'accpro.descripcion_ap',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'efectividad_cumpl_ap',
+                fieldLabel: 'Efectividad',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 300,
+                renderer : function(value, p, record) {
+                    return String.format('<a style="cursor: pointer">{0}</a>', record.data['efectividad_cumpl_ap']);
+                }
+            },
+            type:'TextField',
+            filters:{pfiltro:'accpro.efectividad_cumpl_ap',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'nombre_estado',
+                fieldLabel: 'Estado',
+                allowBlank: true,
+                gwidth: 300,
             },
             type:'TextField',
             filters:{pfiltro:'smt.estado',type:'string'},
@@ -235,86 +307,56 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
-
 		{
 			config:{
 				name: 'descrip_causa_nc',
 				fieldLabel: 'Descripcion causa No conformidad',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 200,
-				//maxLength:-5
+				gwidth: 300
 			},
 				type:'TextArea',
 				filters:{pfiltro:'accpro.descrip_causa_nc',type:'string'},
 				id_grupo:1,
 				grid:true,
 				form:true
-		},		
-		{
-			config:{
-				name: 'descripcion_ap',
-				fieldLabel: 'Descripcion accion propuesta',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 200,
-				//maxLength:-5
-			},
-				type:'TextArea',
-				filters:{pfiltro:'accpro.descripcion_ap',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:true
 		},
-		//configuracion del componente -->id_parametro
-		{
-			config: {
-				name: 'id_parametro',
-				fieldLabel: 'Tipo de Accion',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_auditoria/control/Parametro/listarParametro',
-					id: 'id_parametro',
-					root: 'datos',
-					sortInfo: {
-						field: 'valor_parametro',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_parametro', 'valor_parametro', 'id_tipo_parametro'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'prm.id_parametro#prm.valor_parametro',id_tipo_parametro:1}
-				}),
-				valueField: 'id_parametro',
-				displayField: 'valor_parametro',
-				gdisplayField: 'valor_parametro',
-				hiddenName: 'id_parametro',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '40%',
-				gwidth: 100,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['valor_parametro']);
-				}
-			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'prm.valor_parametro',type: 'string'},
-			grid: true,
-			form: true
-		},
+        {
+            config:{
+                name: 'fecha_inicio_ap',
+                fieldLabel: 'Inicio aplicacion',
+                allowBlank: true,
+                anchor: '50%',
+                gwidth: 80,
+                format: 'd/m/Y',
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'accpro.fecha_inicio_ap',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'fecha_fin_ap',
+                fieldLabel: 'Fin aplicacion',
+                allowBlank: true,
+                anchor: '50%',
+                gwidth: 80,
+                format: 'd/m/Y',
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'accpro.fecha_fin_ap',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config: {
 				name: 'id_funcionario',
-				//fieldLabel: 'id_funcionario_aprob',
-				fieldLabel: 'Responsable de Aprobar la Accion Propuesta',
+				fieldLabel: 'Responsable',
 				allowBlank: true,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
@@ -342,7 +384,7 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 				pageSize: 15,
 				queryDelay: 1000,
 				anchor: '40%',
-				gwidth: 100,
+				gwidth: 250,
 				minChars: 2,
 				renderer : function(value, p, record) {
 					return String.format('{0}', record.data['funcionario_name']);
@@ -354,62 +396,13 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
-
-		{
-			config:{
-				name: 'efectividad_cumpl_ap',
-				fieldLabel: 'efectividad/ cumplimiento de la accion propuesta',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				//maxLength:-5
-			},
-				type:'TextField',
-				filters:{pfiltro:'accpro.efectividad_cumpl_ap',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:true
-		},
-		{
-			config:{
-				name: 'fecha_inicio_ap',
-				fieldLabel: 'Inicio aplicacion accion propuesta',
-				allowBlank: true,
-				anchor: '50%',
-				gwidth: 80,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-			},
-				type:'DateField',
-				filters:{pfiltro:'accpro.fecha_inicio_ap',type:'date'},
-				id_grupo:1,
-				grid:true,
-				form:true
-		},		
-		{
-			config:{
-				name: 'fecha_fin_ap',
-				fieldLabel: 'Fin aplicacion accion propuesta',
-				allowBlank: true,
-				anchor: '50%',
-				gwidth: 80,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-			},
-				type:'DateField',
-				filters:{pfiltro:'accpro.fecha_fin_ap',type:'date'},
-				id_grupo:1,
-				grid:true,
-				form:true
-		},
 		{
 			config:{
 				name: 'obs_resp_area',
 				fieldLabel: 'Observaciones Responsable de Area',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 150,
-				//maxLength:-5
+				gwidth: 300
 			},
 				type:'TextArea',
 				filters:{pfiltro:'accpro.obs_resp_area',type:'string'},
@@ -423,8 +416,7 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Observaciones Auditor Consultor',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 150,
-				//maxLength:-5
+				gwidth: 300
 			},
 				type:'TextArea',
 				filters:{pfiltro:'accpro.obs_auditor_consultor',type:'string'},
@@ -605,6 +597,7 @@ Phx.vista.AccionPropuesta=Ext.extend(Phx.gridInterfaz,{
 		{name:'funcionario_noc', type: 'string'},
 		{name:'id_aom', type: 'numeric'},
         {name:'auditoria', type: 'string'},
+        {name:'nombre_estado', type: 'string'},
 	],
 	sortInfo:{
 		field: 'id_ap',

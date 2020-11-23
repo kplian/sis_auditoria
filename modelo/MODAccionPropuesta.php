@@ -62,6 +62,7 @@ class MODAccionPropuesta extends MODbase{
         $this->captura('funcionario_noc','text');
         $this->captura('id_aom','int4');
         $this->captura('auditoria','text');
+        $this->captura('nombre_estado','varchar');
 
         
 		//Ejecuta la instruccion

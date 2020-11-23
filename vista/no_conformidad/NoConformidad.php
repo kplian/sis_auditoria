@@ -143,6 +143,16 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
                     form:true
                 },
                 {
+                    //configuracion del componente -->id_proceso_wf
+                    config:{
+                        labelSeparator:'',
+                        inputType:'hidden',
+                        name: 'estado_wf',
+                    },
+                    type:'Field',
+                    form:true
+                },
+                {
 		 	     config:{
 		 	         name: 'revisar',
 		 	         fieldLabel: 'Revisar',
@@ -290,7 +300,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
-                name: 'estado_wf',
+                name: 'nombre_estado',
                 fieldLabel: 'Estado',
                 allowBlank: true,
                 gwidth: 200,
@@ -696,6 +706,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
         {name:'uo_aom', type: 'string'},
         {name:'aom_funcionario_resp', type: 'string'},
         {name:'funcionario_resp_nc', type: 'string'},
+        {name:'nombre_estado', type: 'string'},
 	],
 	sortInfo:{
 		field: 'id_nc',

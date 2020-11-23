@@ -2059,29 +2059,36 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 ],
                 tbar: [
+
                     {
-                        text: '<button class="btn"><i class="fa fa-trash fa-lg"></i>&nbsp;&nbsp;<b>Eliminar</b></button>',
-                        scope:this,
-                        width: '100',
-                        handler: function(){
-                            const  s =  table.getSelectionModel().getSelections();
-                            // console.log(s[0].data)
-                            Phx.CP.loadingShow();
-                            Ext.Ajax.request({
-                                url: '../../sis_auditoria/control/Cronograma/eliminarCronograma',
-                                params: {
-                                    id_cronograma : s[0].data.id_cronograma
-                                },
-                                isUpload: false,
-                                success: function(a,b,c){
-                                    Phx.CP.loadingHide();
-                                    tienda.load();
-                                },
-                                argument: this.argumentSave,
-                                failure: this.conexionFailure,
-                                timeout: this.timeout,
-                                scope: this
-                            })
+                        xtype: 'box',
+                        autoEl: {
+                            tag: 'a',
+                            html: 'Eliminar Actividad'
+                        },
+                        style: 'cursor:pointer; font-size: 13px; margin: 10px;',
+                        listeners: {
+                            render: function(component) {
+                                component.getEl().on('click', function(e) {
+                                    const  s =  table.getSelectionModel().getSelections();
+                                    Phx.CP.loadingShow();
+                                    Ext.Ajax.request({
+                                        url: '../../sis_auditoria/control/Cronograma/eliminarCronograma',
+                                        params: {
+                                            id_cronograma : s[0].data.id_cronograma
+                                        },
+                                        isUpload: false,
+                                        success: function(a,b,c){
+                                            Phx.CP.loadingHide();
+                                            tienda.load();
+                                        },
+                                        argument: this.argumentSave,
+                                        failure: this.conexionFailure,
+                                        timeout: this.timeout,
+                                        scope: this
+                                    })
+                                });
+                            }
                         }
                     }
                 ],

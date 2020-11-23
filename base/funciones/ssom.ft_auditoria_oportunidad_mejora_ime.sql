@@ -450,7 +450,6 @@ BEGIN
 
               end loop;
 
-     --- raise exception '%',v_equipo;
   v_resumen = '<div>
                 <p>En fecha '||to_char( v_registros_proc.fecha_prog_inicio,'DD/MM/YYYY')||', conforme al Programa Anual de Auditorias Internas de la Empresa se realizó la auditoria:</p>
                 <p>"'||v_registros_proc.nombre_aom1||'"</p>
@@ -475,7 +474,7 @@ BEGIN
        end if;
 
 
-              if va_codigo_estado[1] = 'notificar_responsable' then
+          /*    if va_codigo_estado[1] = 'notificar_responsable' then
 
 
        		select  ao.id_aom
@@ -501,10 +500,11 @@ BEGIN
 
 
 
-              end if;
+              end if;*/
 
+       --raise exception '%',va_codigo_estado;
 
-       if va_codigo_estado[1] = 'notificar' then
+       if va_codigo_estado[1] = 'curso' then
 
        		select  ao.id_aom,
             		ao.fecha_prog_inicio,

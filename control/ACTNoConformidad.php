@@ -26,9 +26,9 @@ class ACTNoConformidad extends ACTbase{
            $this->objParam->addFiltro("noconf.estado_wf in (''aceptada_resp'')");
         }
         if($this->objParam->getParametro('interfaz') == 'NoConformidadAccion'){
-            $this->objParam->addFiltro("noconf.estado_wf in (''correccion'') and (select count(a.id_ap)
+         /*   $this->objParam->addFiltro("noconf.estado_wf in (''correccion'') and (select count(a.id_ap)
                                                                                     from ssom.taccion_propuesta a
-                                                                                        where a.id_nc = noconf.id_nc) > 0 ");
+                                                                                        where a.id_nc = noconf.id_nc) > 0 ");*/
         }
  
 
@@ -175,6 +175,9 @@ class ACTNoConformidad extends ACTbase{
 
         if ($this->objParam->getParametro('tipo_interfaz')  == 'NoConformidadSuper'){
               $this->objParam->addFiltro("nof.estado_wf in (''aceptada_resp'',''rechazado_resp'')");
+        }
+        if($this->objParam->getParametro('id_nc')!=''){
+            $this->objParam->addFiltro("nof.id_nc = ".$this->objParam->getParametro('id_nc'));
         }
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
             $this->objReporte = new Reporte($this->objParam,$this);

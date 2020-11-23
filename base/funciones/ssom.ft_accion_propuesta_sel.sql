@@ -82,11 +82,14 @@ BEGIN
                         uon.nombre_unidad as area_noc,
 						funn.desc_funcionario1 as funcionario_noc,
                         om.id_aom,
-                        om.nombre_aom1 ||'' ''|| om.nro_tramite_wf as auditoria
+                        om.nombre_aom1 ||'' ''|| om.nro_tramite_wf as auditoria,
+                        tp.etapa as nombre_estado
 						from ssom.taccion_propuesta accpro
 						inner join segu.tusuario usu1 on usu1.id_usuario = accpro.id_usuario_reg
                         inner join ssom.tno_conformidad noc on noc.id_nc = accpro.id_nc
                         inner join ssom.tauditoria_oportunidad_mejora om on om.id_aom = noc.id_aom
+                         inner join wf.testado_wf es on es.id_estado_wf = accpro.id_estado_wf
+                        inner join wf.ttipo_estado tp on tp.id_tipo_estado = es.id_tipo_estado
 						left join segu.tusuario usu2 on usu2.id_usuario = accpro.id_usuario_mod
                         left join ssom.tparametro param on param.id_parametro = accpro.id_parametro
                         left join orga.vfuncionario_cargo ofunc on ofunc.id_funcionario = accpro.id_funcionario
@@ -121,6 +124,8 @@ BEGIN
 					    inner join segu.tusuario usu1 on usu1.id_usuario = accpro.id_usuario_reg
                         inner join ssom.tno_conformidad noc on noc.id_nc = accpro.id_nc
                         inner join ssom.tauditoria_oportunidad_mejora om on om.id_aom = noc.id_aom
+                         inner join wf.testado_wf es on es.id_estado_wf = accpro.id_estado_wf
+                        inner join wf.ttipo_estado tp on tp.id_tipo_estado = es.id_tipo_estado
 						left join segu.tusuario usu2 on usu2.id_usuario = accpro.id_usuario_mod
                         left join ssom.tparametro param on param.id_parametro = accpro.id_parametro
                         join orga.vfuncionario_cargo ofunc on ofunc.id_funcionario = accpro.id_funcionario

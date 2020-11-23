@@ -11,10 +11,10 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-    Phx.vista.AccionesPropuestaImplementadas = {
+    Phx.vista.AccionesPropuestaResponsable = {
         require:'../../../sis_auditoria/vista/accion_propuesta/AccionPropuesta.php',
         requireclase:'Phx.vista.AccionPropuesta',
-        nombreVista: 'AccionesPropuestaImplementadas',
+        nombreVista: 'AccionesPropuestaResponsable',
         bedit:false,
         bnew:false,
         bsave:false,
@@ -35,7 +35,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('implementar')].grid=false;
             this.Atributos[this.getIndAtributo('revisar')].grid=false;
             this.Atributos[this.getIndAtributo('rechazar')].grid=false;
-            Phx.vista.AccionesPropuestaImplementadas.superclass.constructor.call(this,config);
+            Phx.vista.AccionesPropuestaResponsable.superclass.constructor.call(this,config);
             this.init();
             this.store.baseParams.interfaz = this.nombreVista;
             this.load({params:{start:0, limit:50}});
@@ -129,81 +129,81 @@ header("content-type: text/javascript; charset=UTF-8");
                 ]
             });
             const primero = new Ext.form.FieldSet({
-                collapsible: false,
-                border: true,
-                layout: 'form',
-                defaults: {width: 600},
-                items: [
-                    {
-                        fieldLabel: 'Informe',
-                        xtype: 'box',
-                        autoEl: {
-                            tag: 'a',
-                            html:  maestro.auditoria,
-                        },
-                        style: 'cursor:pointer;',
-                        listeners: {
-                            render: function(component) {
-                                component.getEl().on('click', function(e) {
-                                    me.onCrearAuditoria(maestro);
-                                    me.formularioVentana_aud.show();
-                                });
+                    collapsible: false,
+                    border: true,
+                    layout: 'form',
+                    defaults: {width: 600},
+                    items: [
+                        {
+                            fieldLabel: 'Informe',
+                            xtype: 'box',
+                            autoEl: {
+                                tag: 'a',
+                                html:  maestro.auditoria,
+                            },
+                            style: 'cursor:pointer;',
+                            listeners: {
+                                render: function(component) {
+                                    component.getEl().on('click', function(e) {
+                                         me.onCrearAuditoria(maestro);
+                                         me.formularioVentana_aud.show();
+                                    });
+                                }
                             }
-                        }
-                    },
-                    {
-                        xtype: 'field',
-                        labelSeparator:'',
-                        inputType:'hidden',
-                        name: 'id_ap'
-                    },
-                    {
-                        xtype: 'field',
-                        fieldLabel: 'Area',
-                        name: 'area',
-                        anchor: '100%',
-                        value: maestro.uo_aom,
-                        readOnly :true,
-                        style: 'background-image: none; border: 0; font-weight: bold;',
-                    },
-                    {
-                        xtype: 'field',
-                        fieldLabel: 'Auditor resp',
-                        name: 'auditor_respo',
-                        anchor: '100%',
-                        value: maestro.aom_funcionario_resp,
-                        readOnly :true,
-                        style: 'background-image: none; border: 0; font-weight: bold;',
-                    },
-                    {
-                        fieldLabel: 'No Conformidad',
-                        xtype: 'box',
-                        autoEl: {
-                            tag: 'a',
-                            html: maestro.codigo_nc,
                         },
-                        style: 'cursor:pointer;',
-                        listeners: {
-                            render: function(component) {
-                                component.getEl().on('click', function(e) {
-                                    me.formularioNoConformidad(maestro);
-                                    me.ventanaNoConformidad.show();
-                                });
+                        {
+                            xtype: 'field',
+                            labelSeparator:'',
+                            inputType:'hidden',
+                            name: 'id_ap'
+                        },
+                        {
+                            xtype: 'field',
+                            fieldLabel: 'Area',
+                            name: 'area',
+                            anchor: '100%',
+                            value: maestro.uo_aom,
+                            readOnly :true,
+                            style: 'background-image: none; border: 0; font-weight: bold;',
+                        },
+                        {
+                            xtype: 'field',
+                            fieldLabel: 'Auditor resp',
+                            name: 'auditor_respo',
+                            anchor: '100%',
+                            value: maestro.aom_funcionario_resp,
+                            readOnly :true,
+                            style: 'background-image: none; border: 0; font-weight: bold;',
+                        },
+                        {
+                            fieldLabel: 'No Conformidad',
+                            xtype: 'box',
+                            autoEl: {
+                                tag: 'a',
+                                html: maestro.codigo_nc,
+                            },
+                            style: 'cursor:pointer;',
+                            listeners: {
+                                render: function(component) {
+                                    component.getEl().on('click', function(e) {
+                                        me.formularioNoConformidad(maestro);
+                                        me.ventanaNoConformidad.show();
+                                    });
+                                }
                             }
-                        }
-                    },
-                    {
-                        xtype: 'textarea',
-                        name: 'descrip_causa_nc',
-                        fieldLabel: 'Descripcion causa No conformidad',
-                        allowBlank: true,
-                        anchor: '100%',
-                        gwidth: 210,
-                        readOnly :true,
+                        },
+                        {
+                            xtype: 'textarea',
+                            name: 'descrip_causa_nc',
+                            fieldLabel: 'Descripcion causa No conformidad',
+                            allowBlank: true,
+                            anchor: '100%',
+                            gwidth: 210,
+                            readOnly :true,
 
-                    }
-                ]
-            });
+                        }
+                    ]
+                });
             this.form = new Ext.form.FormPanel({
                 items: [
                     {

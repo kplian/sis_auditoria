@@ -78,6 +78,7 @@ DECLARE
 
     v_estado_new			varchar;
     v_id_estado_new			integer;
+    v_funcionario_nc		integer;
 
 BEGIN
 
@@ -114,8 +115,8 @@ BEGIN
                 v_id_proceso_macro
            	from  wf.tproceso_macro pm
            	inner join wf.ttipo_proceso tp on tp.id_proceso_macro = pm.id_proceso_macro
-			where  pm.codigo='AUD' and tp.estado_reg = 'activo' --and tp.inicio = 'no'
-            and tp.codigo = 'ACCP';
+			where  pm.codigo='ACCN' and tp.estado_reg = 'activo' and tp.inicio = 'si'
+            and tp.codigo = 'ACCI';
 
         	--- generar nro de tramite usando funcion de wf (sirve para wf)
 
@@ -138,16 +139,7 @@ BEGIN
                 NULL,
                 NULL,
                 'Accion propuesta',
-                v_codigo_tipo_proceso,
-                v_parametros.nro_tramite_padre);
-                --Condicion para fechas utilizamos la funcion overlaps
-				/*v_fechas_validas = (select( v_parametros.fecha_inicio_ap::date, v_parametros.fecha_inicio_ap::date) overlaps
-									      ( v_parametros.fecha_inicio_ap::date, v_parametros.fecha_fin_ap::date));
-
-            if not v_fechas_validas then
-        		raise exception 'La fecha final debe ser igual o mayor a la fecha inicial';
-            end if;*/
-
+                v_codigo_tipo_proceso);
 
 
         	--Sentencia de la insercion
@@ -198,6 +190,36 @@ BEGIN
                 v_codigo_estado,	--integrar con wf new
                 ssom.f_generar_correlativo('ACCPRO', EXTRACT(YEAR FROM current_date)::integer,true)
 			)RETURNING id_ap into v_id_ap;
+
+
+
+			select nc.id_funcionario_nc into v_funcionario_nc
+            from ssom.tno_conformidad nc
+            where nc.id_nc = v_parametros.id_nc;
+
+            	insert into ssom.trepon_accion(
+			estado_reg,
+			obs_dba,
+			id_ap,
+			id_funcionario,
+			id_usuario_reg,
+			fecha_reg,
+			id_usuario_ai,
+			usuario_ai,
+			id_usuario_mod,
+			fecha_mod
+          	) values(
+			'activo',
+			null,
+			v_id_ap,
+			v_funcionario_nc,
+			p_id_usuario,
+			now(),
+			v_parametros._id_usuario_ai,
+			v_parametros._nombre_usuario_ai,
+			null,
+			null
+			);
 
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Acciones Propuestas almacenado(a) con exito (id_ap'||v_id_ap||')');

@@ -70,6 +70,7 @@ class MODNoConformidad extends MODbase{
         $this->captura('uo_aom','varchar');
         $this->captura('aom_funcionario_resp','text');
         $this->captura('funcionario_resp_nc','text');
+        $this->captura('nombre_estado','varchar');
 
 
 		//Ejecuta la instruccion

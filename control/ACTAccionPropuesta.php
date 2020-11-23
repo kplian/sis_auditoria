@@ -16,15 +16,25 @@ class ACTAccionPropuesta extends ACTbase{
         if ($this->objParam->getParametro('id_nc') != ''){
             $this->objParam->addFiltro("accpro.id_nc = ".$this->objParam->getParametro('id_nc'));
         }
-        if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaPendientes' ){
-            $this->objParam->addFiltro("accpro.estado_wf in (''propuesta'',''responsable'',''auditor'') ");
-        }
+         if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaResponsable' ){
+             $this->objParam->addFiltro("accpro.estado_wf in (''propuesto'') ");
+         }
+         if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaAuditor' ){
+             $this->objParam->addFiltro("accpro.estado_wf in (''aceptado_resp'') ");
+         }
+         if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaImplementadas' ){
+             $this->objParam->addFiltro("accpro.estado_wf in (''implementadas'') ");
+         }
+         if($this->objParam->getParametro('interfaz') == 'AccionesProImplementaVoBo' ){
+             $this->objParam->addFiltro("accpro.estado_wf in (''implementado_aceptado_resp'') ");
+         }
+       /*
         if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaImplementadas' ){
             $this->objParam->addFiltro("accpro.estado_wf in (''implementadas'') ");
         }
         if($this->objParam->getParametro('interfaz') == 'AccionesProImplementaVoBo' ){
             $this->objParam->addFiltro("accpro.estado_wf not in (''propuesta'',''responsable'',''auditor'') ");
-        }
+        }*/
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODAccionPropuesta','listarAccionPropuesta');
