@@ -28,14 +28,6 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
                 handler: this.loadCheckDocumentosRecWf,
                 tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.'
             });
-        this.addButton('sig_estado',{
-            text:'Aprobar',
-            grupo:[0],
-            iconCls: 'bok',
-            disabled: true,
-            handler: this.sigEstado,
-            tooltip: '<b>Pasar al Siguiente Estado</b>'
-        });
         this.addButton('ant_estado', {
             argument: {estado: 'anterior'},
             text:'Estado Anterior',
@@ -45,6 +37,15 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
             handler:this.antEstado,
             tooltip: '<b>Pasar al Anterior Estado</b>'
         });
+        this.addButton('sig_estado',{
+            text:'Aprobar',
+            grupo:[0],
+            iconCls: 'bok',
+            disabled: true,
+            handler: this.sigEstado,
+            tooltip: '<b>Pasar al Siguiente Estado</b>'
+        });
+
 	},
     addBotonesGantt: function() {
         this.menuAdqGantt = new Ext.Toolbar.SplitButton({
@@ -1075,13 +1076,13 @@ Phx.vista.AuditoriaOportunidadMejora = Ext.extend(Phx.gridInterfaz,{
         }
         return resultado;
     },
-   west: {
+  /* west: {
           url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/FormFiltro.php',
           width: '30%',
           title:'Filtros',
           collapsed: true,
           cls: 'FormFiltro'
-   }
+   }*/
 }
 )
 </script>

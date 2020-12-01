@@ -43,7 +43,6 @@ class ACTNoConformidad extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-				
 	function insertarNoConformidad(){
 		$this->objFunc=$this->create('MODNoConformidad');	
 		if($this->objParam->insertar('id_nc')){
@@ -53,20 +52,16 @@ class ACTNoConformidad extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-						
 	function eliminarNoConformidad(){
 	    $this->objFunc=$this->create('MODNoConformidad');
 		$this->res=$this->objFunc->eliminarNoConformidad($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-
-	//Devuelve al Gerente de Area 
     function listarRespAreaGerente(){
 		$this->objFunc=$this->create('MODNoConformidad');	
 		$this->res=$this->objFunc->listarRespAreaGerente($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
     }
-
     function listarSomUsuario(){
         $this->objParam->defecto('ordenacion','id_funcionario');
 
@@ -77,19 +72,16 @@ class ACTNoConformidad extends ACTbase{
         $this->res=$this->objFunc->listarSomUsuario($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-	
     function siguienteEstado(){
         $this->objFunc=$this->create('MODNoConformidad');
         $this->res=$this->objFunc->siguienteEstado($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-	
     function anteriorEstado(){
         $this->objFunc=$this->create('MODNoConformidad');
         $this->res=$this->objFunc->anteriorEstado($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-
     function reporteNoConforPDF(){
         $this->objFunc=$this->create('MODNoConformidad');
         $this->res=$this->objFunc->reporteNoConforPDF($this->objParam);
@@ -117,7 +109,6 @@ class ACTNoConformidad extends ACTbase{
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 
     }
-    
 	function listarFuncionariosUO(){
 		$this->objParam->defecto('ordenacion','id_nc');
 
@@ -126,14 +117,12 @@ class ACTNoConformidad extends ACTbase{
 		$this->objFunc=$this->create('MODNoConformidad');
 		$this->res=$this->objFunc->listarFuncionariosUO($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
-	}    
-	
+	}
 	function asignarFuncRespNC(){
 		$this->objFunc=$this->create('MODNoConformidad');	
 		$this->res=$this->objFunc->asignarFuncRespNC($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-
     function sigueienteGrupo(){
         $this->objFunc=$this->create('MODNoConformidad');
         $this->res=$this->objFunc->sigueienteGrupo($this->objParam);

@@ -32,9 +32,7 @@ header("content-type: text/javascript; charset=UTF-8");
         this.Atributos[this.getIndAtributo('id_destinatario')].grid=false;
         this.Atributos[this.getIndAtributo('recomendacion')].grid=false;
         this.Atributos[this.getIndAtributo('id_tipo_om')].grid=false;
-
         Phx.vista.PlanificarAuditoria.superclass.constructor.call(this,config);
-       // this.getBoton('ant_estado').setVisible(false);
         this.getBoton('btnChequeoDocumentosWf').setVisible(false);
         this.addButton('sig_estado',{
               text:'Ejecutar',
@@ -732,6 +730,8 @@ header("content-type: text/javascript; charset=UTF-8");
                                                                  anchor: '100%',
                                                                  readOnly: true,
                                                                  id: this.idContenedor + '_nombre_aom1',
+                                                                 style: 'background-image: none; border: 0;',
+
                                                              }
                                                          ]
                                                  }),
@@ -947,8 +947,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     },this)
                 } else {
                     submit[obj.name]=obj.getValue();
-                    if(obj.name == 'id_tnorma' || obj.name == 'id_tobjeto'){
-                        if(obj.selectedIndex!=-1){
+                    if(obj.name === 'id_tnorma' || obj.name === 'id_tobjeto'){
+                        if(obj.selectedIndex!==-1){
                             submit[obj.name]=obj.store.getAt(obj.selectedIndex).id;
                         }
                     }
@@ -1015,9 +1015,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     {
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
-                        name: 'nro_tramite_wf',
+                        name: 'nro_tramite',
                         anchor: '100%',
-                        value: maestro.nro_tramite_wf,
+                        value: maestro.nro_tramite,
                         readOnly :true,
                         style: 'background-image: none; border: 0; font-weight: bold;',
                     },
@@ -1193,9 +1193,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
-                        name: 'nro_tramite_wf',
+                        name: 'nro_tramite',
                         anchor: '100%',
-                        value: maestro.nro_tramite_wf,
+                        value: maestro.nro_tramite,
                         readOnly :true,
                         style: 'background-image: none; border: 0;font-weight: bold;',
                     },
@@ -1490,9 +1490,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     {
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
-                        name: 'nro_tramite_wf',
+                        name: 'nro_tramite',
                         anchor: '100%',
-                        value: maestro.nro_tramite_wf,
+                        value: maestro.nro_tramite,
                         readOnly :true,
                         style: 'background-image: none; border: 0;font-weight: bold;',
                     },
@@ -1722,9 +1722,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     {
                         xtype: 'field',
                         fieldLabel: 'Código Auditoria',
-                        name: 'nro_tramite_wf',
+                        name: 'nro_tramite',
                         anchor: '100%',
-                        value: maestro.nro_tramite_wf,
+                        value: maestro.nro_tramite,
                         readOnly :true,
                         style: 'background-image: none; border: 0;font-weight: bold;',
                     },
@@ -2224,7 +2224,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                         direction: 'ASC'
                                                     },
                                                     totalProperty: 'total',
-                                                    fields: ['id_funcionario', 'desc_funcionario1'],
+                                                    fields: ['id_funcionario', 'desc_funcionario1','id_equipo_responsable'],
                                                     remoteSort: true,
                                                     autoLoad: true,
                                                     baseParams: { dir:'ASC', sort:'id_aom', limit:'100', start:'0', id_aom: maestro.id_aom}
@@ -2242,7 +2242,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                         }
                                                     }
                                                 }],
-                                                valueField: 'id_funcionario',
+                                                valueField: 'id_equipo_responsable',
                                                 displayField: 'desc_funcionario1',
                                             },
                                             {
@@ -2253,7 +2253,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     id: 'id_funcionario',
                                                     root: 'datos',
                                                     totalProperty: 'total',
-                                                    fields: ['id_funcionario', 'desc_funcionario1'],
+                                                    fields: ['id_funcionario', 'desc_funcionario1','id_equipo_responsable'],
                                                     remoteSort: true,
                                                     baseParams: { dir:'ASC', sort:'id_funcionario', limit:'100', start:'0'}
                                                 }),
@@ -2263,7 +2263,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                         isForm.getForm().findField('itemselector').reset();
                                                     }
                                                 }],
-                                                valueField: 'id_funcionario',
+                                                valueField: 'id_equipo_responsable',
                                                 displayField: 'desc_funcionario1',
                                             }]
                                         }],
@@ -2835,7 +2835,7 @@ header("content-type: text/javascript; charset=UTF-8");
           obj = Ext.getCmp(element);
           if(obj&&obj.items){
               Ext.each(obj.items.items, function(elm, b, c){
-                  if(elm.getXType()=='combo'&&elm.mode=='remote'&&elm.store!=undefined){
+                  if(elm.getXType()==='combo'&&elm.mode==='remote'&&elm.store!==undefined){
                       if (!elm.store.getById(data[elm.name])) {
                           rec = new Ext.data.Record({[elm.displayField]: data[elm.gdisplayField], [elm.valueField]: data[elm.name] },data[elm.name]);
                           elm.store.add(rec);
@@ -2848,7 +2848,7 @@ header("content-type: text/javascript; charset=UTF-8");
           } else {
               key = element.replace(this.idContenedor+'_','');
               if(obj){
-                  if((obj.getXType()=='combo'&&obj.mode=='remote'&&obj.store!=undefined)||key=='id_centro_costo'){
+                  if((obj.getXType()==='combo'&&obj.mode==='remote'&&obj.store!==undefined)||key==='id_centro_costo'){
                       if (!obj.store.getById(data[key])) {
                           rec = new Ext.data.Record({[obj.displayField]: data[obj.gdisplayField], [obj.valueField]: data[key] },data[key]);
                           obj.store.add(rec);
@@ -2878,16 +2878,18 @@ header("content-type: text/javascript; charset=UTF-8");
         if(data['estado_wf'] === 'planificacion'){
             this.getBoton('sig_estado').enable();
         }
-        // this.getBoton('btnChequeoDocumentosWf').enable();
+        this.getBoton('ant_estado').disable();
+
+        if(data['estado_wf'] === 'aprobado_responsable'){
+            this.getBoton('ant_estado').enable();
+        }
         this.getBoton('diagrama_gantt').enable();
-        this.getBoton('ant_estado').enable();
         return tb
     },
     liberaMenu:function(){
         const tb = Phx.vista.AuditoriaOportunidadMejora.superclass.liberaMenu.call(this);
         if(tb){
               this.getBoton('sig_estado').disable();
-              // this.getBoton('btnChequeoDocumentosWf').disable();
               this.getBoton('diagrama_gantt').disable();
               this.getBoton('ant_estado').disable();
         }
@@ -2895,7 +2897,6 @@ header("content-type: text/javascript; charset=UTF-8");
     },
     onReloadPage : function(m){
           this.maestro = m;
-          console.log('=22222>',this);
           this.store.baseParams = {
             id_gestion:  this.maestro.id_gestion,
             desde:  this.maestro.desde,
@@ -2910,9 +2911,7 @@ header("content-type: text/javascript; charset=UTF-8");
           this.store.reload({ params: this.store.baseParams});
     },
     oncellclick : function(grid, rowIndex, columnIndex, e) {
-
         const fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
-
         if (fieldName === 'id_proceso') {
             this.formularioProceso();
             this.procesoVentana.show();
@@ -2985,7 +2984,6 @@ header("content-type: text/javascript; charset=UTF-8");
         }
     },
     formatoFecha:function (date){
-
         let day = date.getDate()
         let month = date.getMonth() + 1
         let year = date.getFullYear()
@@ -2999,6 +2997,12 @@ header("content-type: text/javascript; charset=UTF-8");
     bnew:false,
     bdel:false,
     bedit:true,
-
+        west: {
+            url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/filter/FormFiltroPlan.php',
+            width: '30%',
+            title:'Filtros',
+            collapsed: true,
+            cls: 'FormFiltroPlan'
+        }
     };
 </script>

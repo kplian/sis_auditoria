@@ -112,7 +112,6 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-
     function  getListAuditores(){
         $this->objParam->defecto('ordenacion','id_funcionario');
         $this->objParam->defecto('dir_ordenacion','desc');
@@ -193,7 +192,6 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
         $this->res=$this->objFunc->getListFuncionario($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-
     function reporteAuditoriaListar(){
         $this->objFunc = $this->create('MODAuditoriaOportunidadMejora');
         $cbteHeader = $this->objFunc->reporteAuditoriaListar($this->objParam);
@@ -249,9 +247,7 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
             exit;
         }
     }
-
     function reporteAuditoria(){
-
         $dataAuditoria = $this->reporteAuditoriaListar();
         $dataProcesos = $this->reporteAuditoriaProceso();
         $dataEquipo = $this->reporteAuditoriaEquipo();
@@ -336,6 +332,15 @@ class ACTAuditoriaOportunidadMejora extends ACTbase{
     function listarEstados(){
         $this->objParam->defecto('ordenacion','id_aom');
         $this->objParam->defecto('dir_ordenacion','ASC');
+
+        if($this->objParam->getParametro('progrmar')!='') {
+            $this->objParam->addFiltro(" ts.codigo in (''programada'',''aprobado_responsable'')");
+        }
+
+        if($this->objParam->getParametro('planificacion')!='') {
+            $this->objParam->addFiltro(" ts.codigo not in (''programada'',''aprobado_responsable'')");
+        }
+
         $this->objFunc=$this->create('MODAuditoriaOportunidadMejora');
         $this->res=$this->objFunc->listarEstados($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());

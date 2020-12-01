@@ -21,7 +21,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.idContenedor = config.idContenedor;
             Phx.vista.ProgramarAuditoria.superclass.constructor.call(this,config);
             this.getBoton('ant_estado').setVisible(false);
-            this.getBoton('btnChequeoDocumentosWf').setVisible(false);
+           // this.getBoton('btnChequeoDocumentosWf').setVisible(false);
             this.getBoton('diagrama_gantt').setVisible(false);
             this.init();
             this.store.baseParams.interfaz = 'ProgramarAuditoria';
@@ -63,12 +63,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('sig_estado').disable();
                 this.getBoton('del').disable();
             }
+
+            this.getBoton('btnChequeoDocumentosWf').enable();
             return tb
         },
         liberaMenu:function(){
             const tb = Phx.vista.ProgramarAuditoria.superclass.liberaMenu.call(this);
             if(tb){
                 this.getBoton('sig_estado').disable();
+                this.getBoton('btnChequeoDocumentosWf').disable();
             }
             return tb
         },
@@ -180,6 +183,13 @@ header("content-type: text/javascript; charset=UTF-8");
                         }]
                 }] //
             }
-        ]
+        ],
+        west: {
+            url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/filter/FormFiltro.php',
+            width: '30%',
+            title:'Filtros',
+            collapsed: true,
+            cls: 'FormFiltro'
+        }
 };
 </script>
