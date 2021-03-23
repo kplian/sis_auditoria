@@ -434,3 +434,7 @@ select pxp.f_insert_tgui ('Acciones Implementadas', 'Acciones Implementadas', 'A
 select pxp.f_insert_tgui ('Filtro Auditoria', 'Auditoria', 'AUDI', 'si', 3, 'sis_auditoria/vista/auditoria_oportunidad_mejora/FiltroAuditoria.php', 4, '', 'FiltroAuditoria', 'SSOM');
 
 /********************************************F-DAT-MMV-SSOM-6-13/8/2020********************************************/
+
+/********************************************I-DAT-MMV-SSOM-11-23/3/2021********************************************/
+select pxp.f_insert_tgui ('Equipo Responsable', 'Equipo Responsable', 'ER', 'si', 3, 'sis_auditoria/vista/equipo_auditores/EquipoAuditores.php', 5, '', 'EquipoAuditores', 'SSOM');
+/********************************************F-DAT-MMV-SSOM-11-23/3/2021********************************************/

@@ -63,6 +63,9 @@ select pxp.f_insert_testructura_gui ('AID', 'SGUI');
 select pxp.f_insert_testructura_gui ('AUDI', 'SGUI');
 /***********************************F-DEP-MMV-SSOM-6-13/8/2020*****************************************/
 
+/***********************************I-DEP-MMV-SSOM-11-23/3/2021*****************************************/
+select pxp.f_insert_testructura_gui ('ER', 'PDAU');
+/***********************************F-DEP-MMV-SSOM-11-23/3/2021*****************************************/
 
 
 
