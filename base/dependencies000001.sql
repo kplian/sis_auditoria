@@ -67,6 +67,15 @@ select pxp.f_insert_testructura_gui ('AUDI', 'SGUI');
 select pxp.f_insert_testructura_gui ('ER', 'PDAU');
 /***********************************F-DEP-MMV-SSOM-11-23/3/2021*****************************************/
 
+/***********************************I-DEP-MMV-SSOM-11-1-23/3/2021*****************************************/
+select wf.f_import_ttipo_documento_estado ('insert','prueba','SAUDIT','vob_programado','SAUDIT','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','EVI','ACPRO','implementada','ACPRO','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','EVI','ACPRO','vbimplementada_responsable','ACPRO','exigir','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','EVIS','ACPRO','implementada','ACPRO','eliminar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','EVIAP','NOCON','vbnoconformidad','NOCON','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','EVIAP','NOCON','propuesta','NOCON','insertar','superior','');
+/***********************************F-DEP-MMV-SSOM-11-1-23/3/2021*****************************************/
+
 
 
 
