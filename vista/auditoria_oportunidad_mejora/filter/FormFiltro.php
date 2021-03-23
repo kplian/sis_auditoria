@@ -25,9 +25,19 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
           this.panelResumen
     ];
 
-      Phx.vista.FormFiltro.superclass.constructor.call(this,config);
-      this.init();
-      this.onEvento();
+            Phx.vista.FormFiltro.superclass.constructor.call(this, config);
+            this.init();
+            this.panel.on('collapse', function (p) {
+                if (!p.col) {
+                    var id = p.getEl().id,
+                        parent = p.getEl().parent(),
+                        buscador = '#' + id + '-xcollapsed',
+                        col = parent.down(buscador);
+                    col.insertHtml('beforeEnd', '<div style="writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; height: 100%;"><span class="x-panel-header-text"><b>' + p.title + '</b></span></div>');
+                    p.col = col;
+                }
+            }, this);
+            this.onEvento();
 
       if(config.detalle){
       			//cargar los valores para el FormFiltro
@@ -90,83 +100,82 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
                 format: 'd/m/Y',
                 anchor: '100%',
 
+                },
+                type: 'DateField',
+                id_grupo: 0,
+                form: true
             },
-            type: 'DateField',
-            id_grupo: 0,
-            form: true
+            {
+                config: {
+                    name: 'id_tipo_estado',
+                    fieldLabel: 'Estado',
+                    allowBlank: true,
+                    resizable: true,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarEstados',
+                        id: 'id_tipo_estado',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'codigo',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_tipo_estado', 'codigo', 'nombre_estado'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'ts.codigo', progrmar: 'si',}
+                    }),
+                    valueField: 'codigo',
+                    displayField: 'nombre_estado',
+                    gdisplayField: 'codigo',
+                    hiddenName: 'id_tipo_estado',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 10,
+                    queryDelay: 1000,
+                    anchor: '100%',
+                    gwidth: 80,
+                    listWidth: '280',
+                    minChars: 2
+                },
+                type: 'ComboBox',
+                id_grupo: 0,
+                form: true
+            }
+        ],
+        labelSubmit: '<i class="fa fa-check"></i> Aplicar FormFiltro',
+        title: 'FormFiltro',
+        fwidth: 200,
+
+        onSubmit: function () {
+            const me = this;
+            if (this.form.getForm().isValid()) {
+                const parametros = me.getValForm();
+                this.fireEvent('beforesave', this, this.getValues());
+                this.getValues();
+                this.onEnablePanel(me.idContenedorPadre, parametros)
+            }
         },
-        {
-            config: {
-                name: 'id_tipo_estado',
-                fieldLabel: 'Estado',
-                allowBlank: true,
-                resizable:true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarEstados',
-                    id: 'id_tipo_estado',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'codigo',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_tipo_estado', 'codigo','nombre_estado'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'ts.codigo',progrmar: 'si',}
-                }),
-                valueField: 'codigo',
-                displayField: 'nombre_estado',
-                gdisplayField: 'codigo',
-                hiddenName: 'id_tipo_estado',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '100%',
-                gwidth: 80,
-                minChars: 2
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            form: true
-        }
-	],
-  	labelSubmit: '<i class="fa fa-check"></i> Aplicar FormFiltro',
-  	title: 'FormFiltro',
-    fwidth:200,
-
-      onSubmit:function(){
-
-      const me = this;
-
-      if (this.form.getForm().isValid()) {
-                 var parametros = me.getValForm();
-  			         this.fireEvent('beforesave',this,this.getValues());
-                 this.getValues();
-                 this.onEnablePanel(me.idContenedorPadre, parametros)
-  		}
-  	},
-    onEvento:function(){
-      this.ocultarComponente(this.Cmp.desde);
-      this.ocultarComponente(this.Cmp.hasta);
-      this.Cmp.tipo_filtro.on('change', function(cmp, check){
-        if(check.getRawValue() !== 'gestion'){
-          this.ocultarComponente(this.Cmp.id_gestion);
-          this.mostrarComponente(this.Cmp.desde);
-          this.mostrarComponente(this.Cmp.hasta);
-        }else{
-          this.mostrarComponente(this.Cmp.id_gestion);
-          this.ocultarComponente(this.Cmp.desde);
-          this.ocultarComponente(this.Cmp.hasta);
-        }
-      },this);
-    },
-    getValues:function(){
-        return {
+        onEvento: function () {
+            this.ocultarComponente(this.Cmp.desde);
+            this.ocultarComponente(this.Cmp.hasta);
+            this.Cmp.tipo_filtro.on('change', function (cmp, check) {
+                if (check.getRawValue() !== 'gestion') {
+                    this.ocultarComponente(this.Cmp.id_gestion);
+                    this.mostrarComponente(this.Cmp.desde);
+                    this.mostrarComponente(this.Cmp.hasta);
+                } else {
+                    this.mostrarComponente(this.Cmp.id_gestion);
+                    this.ocultarComponente(this.Cmp.desde);
+                    this.ocultarComponente(this.Cmp.hasta);
+                }
+            }, this);
+        },
+        getValues: function () {
+            return {
                 id_gestion: this.Cmp.id_gestion.getValue(),
                 desde: this.Cmp.desde.getValue(),
                 hasta: this.Cmp.hasta.getValue(),
