@@ -40,7 +40,7 @@ BEGIN
 	***********************************/
 
 	if(p_transaccion='SSOM_RAN_SEL')then
-     				a
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
