@@ -1,4 +1,4 @@
-create or replace function soom.ft_auditoria_oportunidad_mejora_sel(p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying) returns character varying
+create or replace function ssom.ft_auditoria_oportunidad_mejora_sel(p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying) returns character varying
     language plpgsql
 as
 $$
