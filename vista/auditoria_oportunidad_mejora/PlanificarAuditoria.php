@@ -1329,49 +1329,39 @@ header("content-type: text/javascript; charset=UTF-8");
                                 width: 250,
                                 height: 150,
                                 store: tienda,
-                                tbar: [
-                                    {
-                                        xtype: 'textfield',
-                                        fieldStyle: 'text-align: left;',
-                                        enableKeyEvents: true,
-                                        listeners: {
-                                            scope: this,
-                                            specialkey: function (field, e) {
-                                                if (e.getKey() === e.ENTER) {
-                                                    let valueFied = null;
-                                                    if (String(field).trim() !== ""){
-                                                        valueFied = field.getValue();
-                                                    }
-                                                    tienda.filter([
+                                tbar : {
+                                    xtype: 'toolbar',
+                                    flex: 1,
+                                    dock: 'top',
+                                    items: [
+                                        'Filtro:',
+                                        {
+                                            xtype: 'textfield',
+                                            fieldStyle: 'text-align: left;',
+                                            enableKeyEvents: true,
+                                            listeners: {
+                                                scope: this,
+                                                specialkey: function(field, e){
+                                                    if (e.getKey() === e.ENTER){
+                                                        if (String(field).trim() !== '')
                                                         {
-                                                            property     : 'desc_funcionario1',
-                                                            value        : valueFied,
-                                                            anyMatch     : true, //optional, defaults to true
-                                                            caseSensitive: true  //optional, defaults to true
-                                                        },
-
-                                                        //filter functions can also be passed
-                                                        // {
-                                                        //     fn   : function(record) {
-                                                        //         return record
-                                                        //     },
-                                                        //     scope: this
-                                                        // }
-                                                    ])
-                                                    // console.log(field.getValue())
-                                                    // tienda.filter(
-                                                    //     [
-                                                    //         {
-                                                    //             property: 'desc_funcionario1',
-                                                    //             value: field.getValue()
-                                                    //         }
-                                                    //     ]);
-                                                    // tienda.load();
+                                                            isForm.getForm().findField('id_equipo_auditor').multiselects[0].store.baseParams = {
+                                                                desc_funcionario1:field.getValue(),
+                                                                dir: 'ASC',
+                                                                sort: 'id_funcionario',
+                                                                limit: '100',
+                                                                start: '0',
+                                                                codigo: 'MEQ',
+                                                                item: maestro.id_aom
+                                                            };
+                                                            isForm.getForm().findField('id_equipo_auditor').multiselects[0].store.load();
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                ],
+                                    ]
+                                },
                                 displayField: 'desc_funcionario1',
                                 valueField: 'id_funcionario',
                             },

@@ -1,11 +1,11 @@
 <?php
 /**
-*@package pXP
-*@file AuditoriaOportunidadMejora.php
-*@author MMV
-*@date 21/04/2020
-*@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
-*/
+ * @package pXP
+ * @file AuditoriaOportunidadMejora.php
+ * @author MMV
+ * @date 21/04/2020
+ * @description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ */
 
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -1041,66 +1041,69 @@ header("content-type: text/javascript; charset=UTF-8");
                     hidden: false
                 });
 
-        this.formFiltro = new Ext.form.FormPanel({
-            baseCls: 'x-plain',
-            autoDestroy: true,
-            border: false,
-            layout: 'form',
-            autoHeight: true,
-            items: [desde,hasta]
-        });
-        this.ventanaFiltro = new Ext.Window({
-            title: 'Filtro',
-            collapsible: true,
-            maximizable: true,
-            autoDestroy: true,
-            width: 350,
-            height: 180,
-            layout: 'fit',
-            plain: true,
-            bodyStyle: 'padding:5px;',
-            buttonAlign: 'center',
-            items: this.formFiltro,
-            modal:true,
-            closeAction: 'hide',
-            buttons: [{
-                text: 'Aplicar',
-                handler: this.aplicarFiltro,
-                scope: this},
-                {
-                    text: 'Cancelar',
-                    handler: function(){ this.ventanaFiltro.hide() },
-                    scope: this
-                }]
-        });
-        this.cmpDesde = this.formFiltro.getForm().findField('desde');
-        this.cmpHasta= this.formFiltro.getForm().findField('hasta');
-    },
-    aplicarFiltro: function(){
-        Phx.CP.loadingShow();
-        if(this.validarFiltros()){
-            Phx.CP.loadingHide();
-            this.store.baseParams.desde = this.cmpDesde.getValue().dateFormat('d/m/y');
-            this.store.baseParams.hasta = this.cmpHasta.getValue().dateFormat('d/m/y');
-            this.ventanaFiltro.hide();
-            this.load();
+                this.formFiltro = new Ext.form.FormPanel({
+                    baseCls: 'x-plain',
+                    autoDestroy: true,
+                    border: false,
+                    layout: 'form',
+                    autoHeight: true,
+                    items: [desde, hasta]
+                });
+                this.ventanaFiltro = new Ext.Window({
+                    title: 'Filtro',
+                    collapsible: true,
+                    maximizable: true,
+                    autoDestroy: true,
+                    width: 350,
+                    height: 180,
+                    layout: 'fit',
+                    plain: true,
+                    bodyStyle: 'padding:5px;',
+                    buttonAlign: 'center',
+                    items: this.formFiltro,
+                    modal: true,
+                    closeAction: 'hide',
+                    buttons: [{
+                        text: 'Aplicar',
+                        handler: this.aplicarFiltro,
+                        scope: this
+                    },
+                        {
+                            text: 'Cancelar',
+                            handler: function () {
+                                this.ventanaFiltro.hide()
+                            },
+                            scope: this
+                        }]
+                });
+                this.cmpDesde = this.formFiltro.getForm().findField('desde');
+                this.cmpHasta = this.formFiltro.getForm().findField('hasta');
+            },
+            aplicarFiltro: function () {
+                Phx.CP.loadingShow();
+                if (this.validarFiltros()) {
+                    Phx.CP.loadingHide();
+                    this.store.baseParams.desde = this.cmpDesde.getValue().dateFormat('d/m/y');
+                    this.store.baseParams.hasta = this.cmpHasta.getValue().dateFormat('d/m/y');
+                    this.ventanaFiltro.hide();
+                    this.load();
+                }
+                Phx.CP.loadingHide();
+            },
+            validarFiltros: function () {
+                let resultado = false;
+                if (this.cmpDesde.validate() && this.cmpHasta.validate()) {
+                    resultado = true
+                }
+                return resultado;
+            },
+            /* west: {
+                    url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/FormFiltro.php',
+                    width: '30%',
+                    title:'Filtros',
+                    collapsed: true,
+                    cls: 'FormFiltro'
+             }*/
         }
-        Phx.CP.loadingHide();
-    },
-    validarFiltros:function(){
-        let resultado = false;
-        if(this.cmpDesde.validate() && this.cmpHasta.validate()){
-            resultado = true
-        }
-        return resultado;
-    },
-  /* west: {
-          url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/FormFiltro.php',
-          width: '30%',
-          title:'Filtros',
-          collapsed: true,
-          cls: 'FormFiltro'
-   }*/
-}
-)
+    )
 </script>
