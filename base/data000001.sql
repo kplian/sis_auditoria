@@ -439,71 +439,217 @@ select pxp.f_insert_tgui ('Filtro Auditoria', 'Auditoria', 'AUDI', 'si', 3, 'sis
 select pxp.f_insert_tgui ('Equipo Responsable', 'Equipo Responsable', 'ER', 'si', 3, 'sis_auditoria/vista/equipo_auditores/EquipoAuditores.php', 5, '', 'EquipoAuditores', 'SSOM');
 /********************************************F-DAT-MMV-SSOM-11-23/3/2021********************************************/
 
-/********************************************I-DAT-MMV-SSOM-11-2-23/3/2021********************************************/
-
-select wf.f_import_tproceso_macro ('insert','SAOM', 'SSOM', 'Seguimiento Auditoria - OM','si');
+/********************************************I-DAT-MMV-SSOM-11-24/3/2021********************************************/
+select wf.f_import_tproceso_macro ('insert','AUD', 'SSOM', 'Auditoria','si');
 select wf.f_import_tcategoria_documento ('insert','legales', 'Legales');
 select wf.f_import_tcategoria_documento ('insert','proceso', 'Proceso');
-select wf.f_import_ttipo_proceso ('insert','SAUDIT',NULL,NULL,'SAOM','Seguimiento de Auditoria','ssom.tauditoria_oportunidad_mejora','id_aom','si','','','','SAUDIT',NULL);
-select wf.f_import_ttipo_proceso ('insert','NOCON',NULL,NULL,'SAOM','No Conformidad','','','no','','','','NOCON',NULL);
-select wf.f_import_ttipo_proceso ('insert','ACPRO',NULL,NULL,'SAOM','Acciones Propuestas','','','no','','','','ACPRO',NULL);
-select wf.f_import_ttipo_estado ('insert','programado','SAUDIT','Borrador','si','no','no','ninguno','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','vob_programado','SAUDIT','VoB Programacion','no','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','planificacion','SAUDIT','Planificada','no','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','vob_planificacion','SAUDIT','VoB Planificacion','no','no','no','funcion_listado','ssom.f_listar_funcionarios_x_depto','depto_listado','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','informe','SAUDIT','Informe','no','no','no','listado','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','vob_informe','SAUDIT','VoB Informe','no','no','no','funcion_listado','ssom.f_get_funcionarios_x_uoi','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','observado','SAUDIT','(Prog-Observada)','no','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','acept_resp_area','SAUDIT','Aceptado por Responsable de Area','no','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','ejecutada','SAUDIT','Ejecutada','no','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','en_curso','SAUDIT','En Curso','no','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','cerrado','SAUDIT','Cerrada','no','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','prog_aprob','SAUDIT','Programada','no','no','no','funcion_listado','ssom.f_get_funcionario_responsable','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','plani_aprob','SAUDIT','Plan-Aprobada','no','no','no','funcion_listado','ssom.f_get_funcionario_responsable','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','plan_observado','SAUDIT','(Plan-Observada)','no','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','informe_observado','SAUDIT','(Informe-Observada)','no','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','propuesta','NOCON','Propuesta de No Conformidad','si','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','vbnoconformidad','NOCON','VoBo No Conformidad','no','no','no','ninguno','ssom.f_listar_gerente_uo','ninguno','','','si','si',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','correccion','NOCON','Correccion de la No Conformidad','no','no','no','funcion_listado','ssom.f_listar_funcionarios_x_uo','ninguno','','','si','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','finalizado','NOCON','Finalizado de las correcciones','no','no','si','funcion_listado','ssom.f_listar_gerente_uo','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','propuesta','ACPRO','Accion propuesta','si','no','no','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','vbpropuesta_responsable','ACPRO','VoBo acción propuesta responsable','no','no','no','funcion_listado','ssom.f_listar_gerente_uo_ap','ninguno','','','si','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','vbpropuesta_auditor','ACPRO','VoBo acción propuesta auditor','no','no','no','funcion_listado','ssom.f_listar_auditor_ap','ninguno','','','si','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','implementada','ACPRO','Acción implementada','no','no','no','todos','','ninguno','','','si','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','vbimplementada_responsable','ACPRO','VoBo accion implementada responsable','no','no','no','todos','','ninguno','','','si','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','vbimplementada_auditor','ACPRO','VoBo accion implementada auditor','no','no','no','todos','','ninguno','','','si','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_estado ('insert','finalizado','ACPRO','Finalizado de las acciones','no','no','si','todos','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no',NULL,NULL,NULL,NULL,'no',NULL,NULL,NULL);
-select wf.f_import_ttipo_documento ('insert','prueba','SAUDIT','prueba','','','escaneado',1.00,'{}','no',NULL,NULL,NULL);
-select wf.f_import_ttipo_documento ('insert','EVI','ACPRO','Evidencia 1','Evidencia 1','','escaneado',1.00,'{}','no',NULL,NULL,NULL);
-select wf.f_import_ttipo_documento ('insert','EVIS','ACPRO','Evidencia N','Evidencia N','','escaneado',2.00,'{}','no',NULL,NULL,NULL);
-select wf.f_import_ttipo_documento ('insert','EVIAP','NOCON','Evidencia','Evidencia','','escaneado',1.00,'{}','no',NULL,NULL,NULL);
-select wf.f_import_testructura_estado ('insert','informe','vob_informe','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','vob_informe','acept_resp_area','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','vob_programado','prog_aprob','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','vob_planificacion','plani_aprob','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','observado','vob_programado','SAUDIT',1,'"{$tabla.id_tipo_auditoria}"=1','no');
-select wf.f_import_testructura_estado ('insert','plani_aprob','ejecutada','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','plan_observado','vob_planificacion','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','ejecutada','informe','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','acept_resp_area','en_curso','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','acept_resp_area','cerrado','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','prog_aprob','planificacion','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','planificacion','vob_planificacion','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','informe_observado','vob_informe','SAUDIT',1,'','no');
-select wf.f_import_testructura_estado ('insert','programado','prog_aprob','SAUDIT',1,'"{$tabla.id_tipo_auditoria}"=1','no');
-select wf.f_import_testructura_estado ('insert','correccion','finalizado','NOCON',1,'','no');
-select wf.f_import_testructura_estado ('insert','propuesta','vbnoconformidad','NOCON',1,'','no');
-select wf.f_import_testructura_estado ('insert','vbnoconformidad','correccion','NOCON',1,'','no');
-select wf.f_import_testructura_estado ('insert','propuesta','vbpropuesta_responsable','ACPRO',1,'','no');
-select wf.f_import_testructura_estado ('insert','vbpropuesta_responsable','vbpropuesta_auditor','ACPRO',1,'','no');
-select wf.f_import_testructura_estado ('insert','vbpropuesta_auditor','implementada','ACPRO',1,'','no');
-select wf.f_import_testructura_estado ('insert','implementada','vbimplementada_responsable','ACPRO',1,'','no');
-select wf.f_import_testructura_estado ('insert','vbimplementada_responsable','vbimplementada_auditor','ACPRO',1,'','no');
-select wf.f_import_testructura_estado ('insert','vbimplementada_auditor','finalizado','ACPRO',1,'','no');
-select wf.f_import_testructura_estado ('insert','programado','informe','SAUDIT',1,'"{$tabla.id_tipo_auditoria}"=2','no');
-select wf.f_import_tfuncionario_tipo_estado ('insert','programado','SAUDIT',NULL,NULL,'',NULL);
-select wf.f_import_tfuncionario_tipo_estado ('insert','vob_planificacion','SAUDIT',NULL,NULL,'',NULL);
-select wf.f_import_tfuncionario_tipo_estado ('insert','vob_informe','SAUDIT',NULL,NULL,'',NULL);
-select wf.f_import_tfuncionario_tipo_estado ('insert','informe','SAUDIT','5319494',NULL,'',NULL);
-select wf.f_import_tfuncionario_tipo_estado ('insert','prog_aprob','SAUDIT',NULL,NULL,'',NULL);
-/********************************************F-DAT-MMV-SSOM-11-2-23/3/2021********************************************/
+select wf.f_import_ttipo_proceso ('insert','AUDSE',NULL,NULL,'AUD','Seguimiento de Auditoria','ssom.tauditoria_oportunidad_mejora','id_aom','si','','','','AUDSE',NULL);
+select wf.f_import_ttipo_proceso ('delete','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_proceso ('delete','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','pendiente','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','aprobar','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','borrador','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','planificacion','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','vbplanificacion','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','informe','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','vbinforme','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','aceptado_responsable','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','propuesta','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','vbnoconformidad','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','correccion','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','finalizado','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('insert','programada','AUDSE','Programada','si','no','no','ninguno','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no','Programada','','',NULL,'no',NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','curso','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','cerrado','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','propuesta','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','vbpropuesta_responsable','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','vbpropuesta_auditor','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','implementada','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','vbimplementada_responsable','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','vbimplementada_auditor','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','finalizado','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('insert','aprobado_responsable','AUDSE','Aprobada por el Responsable de Área','no','no','no','ninguno','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no','Aprobada Responsable Área','','',NULL,'no',NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('insert','planificacion','AUDSE','Planificada','no','no','no','ninguno','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no','Planificada','','',NULL,'no',NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','vbplanificacion','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','informe','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('insert','ejecutada','AUDSE','Ejecutada','no','no','no','ninguno','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no','Ejecutada','','',NULL,'no',NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('insert','notificar','AUDSE','Notificada Responsable  Área','no','no','no','ninguno','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no','Notificada Responsable  Área','','',NULL,'no',NULL,'','');
+select wf.f_import_ttipo_estado ('delete','notificar_responsable','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','aceptada_responsable_area','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','rechazada_responsable_area','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','acciones_propuestas_responsable','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','correccion','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','accion_aprobada_responsable','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','accion_rechazada_responsable','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','accion_aprobada_auditor','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','accion_rechazada_auditor','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','implementadas','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','implementadas_aprobadas_resp','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','implementadas_rechazadas_resp','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','verificadas','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','rechazado','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','verificado','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','acciones_propuestas','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','en_curso','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','cerrado','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','responsable','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('delete','auditor','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+                                 NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_estado ('insert','curso','AUDSE','En curso','no','no','no','ninguno','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no','En curso','','',NULL,'no',NULL,'','');
+select wf.f_import_ttipo_estado ('insert','aceptado_resp','AUDSE','Aceptado Responsable Área','no','no','no','ninguno','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no','Aceptado Responsable Área','','',NULL,'no',NULL,'','');
+select wf.f_import_ttipo_estado ('insert','cerrado','AUDSE','Cerrado','no','no','si','ninguno','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL,'no','Cerrado','','',NULL,'no',NULL,'','');
+select wf.f_import_ttipo_documento ('delete','IN','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_documento ('delete','AUD','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_documento ('delete','AREV','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_documento ('delete','INOC','AUNC',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_documento ('delete','IAU','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_documento ('delete','AUR','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_documento ('delete','NCOR','AUDSE',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_ttipo_documento ('delete','EVD','ACCP',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','pendiente','aprobar','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','borrador','planificacion','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','planificacion','planificacion','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','planificacion','vbplanificacion','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','vbplanificacion','informe','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','informe','vbinforme','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','vbinforme','aceptado_responsable','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','borrador','programada','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','programada','planificacion','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','planificacion','vbplanificacion','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','borrador','informe','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','propuesta','vbpropuesta_responsable','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','vbpropuesta_responsable','vbpropuesta_auditor','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','vbpropuesta_auditor','implementada','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','implementada','vbimplementada_responsable','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','vbimplementada_responsable','vbimplementada_auditor','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','vbimplementada_auditor','finalizado','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','vbnoconformidad','correccion','AUNC',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','correccion','finalizado','AUNC',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','vbpropuesta_responsable','vbpropuesta_auditor','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','propuesta','vbnoconformidad','AUNC',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('insert','programada','aprobado_responsable','AUDSE',1,'','no');
+select wf.f_import_testructura_estado ('delete','aprobado_responsable','planificacion','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','planificacion','vbplanificacion','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','vbplanificacion','informe','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','planificacion','ejecutada','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','ejecutada','notificar','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','ejecutada','notificar_responsable','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','notificar_responsable','notificar','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','aprobado_responsable','ejecutada','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','propuesta','aceptada_responsable_area','AUNC',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','propuesta','rechazada_responsable_area','AUNC',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','aceptada_responsable_area','acciones_propuestas_responsable','AUNC',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','acciones_propuestas_responsable','correccion','AUNC',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','rechazada_responsable_area','propuesta','AUNC',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','propuesta','accion_aprobada_responsable','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','propuesta','accion_rechazada_responsable','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','accion_aprobada_responsable','accion_aprobada_auditor','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','accion_aprobada_responsable','accion_rechazada_auditor','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','accion_rechazada_responsable','propuesta','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','accion_aprobada_auditor','accion_rechazada_auditor','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','accion_aprobada_auditor','implementadas','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','accion_rechazada_auditor','propuesta','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','implementadas','implementadas_aprobadas_resp','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','implementadas','implementadas_rechazadas_resp','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','implementadas_aprobadas_resp','verificado','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','implementadas_aprobadas_resp','rechazado','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','implementadas_rechazadas_resp','propuesta','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','notificar','acciones_propuestas','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','acciones_propuestas','en_curso','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','en_curso','cerrado','AUDSE',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','propuesta','responsable','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','responsable','auditor','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','auditor','implementadas','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('delete','implementadas','verificado','ACCP',NULL,NULL,NULL);
+select wf.f_import_testructura_estado ('insert','aprobado_responsable','planificacion','AUDSE',1,'','no');
+select wf.f_import_testructura_estado ('insert','planificacion','ejecutada','AUDSE',1,'','no');
+select wf.f_import_testructura_estado ('insert','ejecutada','notificar','AUDSE',1,'','no');
+select wf.f_import_testructura_estado ('insert','notificar','curso','AUDSE',1,'','no');
+select wf.f_import_testructura_estado ('insert','curso','aceptado_resp','AUDSE',1,'','no');
+select wf.f_import_testructura_estado ('insert','aceptado_resp','cerrado','AUDSE',1,'','no');
+/********************************************F-DAT-MMV-SSOM-11-24/3/2021********************************************/
