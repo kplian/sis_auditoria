@@ -110,6 +110,11 @@ class ACTAuditoriaOportunidadMejora extends ACTbase
         $this->objParam->defecto('ordenacion', 'id_funcionario');
         $this->objParam->defecto('dir_ordenacion', 'desc');
 
+        if ($this->objParam->getParametro('desc_funcionario1') != '') {
+            $this->objParam->addFiltro("((fun.desc_funcionario1::varchar ILIKE ''%".$this->objParam->getParametro('desc_funcionario1')."%'') or
+                                    to_tsvector(fun.desc_funcionario1::varchar) @@ plainto_tsquery(''spanish'', ''".$this->objParam->getParametro('desc_funcionario1')."''))");
+        }
+
         if ($this->objParam->getParametro('item') != '') {
             $this->objParam->addFiltro(" fun.id_funcionario not in
                                                         (select  eqre.id_funcionario
