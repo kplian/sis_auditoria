@@ -439,7 +439,7 @@ select pxp.f_insert_tgui ('Filtro Auditoria', 'Auditoria', 'AUDI', 'si', 3, 'sis
 select pxp.f_insert_tgui ('Equipo Responsable', 'Equipo Responsable', 'ER', 'si', 3, 'sis_auditoria/vista/equipo_auditores/EquipoAuditores.php', 5, '', 'EquipoAuditores', 'SSOM');
 /********************************************F-DAT-MMV-SSOM-11-23/3/2021********************************************/
 
-/********************************************I-DAT-MMV-SSOM-11-1-23/3/2021********************************************/
+/********************************************I-DAT-MMV-SSOM-11-2-23/3/2021********************************************/
 
 select wf.f_import_tproceso_macro ('insert','SAOM', 'SSOM', 'Seguimiento Auditoria - OM','si');
 select wf.f_import_tcategoria_documento ('insert','legales', 'Legales');
@@ -506,8 +506,4 @@ select wf.f_import_tfuncionario_tipo_estado ('insert','vob_planificacion','SAUDI
 select wf.f_import_tfuncionario_tipo_estado ('insert','vob_informe','SAUDIT',NULL,NULL,'',NULL);
 select wf.f_import_tfuncionario_tipo_estado ('insert','informe','SAUDIT','5319494',NULL,'',NULL);
 select wf.f_import_tfuncionario_tipo_estado ('insert','prog_aprob','SAUDIT',NULL,NULL,'',NULL);
-/********************************************F-DAT-MMV-SSOM-11-1-23/3/2021********************************************/
-
-/********************************************I-DAT-MMV-SSOM-11-23/3/2021********************************************/
-select pxp.f_insert_tgui ('Equipo Responsable', 'Equipo Responsable', 'ER', 'si', 3, 'sis_auditoria/vista/equipo_auditores/EquipoAuditores.php', 5, '', 'EquipoAuditores', 'SSOM');
-/********************************************F-DAT-MMV-SSOM-11-23/3/2021********************************************/
+/********************************************F-DAT-MMV-SSOM-11-2-23/3/2021********************************************/
