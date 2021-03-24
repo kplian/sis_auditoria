@@ -15,6 +15,10 @@ class ACTPregunta extends ACTbase
         $this->objParam->defecto('ordenacion', 'id_pregunta');
         $this->objParam->defecto('dir_ordenacion', 'asc');
 
+        if ($this->objParam->getParametro('descrip_pregunta') != '') {
+            $this->objParam->addFiltro("((prptnor.descrip_pregunta::varchar ILIKE ''%".$this->objParam->getParametro('descrip_pregunta')."%'') or
+                                    to_tsvector(prptnor.descrip_pregunta::varchar) @@ plainto_tsquery(''spanish'', ''".$this->objParam->getParametro('descrip_pregunta')."''))");
+        }
         //***************
         if ($this->objParam->getParametro('id_pn') != '') {
             $this->objParam->addFiltro("prptnor.id_pn = " . $this->objParam->getParametro('id_pn'));

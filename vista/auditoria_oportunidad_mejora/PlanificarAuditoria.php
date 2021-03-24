@@ -1114,18 +1114,37 @@ header("content-type: text/javascript; charset=UTF-8");
                                         item: maestro.id_aom
                                     }
                                 }),
-                                tbar: [{
-                                    text: 'Todo',
-                                    handler: function () {
-                                        const toStore = isForm.getForm().findField('id_proceso').multiselects[0].store;
-                                        const fromStore = isForm.getForm().findField('id_proceso').multiselects[1].store;
-                                        for (var i = toStore.getCount() - 1; i >= 0; i--) {
-                                            const record = toStore.getAt(i);
-                                            toStore.remove(record);
-                                            fromStore.add(record);
+                                tbar: {
+                                    xtype: 'toolbar',
+                                    flex: 1,
+                                    dock: 'top',
+                                    items: [
+                                        'Filtro:',
+                                        {
+                                            xtype: 'textfield',
+                                            fieldStyle: 'text-align: left;',
+                                            enableKeyEvents: true,
+                                            listeners: {
+                                                scope: this,
+                                                specialkey: function (field, e) {
+                                                    if (e.getKey() === e.ENTER) {
+                                                        if (String(field).trim() !== '') {
+                                                            isForm.getForm().findField('id_proceso').multiselects[0].store.baseParams = {
+                                                                proceso: field.getValue(),
+                                                                dir: 'ASC',
+                                                                sort: 'id_proceso',
+                                                                limit: '100',
+                                                                start: '0',
+                                                                item: maestro.id_aom
+                                                            };
+                                                            isForm.getForm().findField('id_proceso').multiselects[0].store.load();
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }
-                                }],
+                                    ]
+                                },
                                 displayField: 'proceso',
                                 valueField: 'id_proceso',
                             }, {
@@ -1147,12 +1166,25 @@ header("content-type: text/javascript; charset=UTF-8");
                                         id_aom: maestro.id_aom
                                     }
                                 }),
-                                tbar: [{
-                                    text: 'Limpiar',
-                                    handler: function () {
-                                        isForm.getForm().findField('id_proceso').reset();
-                                    }
-                                }],
+                                tbar: [
+                                    {
+                                        text: 'Todo',
+                                        handler: function () {
+                                            const toStore = isForm.getForm().findField('id_proceso').multiselects[0].store;
+                                            const fromStore = isForm.getForm().findField('id_proceso').multiselects[1].store;
+                                            for (var i = toStore.getCount() - 1; i >= 0; i--) {
+                                                const record = toStore.getAt(i);
+                                                toStore.remove(record);
+                                                fromStore.add(record);
+                                            }
+                                        }
+                                    },
+                                    {
+                                        text: 'Limpiar',
+                                        handler: function () {
+                                            isForm.getForm().findField('id_proceso').reset();
+                                        }
+                                    }],
                                 displayField: 'proceso',
                                 valueField: 'id_proceso',
                             }]
@@ -1329,7 +1361,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 width: 250,
                                 height: 150,
                                 store: tienda,
-                                tbar : {
+                                tbar: {
                                     xtype: 'toolbar',
                                     flex: 1,
                                     dock: 'top',
@@ -1341,12 +1373,11 @@ header("content-type: text/javascript; charset=UTF-8");
                                             enableKeyEvents: true,
                                             listeners: {
                                                 scope: this,
-                                                specialkey: function(field, e){
-                                                    if (e.getKey() === e.ENTER){
-                                                        if (String(field).trim() !== '')
-                                                        {
+                                                specialkey: function (field, e) {
+                                                    if (e.getKey() === e.ENTER) {
+                                                        if (String(field).trim() !== '') {
                                                             isForm.getForm().findField('id_equipo_auditor').multiselects[0].store.baseParams = {
-                                                                desc_funcionario1:field.getValue(),
+                                                                desc_funcionario1: field.getValue(),
                                                                 dir: 'ASC',
                                                                 sort: 'id_funcionario',
                                                                 limit: '100',
@@ -1576,6 +1607,7 @@ header("content-type: text/javascript; charset=UTF-8");
         formularioPuntoNorma: function (record) {
             const maestro = this.sm.getSelected().data;
             const me = this;
+            let id_norma_aux = null;
             const isForm = new Ext.form.FormPanel({
                 labelAlign: 'top',
                 frame: true,
@@ -1661,18 +1693,38 @@ header("content-type: text/javascript; charset=UTF-8");
                                     remoteSort: true,
                                     baseParams: {dir: 'ASC', sort: 'id_pn', limit: '100', start: '0'}
                                 }),
-                                tbar: [{
-                                    text: 'Todo',
-                                    handler: function () {
-                                        const toStore = isForm.getForm().findField('id_pn').multiselects[0].store;
-                                        const fromStore = isForm.getForm().findField('id_pn').multiselects[1].store;
-                                        for (var i = toStore.getCount() - 1; i >= 0; i--) {
-                                            const record = toStore.getAt(i);
-                                            toStore.remove(record);
-                                            fromStore.add(record);
+                                tbar: {
+                                    xtype: 'toolbar',
+                                    flex: 1,
+                                    dock: 'top',
+                                    items: [
+                                        'Filtro:',
+                                        {
+                                            xtype: 'textfield',
+                                            fieldStyle: 'text-align: left;',
+                                            enableKeyEvents: true,
+                                            listeners: {
+                                                scope: this,
+                                                specialkey: function (field, e) {
+                                                    if (e.getKey() === e.ENTER) {
+                                                        if (String(field).trim() !== '') {
+                                                            isForm.getForm().findField('id_pn').multiselects[0].store.baseParams = {
+                                                                nombre_pn: field.getValue(),
+                                                                dir: "ASC",
+                                                                sort: "id_pn",
+                                                                limit: "100",
+                                                                start: "0",
+                                                                id_norma: id_norma_aux,
+                                                                item: maestro.id_aom
+                                                            };
+                                                            isForm.getForm().findField('id_pn').multiselects[0].store.load();
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }
-                                }],
+                                    ]
+                                },
                                 displayField: 'nombre_descrip',
                                 valueField: 'id_pn',
                             }, {
@@ -1693,12 +1745,25 @@ header("content-type: text/javascript; charset=UTF-8");
                                         id_aom: maestro.id_aom
                                     }
                                 }),
-                                tbar: [{
-                                    text: 'Limpiar',
-                                    handler: function () {
-                                        isForm.getForm().findField('id_pn').reset();
-                                    }
-                                }],
+                                tbar: [
+                                    {
+                                        text: 'Todo',
+                                        handler: function () {
+                                            const toStore = isForm.getForm().findField('id_pn').multiselects[0].store;
+                                            const fromStore = isForm.getForm().findField('id_pn').multiselects[1].store;
+                                            for (var i = toStore.getCount() - 1; i >= 0; i--) {
+                                                const record = toStore.getAt(i);
+                                                toStore.remove(record);
+                                                fromStore.add(record);
+                                            }
+                                        }
+                                    },
+                                    {
+                                        text: 'Limpiar',
+                                        handler: function () {
+                                            isForm.getForm().findField('id_pn').reset();
+                                        }
+                                    }],
                                 displayField: 'nombre_descrip',
                                 valueField: 'id_pn',
                             }]
@@ -1743,6 +1808,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_norma: record.data.id_norma,
                     item: maestro.id_aom
                 };
+
+                id_norma_aux = record.data.id_norma;
+
                 isForm.getForm().items.items[3].multiselects[1].store.baseParams = {
                     dir: "ASC",
                     sort: "id_pn",
@@ -1825,6 +1893,7 @@ header("content-type: text/javascript; charset=UTF-8");
             const maestro = this.sm.getSelected().data;
             pnNorma = '';
             const me = this;
+            let id_pn_aux = null;
             this.isFormp = new Ext.form.FormPanel({
                 labelAlign: 'top',
                 frame: true,
@@ -1900,9 +1969,9 @@ header("content-type: text/javascript; charset=UTF-8");
                                 items: [
                                     {
                                         xtype: 'box',
-                                        fieldLabel: ':--',
+                                        fieldLabel: 'Nuevo',
                                         autoEl: {
-                                            tag: 'button',
+                                            tag: 'a',
                                             html: 'Sugerir Pregunta'
                                         },
                                         style: 'cursor:pointer;',
@@ -1945,18 +2014,38 @@ header("content-type: text/javascript; charset=UTF-8");
                                     remoteSort: true,
                                     baseParams: {dir: 'ASC', sort: 'id_pregunta', limit: '100', start: '0'}
                                 }),
-                                tbar: [{
-                                    text: 'Todo',
-                                    handler: function () {
-                                        const toStore = me.isFormp.getForm().findField('id_pregunta').multiselects[0].store;
-                                        const fromStore = me.isFormp.getForm().findField('id_pregunta').multiselects[1].store;
-                                        for (var i = toStore.getCount() - 1; i >= 0; i--) {
-                                            const record = toStore.getAt(i);
-                                            toStore.remove(record);
-                                            fromStore.add(record);
+                                tbar: {
+                                    xtype: 'toolbar',
+                                    flex: 1,
+                                    dock: 'top',
+                                    items: [
+                                        'Filtro:',
+                                        {
+                                            xtype: 'textfield',
+                                            fieldStyle: 'text-align: left;',
+                                            enableKeyEvents: true,
+                                            listeners: {
+                                                scope: this,
+                                                specialkey: function (field, e) {
+                                                    if (e.getKey() === e.ENTER) {
+                                                        if (String(field).trim() !== '') {
+                                                            me.isFormp.getForm().findField('id_pregunta').multiselects[0].store.baseParams = {
+                                                                descrip_pregunta: field.getValue(),
+                                                                dir: "ASC",
+                                                                sort: "id_pregunta",
+                                                                limit: "100",
+                                                                start: "0",
+                                                                id_pn: id_pn_aux,
+                                                                item: maestro.id_aom
+                                                            };
+                                                            me.isFormp.getForm().findField('id_pregunta').multiselects[0].store.load();
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }
-                                }],
+                                    ]
+                                },
                                 displayField: 'descrip_pregunta',
                                 valueField: 'id_pregunta',
                             },
@@ -1972,12 +2061,25 @@ header("content-type: text/javascript; charset=UTF-8");
                                         remoteSort: true,
                                         baseParams: {dir: 'ASC', sort: 'id_pregunta', limit: '100', start: '0'}
                                     }),
-                                    tbar: [{
-                                        text: 'Limpiar',
-                                        handler: function () {
-                                            me.isFormp.getForm().findField('id_pregunta').reset();
-                                        }
-                                    }],
+                                    tbar: [
+                                        {
+                                            text: 'Todo',
+                                            handler: function () {
+                                                const toStore = me.isFormp.getForm().findField('id_pregunta').multiselects[0].store;
+                                                const fromStore = me.isFormp.getForm().findField('id_pregunta').multiselects[1].store;
+                                                for (var i = toStore.getCount() - 1; i >= 0; i--) {
+                                                    const record = toStore.getAt(i);
+                                                    toStore.remove(record);
+                                                    fromStore.add(record);
+                                                }
+                                            }
+                                        },
+                                        {
+                                            text: 'Limpiar',
+                                            handler: function () {
+                                                me.isFormp.getForm().findField('id_pregunta').reset();
+                                            }
+                                        }],
                                     displayField: 'descrip_pregunta',
                                     valueField: 'id_pregunta',
                                 }]
@@ -2000,6 +2102,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         id_pn: record.json.id_pn,
                         item: maestro.id_aom
                     };
+                    id_pn_aux = record.json.id_pn;
                     this.isFormp.getForm().items.items[3].multiselects[0].store.load();
                     this.isFormp.getForm().items.items[3].multiselects[1].store.baseParams = {
                         dir: "ASC",
@@ -2023,6 +2126,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_pn: record.data.id_pn,
                     item: maestro.id_aom
                 };
+                id_pn_aux = record.data.id_pn;
                 this.isFormp.getForm().items.items[3].multiselects[0].store.load();
                 // console.log(record.data.id_pn);
                 this.isFormp.getForm().items.items[3].multiselects[1].store.baseParams = {
@@ -2327,10 +2431,6 @@ header("content-type: text/javascript; charset=UTF-8");
                                     url: '../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
                                     id: 'id_funcionario',
                                     root: 'datos',
-                                    sortInfo: {
-                                        field: 'desc_funcionario1',
-                                        direction: 'ASC'
-                                    },
                                     totalProperty: 'total',
                                     fields: ['id_funcionario', 'desc_funcionario1', 'id_equipo_responsable'],
                                     remoteSort: true,
@@ -2343,21 +2443,40 @@ header("content-type: text/javascript; charset=UTF-8");
                                         id_aom: maestro.id_aom
                                     }
                                 }),
-                                tbar: [{
-                                    text: 'Todo',
-                                    handler: function () {
-                                        const toStore = isForm.getForm().findField('itemselector').multiselects[0].store;
-                                        const fromStore = isForm.getForm().findField('itemselector').multiselects[1].store;
-                                        for (var i = toStore.getCount() - 1; i >= 0; i--) {
-                                            const record = toStore.getAt(i);
-                                            toStore.remove(record);
-                                            fromStore.add(record);
+                                tbar: {
+                                    xtype: 'toolbar',
+                                    flex: 1,
+                                    dock: 'top',
+                                    items: [
+                                        'Filtro:',
+                                        {
+                                            xtype: 'textfield',
+                                            fieldStyle: 'text-align: left;',
+                                            enableKeyEvents: true,
+                                            listeners: {
+                                                scope: this,
+                                                specialkey: function (field, e) {
+                                                    if (e.getKey() === e.ENTER) {
+                                                        if (String(field).trim() !== '') {
+                                                            isForm.getForm().findField('itemselector').multiselects[0].store.baseParams = {
+                                                                desc_funcionario1: field.getValue(),
+                                                                dir: 'ASC',
+                                                                sort: 'id_aom',
+                                                                limit: '100',
+                                                                start: '0',
+                                                                id_aom: maestro.id_aom
+                                                            };
+                                                            isForm.getForm().findField('itemselector').multiselects[0].store.load();
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }
-                                }],
+                                    ]
+                                },
                                 valueField: 'id_equipo_responsable',
                                 displayField: 'desc_funcionario1',
-                            },
+                                },
                                 {
                                     width: 300,
                                     height: 150,
@@ -2375,12 +2494,25 @@ header("content-type: text/javascript; charset=UTF-8");
                                             start: '0'
                                         }
                                     }),
-                                    tbar: [{
-                                        text: 'Limpiar',
-                                        handler: function () {
-                                            isForm.getForm().findField('itemselector').reset();
-                                        }
-                                    }],
+                                    tbar: [
+                                        {
+                                            text: 'Todo',
+                                            handler: function () {
+                                                const toStore = isForm.getForm().findField('itemselector').multiselects[0].store;
+                                                const fromStore = isForm.getForm().findField('itemselector').multiselects[1].store;
+                                                for (var i = toStore.getCount() - 1; i >= 0; i--) {
+                                                    const record = toStore.getAt(i);
+                                                    toStore.remove(record);
+                                                    fromStore.add(record);
+                                                }
+                                            }
+                                        },
+                                        {
+                                            text: 'Limpiar',
+                                            handler: function () {
+                                                isForm.getForm().findField('itemselector').reset();
+                                            }
+                                        }],
                                     valueField: 'id_equipo_responsable',
                                     displayField: 'desc_funcionario1',
                                 }]

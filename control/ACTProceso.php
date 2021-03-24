@@ -13,6 +13,10 @@ class ACTProceso extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_proceso');
 		$this->objParam->defecto('dir_ordenacion','asc');
 
+		if ($this->objParam->getParametro('proceso') != '') {
+			$this->objParam->addFiltro("((pcs.proceso::varchar ILIKE ''%".$this->objParam->getParametro('proceso')."%'') or
+                                    to_tsvector(pcs.proceso::varchar) @@ plainto_tsquery(''spanish'', ''".$this->objParam->getParametro('proceso')."''))");
+		}
 		if($this->objParam->getParametro('item') != ''){
 				$this->objParam->addFiltro("pcs.id_proceso not in ( select aupc.id_proceso
 										   from ssom.tauditoria_proceso aupc
