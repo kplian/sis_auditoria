@@ -24,7 +24,7 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
             text: 'Documentos',
             iconCls: 'bchecklist',
             disabled: false,
-            handler: this.loadCheckDocumentosPlanWf,
+            handler: this.loadCheckDocumentosRecWf,
             tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.',
             scope:this
         });

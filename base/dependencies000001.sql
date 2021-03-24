@@ -115,6 +115,13 @@ select wf.f_import_ttipo_documento_estado ('delete','NCOR','AUDSE','notificar_re
 select wf.f_import_ttipo_documento_estado ('delete','AUR','AUDSE','notificar_responsable','AUDSE',NULL,NULL,NULL);
 /***********************************F-DEP-MMV-SSOM-11-24/3/2021*****************************************/
 
+/***********************************I-DEP-MMV-SSOM-11-2-24/3/2021*****************************************/
+select wf.f_import_ttipo_documento_estado ('insert','DOCE','NOCS','propuesta','NOCS','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCE','NOCS','propuesta','NOCS','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCE','NOCS','propuesta','NOCS','eliminar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','NOCOF','NOCS','aceptada_resp','NOCS','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCE','NOCS','aceptada_resp','NOCS','eliminar','superior','');
+/***********************************F-DEP-MMV-SSOM-11-2-24/3/2021*****************************************/
 
 
 

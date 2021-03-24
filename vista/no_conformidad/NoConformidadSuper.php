@@ -679,7 +679,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         defaults: {width: 490},
                         items: [
                             no_conformidad,
-                            combo
+                           // combo
                         ]
                     })
                 ],
@@ -689,9 +689,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 frame: this.frameForm,
             });
             this.ventanaResponsable = new Ext.Window({
-                title: 'Asignar Responsable No Conformidad',
+                title: 'Aceptar No Conformidad',
                 width: 600,
-                height: 300,
+                height: 250,
                 closeAction: 'hide',
                 labelAlign: 'bottom',
                 items: this.formAuto,

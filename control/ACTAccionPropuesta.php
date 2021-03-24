@@ -20,13 +20,13 @@ class ACTAccionPropuesta extends ACTbase{
              $this->objParam->addFiltro("accpro.estado_wf in (''propuesto'') ");
          }
          if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaAuditor' ){
-             $this->objParam->addFiltro("accpro.estado_wf in (''aceptado_resp'') ");
+             $this->objParam->addFiltro("accpro.estado_wf in (''implementadas'',''implementado_aceptado_resp'',''verificadas'') ");
          }
          if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaImplementadas' ){
-             $this->objParam->addFiltro("accpro.estado_wf in (''implementadas'') ");
+             $this->objParam->addFiltro("accpro.estado_wf in (''aceptado_resp'') ");
          }
          if($this->objParam->getParametro('interfaz') == 'AccionesProImplementaVoBo' ){
-             $this->objParam->addFiltro("accpro.estado_wf in (''implementado_aceptado_resp'') ");
+             $this->objParam->addFiltro("accpro.estado_wf in (''propuesto'') ");
          }
        /*
         if($this->objParam->getParametro('interfaz') == 'AccionesPropuestaImplementadas' ){

@@ -23,7 +23,7 @@ class ACTNoConformidad extends ACTbase{
         }
 
         if($this->objParam->getParametro('interfaz') == 'NoConformidadSinAcciones'){
-           $this->objParam->addFiltro("noconf.estado_wf in (''aceptada_resp'')");
+           $this->objParam->addFiltro("noconf.estado_wf in (''consultor'')");
         }
         if($this->objParam->getParametro('interfaz') == 'NoConformidadAccion'){
          /*   $this->objParam->addFiltro("noconf.estado_wf in (''correccion'') and (select count(a.id_ap)

@@ -17,11 +17,11 @@ class ACTEquipoResponsable extends ACTbase{
         if($this->objParam->getParametro('id_aom')!=''){
             $this->objParam->addFiltro("eqre.id_aom = ".$this->objParam->getParametro('id_aom'));
         }
-				if($this->objParam->getParametro('item')!=''){
-						$this->objParam->addFiltro("eqre.id_funcionario not in (select crer.id_funcionario
-                                                          from ssom.tcronograma_equipo_responsable crer
-                                                          where crer.id_cronograma = ".$this->objParam->getParametro('item').")");
-				}
+		if($this->objParam->getParametro('item')!=''){
+				$this->objParam->addFiltro("eqre.id_funcionario not in (select crer.id_funcionario
+												  from ssom.tcronograma_equipo_responsable crer
+												  where crer.id_cronograma = ".$this->objParam->getParametro('item').")");
+		}
 
         if($this->objParam->getParametro('codigo_parametro')!=''){
             $this->objParam->addFiltro("par.codigo_parametro=  ''".$this->objParam->getParametro('codigo_parametro')."''");

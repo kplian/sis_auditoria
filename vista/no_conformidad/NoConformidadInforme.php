@@ -26,11 +26,8 @@ header("content-type: text/javascript; charset=UTF-8");
         descrip_nc : '',
         constructor: function(config) {
             this.Atributos[this.getIndAtributo('codigo_nc')].grid=false;
-
             Phx.vista.NoConformidadInforme.superclass.constructor.call(this,config);
             this.getBoton('btnNoram').setVisible(false);
-            this.getBoton('btnChequeoDocumentosWf').setVisible(false);
-
             this.init();
             this.grid.addListener('cellclick', this.oncellclick,this);
             this.addButton('btnAceptar', {
@@ -41,6 +38,20 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: '<b>Aceptar toda las no conformidades...</b>',
                 scope:this
             });
+        },
+        loadCheckDocumentosRecWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                'Chequear documento del WF',
+                {
+                    width:'90%',
+                    height:500
+                },
+                rec.data,
+                this.idContenedor,
+                'DocumentoWf'
+            )
         },
         onReloadPage:function(m){
             this.maestro=m;
@@ -62,76 +73,76 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             return tb
         },
-        oncellclick : function(grid, rowIndex, columnIndex, e) {
+        oncellclick: function (grid, rowIndex, columnIndex, e) {
             const record = this.store.getAt(rowIndex),
-                fieldName = grid.getColumnModel().getDataIndex(columnIndex); 
-            if (fieldName === 'revisar' || fieldName === 'rechazar'){
-                this.cambiarAsignacion(record,fieldName);
+                fieldName = grid.getColumnModel().getDataIndex(columnIndex);
+            if (fieldName === 'revisar' || fieldName === 'rechazar') {
+                this.cambiarAsignacion(record, fieldName);
             }
         },
-        cambiarAsignacion: function(record,name){
+        cambiarAsignacion: function (record, name) {
             this.columna = name;
             const select = this.getSelectedData();
             this.descrip_nc = select.descrip_nc;
             this.crearFormResponsableNC(select);
             this.crearFormObservacion(select);
-            if(name === 'revisar'){
-                if(select.revisar === 'si'){
+            if (name === 'revisar') {
+                if (select.revisar === 'si') {
                     Ext.Ajax.request({
-                        url:'../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
-                        params:{
+                        url: '../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
+                        params: {
                             id_nc: select.id_nc,
                             fieldName: name,
-                            id_funcionario_nc : null
+                            id_funcionario_nc: null
                         },
                         success: this.successWizard,
                         failure: this.conexionFailure,
                         timeout: this.timeout,
                         scope: this
                     });
-                }else{
+                } else {
                     this.ventanaResponsable.show();
                 }
             }
-            if(name === 'rechazar'){
-                if(select.rechazar === 'si'){
+            if (name === 'rechazar') {
+                if (select.rechazar === 'si') {
                     Ext.Ajax.request({
-                        url:'../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
-                        params:{
+                        url: '../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
+                        params: {
                             id_nc: select.id_nc,
                             fieldName: name,
-                            id_funcionario_nc : null
+                            id_funcionario_nc: null
                         },
                         success: this.successWizard,
                         failure: this.conexionFailure,
                         timeout: this.timeout,
                         scope: this
                     });
-                }else{
+                } else {
                     this.ventanaObservacion.show();
                 }
             }
 
 
         },
-        onAceptar:function () {
-          this.onFormularioTodo();
-          this.ventanaTodoAcep.show();
+        onAceptar: function () {
+            this.onFormularioTodo();
+            this.ventanaTodoAcep.show();
         },
-        crearFormResponsableNC:function(record){
+        crearFormResponsableNC: function (record) {
             const me = this;
             Phx.CP.loadingShow();
-            const informe =  {
+            const informe = {
                 fieldLabel: 'Informe',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.maestro.nombre_aom1+' '+this.maestro.nro_tramite_wf,
+                    html: this.maestro.nombre_aom1 + ' ' + this.maestro.nro_tramite_wf,
                 },
                 style: 'cursor:pointer;',
                 listeners: {
-                    render: function(component) {
-                        component.getEl().on('click', function(e) {
+                    render: function (component) {
+                        component.getEl().on('click', function (e) {
                             me.onCrearAuditoria(record);
                             me.formularioVentana.show();
                         });
@@ -143,34 +154,34 @@ header("content-type: text/javascript; charset=UTF-8");
                 msgTarget: 'title',
                 fieldLabel: 'Area',
                 allowBlank: true,
-                readOnly :true,
+                readOnly: true,
                 anchor: '100%',
                 style: 'background-image: none;',
                 value: this.maestro.nombre_unidad,
-                maxLength:50
+                maxLength: 50
             });
             const responsable_area = new Ext.form.TextField({
                 name: 'responsable_area',
                 msgTarget: 'title',
                 fieldLabel: 'Responsable area',
                 allowBlank: true,
-                readOnly :true,
+                readOnly: true,
                 anchor: '100%',
                 style: 'background-image: none;',
                 value: '',
-                maxLength:50
+                maxLength: 50
             });
-            const no_conformidad =  {
+            const no_conformidad = {
                 fieldLabel: 'No Conformidad',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.descrip_nc.substr(1,250)+'...'
+                    html: this.descrip_nc.substr(1, 250) + '...'
                 },
                 style: 'cursor:pointer;',
                 listeners: {
-                    render: function(component) {
-                        component.getEl().on('click', function(e) {
+                    render: function (component) {
+                        component.getEl().on('click', function (e) {
                             me.formularioNoConformidad(record);
                             me.ventanaNoConformidad.show();
                         });
@@ -181,30 +192,30 @@ header("content-type: text/javascript; charset=UTF-8");
                 url: '../../sis_auditoria/control/NoConformidad/listarFuncionariosUO',
                 id: 'id_funcionario',
                 root: 'datos',
-                sortInfo:{
+                sortInfo: {
                     field: 'desc_funcionario',
                     direction: 'ASC'
                 },
                 totalProperty: 'total',
-                fields: ['id_funcionario','desc_funcionario','desc_funcionario_cargo'],
+                fields: ['id_funcionario', 'desc_funcionario', 'desc_funcionario_cargo'],
                 remoteSort: true,
                 baseParams: {par_filtro: 'vfc.desc_funcionario1 '}
             });
 
             const combo = new Ext.form.ComboBox({
-                name:'id_funcionario_nc',
-                fieldLabel:'Responsable de No Conformidad',
-                allowBlank : false,
+                name: 'id_funcionario_nc',
+                fieldLabel: 'Responsable de No Conformidad',
+                allowBlank: false,
                 typeAhead: true,
                 store: storeCombo,
                 mode: 'remote',
                 pageSize: 15,
                 triggerAction: 'all',
-                valueField : 'id_funcionario',
-                displayField : 'desc_funcionario',
+                valueField: 'id_funcionario',
+                displayField: 'desc_funcionario',
                 forceSelection: true,
                 anchor: '100%',
-                resizable : true,
+                resizable: true,
                 enableMultiSelect: false
             });
             this.formAuto = new Ext.form.FormPanel({
@@ -214,21 +225,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 autoHeight: true,
                 autoScroll: true,
                 region: 'center',
-                defaults: { height: 450},
+                defaults: {height: 450},
                 items: [
                     new Ext.form.FieldSet({
-                            collapsible: false,
-                            title:'Datos Generales',
-                            border: true,
-                            layout: 'form',
-                                items: [
-                                        informe,
-                                        area,
-                                        responsable_area,
-                                        no_conformidad,
-                                        combo
-                                ]})
-                    ]
+                        collapsible: false,
+                        title: 'Datos Generales',
+                        border: true,
+                        layout: 'form',
+                        items: [
+                            informe,
+                            area,
+                            responsable_area,
+                            no_conformidad,
+                            combo
+                        ]
+                    })
+                ]
             });
             this.ventanaResponsable = new Ext.Window({
                 title: 'Asignar Responsable No Conformidad',
@@ -237,16 +249,19 @@ header("content-type: text/javascript; charset=UTF-8");
                 closeAction: 'hide',
                 labelAlign: 'bottom',
                 items: this.formAuto,
-                modal:true,
+                modal: true,
                 bodyStyle: 'padding:5px',
                 layout: 'form',
                 buttons: [{
                     text: 'Guardar',
                     handler: this.saveResponsable,
-                    scope: this},
+                    scope: this
+                },
                     {
                         text: 'Cancelar',
-                        handler: function(){ this.ventanaResponsable.hide() },
+                        handler: function () {
+                            this.ventanaResponsable.hide()
+                        },
                         scope: this
                     }]
             });
@@ -255,7 +270,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 params: {
                     id_uo: this.maestro.id_uo
                 },
-                success: function(resp){
+                success: function (resp) {
                     const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                     this.formAuto.getForm().findField('responsable_area').setValue(reg.ROOT.datos.desc_funcionario);
                     Phx.CP.loadingHide();
@@ -267,17 +282,17 @@ header("content-type: text/javascript; charset=UTF-8");
             this.cmpResponsable = this.formAuto.getForm().findField('id_funcionario_nc');
 
         },
-        saveResponsable: function(){
+        saveResponsable: function () {
             Phx.CP.loadingShow();
             const select = this.getSelectedData();
 
             Ext.Ajax.request({
-                url:'../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
-                params:{
+                url: '../../sis_auditoria/control/NoConformidad/aceptarNoConformidad',
+                params: {
                     id_nc: select.id_nc,
                     fieldName: this.columna,
-                    id_funcionario_nc : this.cmpResponsable.getValue(),
-                    obs_resp_area : this.cmpObservacion.getValue()
+                    id_funcionario_nc: this.cmpResponsable.getValue(),
+                    obs_resp_area: this.cmpObservacion.getValue()
                 },
                 success: this.successWizard,
                 failure: this.conexionFailure,
@@ -285,38 +300,38 @@ header("content-type: text/javascript; charset=UTF-8");
                 scope: this
             });
         },
-        successWizard:function(resp){
+        successWizard: function (resp) {
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-                if(this.ventanaResponsable){
+            if (!reg.ROOT.error) {
+                if (this.ventanaResponsable) {
                     this.ventanaResponsable.hide();
                 }
-                if(this.ventanaObservacion){
+                if (this.ventanaObservacion) {
                     this.ventanaObservacion.hide();
                 }
-                if(this.ventanaTodoAcep){
+                if (this.ventanaTodoAcep) {
                     this.ventanaTodoAcep.hide();
                 }
                 Phx.CP.loadingHide();
                 this.reload();
-            }else{
+            } else {
                 alert("Error no se no se registro el funcionario")
             }
 
         },
-        crearFormObservacion:function(record){
+        crearFormObservacion: function (record) {
             const me = this;
-            const informe =  {
+            const informe = {
                 fieldLabel: 'Informe',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.maestro.nombre_aom1+' '+this.maestro.nro_tramite_wf,
+                    html: this.maestro.nombre_aom1 + ' ' + this.maestro.nro_tramite_wf,
                 },
                 style: 'cursor:pointer;',
                 listeners: {
-                    render: function(component) {
-                        component.getEl().on('click', function(e) {
+                    render: function (component) {
+                        component.getEl().on('click', function (e) {
                             me.onCrearAuditoria(record);
                             me.formularioVentana.show();
                         });
@@ -328,10 +343,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 msgTarget: 'title',
                 fieldLabel: 'Area',
                 allowBlank: true,
-                readOnly :true,
+                readOnly: true,
                 anchor: '90%',
                 style: 'background-image: none;',
-                maxLength:50,
+                maxLength: 50,
                 value: this.maestro.nombre_unidad,
             });
             const responsable_area = new Ext.form.TextField({
@@ -339,22 +354,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 msgTarget: 'title',
                 fieldLabel: 'Responsable area',
                 allowBlank: true,
-                readOnly :true,
+                readOnly: true,
                 anchor: '90%',
                 style: 'background-image: none;',
-                maxLength:50
+                maxLength: 50
             });
-            const no_conformidad =  {
+            const no_conformidad = {
                 fieldLabel: 'No Conformidad',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.descrip_nc.substr(1,250)+'...'
+                    html: this.descrip_nc.substr(1, 250) + '...'
                 },
                 style: 'cursor:pointer;',
                 listeners: {
-                    render: function(component) {
-                        component.getEl().on('click', function(e) {
+                    render: function (component) {
+                        component.getEl().on('click', function (e) {
                             me.formularioNoConformidad(record);
                             me.ventanaNoConformidad.show();
                         });
@@ -362,13 +377,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
             };
             const obs_consultor = new Ext.form.TextArea({
-                    name: 'obs_resp_area',
-                    msgTarget: 'title',
-                    fieldLabel: 'Causa Rechazo',
-                    allowBlank: true,
-                    anchor: '90%',
-                    style: 'background-image: none;',
-                    maxLength:50
+                name: 'obs_resp_area',
+                msgTarget: 'title',
+                fieldLabel: 'Causa Rechazo',
+                allowBlank: true,
+                anchor: '90%',
+                style: 'background-image: none;',
+                maxLength: 50
             });
 
             this.formObs = new Ext.form.FormPanel({
@@ -378,42 +393,42 @@ header("content-type: text/javascript; charset=UTF-8");
                 autoHeight: true,
                 autoScroll: true,
                 region: 'center',
-                defaults: { height: 450},
+                defaults: {height: 450},
                 items: [
                     new Ext.form.FieldSet({
-                            collapsible: false,
-                            title:'Datos Generales',
-                            border: true,
-                            layout: 'form',
-                                items: [informe,
-                                        area,
-                                        responsable_area,
-                                        no_conformidad,
-                                        obs_consultor
-                                ]
-                    
+                        collapsible: false,
+                        title: 'Datos Generales',
+                        border: true,
+                        layout: 'form',
+                        items: [informe,
+                            area,
+                            responsable_area,
+                            no_conformidad,
+                            obs_consultor
+                        ]
+
                     })
                 ]
             });
 
-            this.ventanaObservacion= new Ext.Window({
+            this.ventanaObservacion = new Ext.Window({
                 title: 'Rechazar No Conformidad',
                 width: 600,
                 height: 400,
                 closeAction: 'hide',
                 labelAlign: 'bottom',
                 items: this.formObs,
-                modal:true,
+                modal: true,
                 bodyStyle: 'padding:5px',
                 layout: 'form',
                 buttons: [{
                     text: 'Guardar',
                     handler: this.saveResponsable,
                     scope: this
-                    },
+                },
                     {
                         text: 'Cancelar',
-                        handler: function(){
+                        handler: function () {
                             this.ventanaObservacion.hide()
                         },
                         scope: this
@@ -424,7 +439,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 params: {
                     id_uo: this.maestro.id_uo
                 },
-                success: function(resp){
+                success: function (resp) {
                     const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                     this.formObs.getForm().findField('responsable_area').setValue(reg.ROOT.datos.desc_funcionario);
                     Phx.CP.loadingHide();
@@ -436,8 +451,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.cmpObservacion = this.formObs.getForm().findField('obs_resp_area');
 
         },
-        onCrearAuditoria:function(record){
-            if(this.formularioVentana){
+        onCrearAuditoria: function (record) {
+            if (this.formularioVentana) {
                 this.form_auditoria.destroy();
                 this.formularioVentana.destroy();
             }
@@ -448,30 +463,30 @@ header("content-type: text/javascript; charset=UTF-8");
                 id: 'id_aproceso',
                 root: 'datos',
                 totalProperty: 'total',
-                fields: ['id_aom','id_aproceso','proceso','desc_funcionario', 'estado_reg','usr_reg','fecha_reg'],
+                fields: ['id_aom', 'id_aproceso', 'proceso', 'desc_funcionario', 'estado_reg', 'usr_reg', 'fecha_reg'],
                 remoteSort: true,
-                baseParams: {dir:'ASC',sort:'id_aom',limit:'100',start:'0'}
+                baseParams: {dir: 'ASC', sort: 'id_aom', limit: '100', start: '0'}
             });
             this.storeEquipo = new Ext.data.JsonStore({
                 url: '../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
                 id: 'id_equipo_responsable',
                 root: 'datos',
                 totalProperty: 'total',
-                fields: ['id_aom','id_formula_detalle','id_parametro','valor_parametro', 'id_funcionario',
-                    'desc_funcionario1', 'estado_reg','usr_reg','fecha_reg'
-                ],remoteSort: true,
-                baseParams: {dir:'ASC',sort:'id_equipo_responsable',limit:'100',start:'0'}
+                fields: ['id_aom', 'id_formula_detalle', 'id_parametro', 'valor_parametro', 'id_funcionario',
+                    'desc_funcionario1', 'estado_reg', 'usr_reg', 'fecha_reg'
+                ], remoteSort: true,
+                baseParams: {dir: 'ASC', sort: 'id_equipo_responsable', limit: '100', start: '0'}
             });
             this.storePuntoNorma = new Ext.data.JsonStore({
                 url: '../../sis_auditoria/control/AuditoriaNpn/listarAuditoriaNpn',
                 id: 'id_anpn',
                 root: 'datos',
                 totalProperty: 'total',
-                fields: ['id_aom','id_anpn','id_norma','sigla_norma',
-                    'id_pn','nombre_pn','codigo_pn','desc_punto_norma',
-                    'usr_reg','estado_reg','fecha_reg','nombre_descrip'],
+                fields: ['id_aom', 'id_anpn', 'id_norma', 'sigla_norma',
+                    'id_pn', 'nombre_pn', 'codigo_pn', 'desc_punto_norma',
+                    'usr_reg', 'estado_reg', 'fecha_reg', 'nombre_descrip'],
                 remoteSort: true,
-                baseParams: {dir:'ASC',sort:'id_anpn',limit:'100',start:'0'}
+                baseParams: {dir: 'ASC', sort: 'id_anpn', limit: '100', start: '0'}
             });
             this.storePregunta = new Ext.data.GroupingStore({
                 url: '../../sis_auditoria/control/AuditoriaNpnpg/listarAuditoriaNpnpg',
@@ -482,39 +497,39 @@ header("content-type: text/javascript; charset=UTF-8");
                     direction: 'ASC'
                 },
                 totalProperty: 'total',
-                fields: ['id_anpnpg','descrip_pregunta','estado_reg','usr_reg','fecha_reg'
-                ],remoteSort: true,
-                baseParams: {dir:'ASC',sort:'id_anpnpg',limit:'100',start:'0'}
+                fields: ['id_anpnpg', 'descrip_pregunta', 'estado_reg', 'usr_reg', 'fecha_reg'
+                ], remoteSort: true,
+                baseParams: {dir: 'ASC', sort: 'id_anpnpg', limit: '100', start: '0'}
             });
             this.storeCronograma = new Ext.data.JsonStore({
                 url: '../../sis_auditoria/control/Cronograma/listarCronograma',
                 id: 'id_cronograma',
                 root: 'datos',
                 totalProperty: 'total',
-                fields: ['id_cronograma','id_aom','id_actividad',
-                    'nueva_actividad','fecha_ini_activ','actividad',
-                    'fecha_fin_activ','hora_ini_activ','hora_fin_activ','lista_funcionario',
-                    'estado_reg','usr_reg','fecha_reg'],remoteSort: true,
-                baseParams: {dir:'ASC',sort:'id_cronograma',limit:'100',start:'0'}
+                fields: ['id_cronograma', 'id_aom', 'id_actividad',
+                    'nueva_actividad', 'fecha_ini_activ', 'actividad',
+                    'fecha_fin_activ', 'hora_ini_activ', 'hora_fin_activ', 'lista_funcionario',
+                    'estado_reg', 'usr_reg', 'fecha_reg'], remoteSort: true,
+                baseParams: {dir: 'ASC', sort: 'id_cronograma', limit: '100', start: '0'}
             });
 
-           Ext.Ajax.request({
-                url:'../../sis_auditoria/control/AuditoriaOportunidadMejora/listarAuditoriaOportunidadMejora',
-                params:{
-                    dir:'ASC',
-                    sort:'id_aom',
-                    limit:'100',
-                    start:'0',
+            Ext.Ajax.request({
+                url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarAuditoriaOportunidadMejora',
+                params: {
+                    dir: 'ASC',
+                    sort: 'id_aom',
+                    limit: '100',
+                    start: '0',
                     id_aom: record.id_aom
                 },
-                success:this.successRevision,
+                success: this.successRevision,
                 failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
+                timeout: this.timeout,
+                scope: this
             });
             const crorograma = new Ext.grid.GridPanel({
                 layout: 'fit',
-                store:  this.storeCronograma,
+                store: this.storeCronograma,
                 region: 'center',
                 split: true,
                 border: false,
@@ -527,13 +542,15 @@ header("content-type: text/javascript; charset=UTF-8");
                         header: 'Actividad',
                         dataIndex: 'id_actividad',
                         width: 150,
-                        renderer:function(value, p, record){return String.format('{0}', record.data['actividad'])},
+                        renderer: function (value, p, record) {
+                            return String.format('{0}', record.data['actividad'])
+                        },
                     },
                     {
                         header: 'Funcionarios',
                         dataIndex: 'lista_funcionario',
                         width: 210,
-                        renderer : function(value, p, record) {
+                        renderer: function (value, p, record) {
                             return String.format('<div class="gridmultiline">{0}</div>', record.data['lista_funcionario']);
                         }
                     },
@@ -542,9 +559,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         dataIndex: 'fecha_ini_activ',
                         align: 'center',
                         width: 100,
-                        renderer:function (value,p,record){
+                        renderer: function (value, p, record) {
                             const fecha = value.split("-");
-                            return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
+                            return fecha[2] + '/' + fecha[1] + '/' + fecha[0];
                         }
                     },
                     {
@@ -552,9 +569,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         dataIndex: 'fecha_fin_activ',
                         align: 'center',
                         width: 100,
-                        renderer:function (value,p,record){
+                        renderer: function (value, p, record) {
                             const fecha = value.split("-");
-                            return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
+                            return fecha[2] + '/' + fecha[1] + '/' + fecha[0];
                         }
                     },
                     {
@@ -592,7 +609,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.form_auditoria = new Ext.form.FormPanel({
                 id: this.idContenedor + '_formulario_aud',
-                items: [{ region: 'center',
+                items: [{
+                    region: 'center',
                     layout: 'column',
                     border: false,
                     autoScroll: true,
@@ -611,7 +629,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             items: [
                                 new Ext.form.FieldSet({
                                     collapsible: false,
-                                    border:false,
+                                    border: false,
                                     items: [
                                         new Ext.form.FieldSet({
                                             collapsible: false,
@@ -659,7 +677,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     anchor: '100%',
                                                     allowBlank: false,
                                                     disabled: false,
-                                                    id: this.idContenedor+'_lugar',
+                                                    id: this.idContenedor + '_lugar',
                                                     readOnly: true,
                                                     style: 'background-image: none;',
                                                 },
@@ -668,7 +686,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     fieldLabel: 'Tipo de Auditoria',
                                                     name: 'id_tnorma',
                                                     allowBlank: false,
-                                                    id: this.idContenedor+'_id_tnorma',
+                                                    id: this.idContenedor + '_id_tnorma',
                                                     emptyText: 'Elija una opción...',
                                                     store: new Ext.data.JsonStore({
                                                         url: '../../sis_auditoria/control/Parametro/listarParametro',
@@ -680,9 +698,9 @@ header("content-type: text/javascript; charset=UTF-8");
                                                             field: 'valor_parametro',
                                                             direction: 'ASC'
                                                         },
-                                                        baseParams:{
-                                                            tipo_parametro:'TIPO_NORMA',
-                                                            par_filtro:'prm.id_tipo_parametro'
+                                                        baseParams: {
+                                                            tipo_parametro: 'TIPO_NORMA',
+                                                            par_filtro: 'prm.id_tipo_parametro'
                                                         }
                                                     }),
                                                     valueField: 'id_parametro',
@@ -703,7 +721,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     fieldLabel: 'Objeto Auditoria',
                                                     name: 'id_tobjeto',
                                                     allowBlank: false,
-                                                    id: this.idContenedor+'_id_tobjeto',
+                                                    id: this.idContenedor + '_id_tobjeto',
                                                     emptyText: 'Elija una opción...',
                                                     store: new Ext.data.JsonStore({
                                                         url: '../../sis_auditoria/control/Parametro/listarParametro',
@@ -715,9 +733,9 @@ header("content-type: text/javascript; charset=UTF-8");
                                                             field: 'valor_parametro',
                                                             direction: 'ASC'
                                                         },
-                                                        baseParams:{
-                                                            tipo_parametro:'OBJETO_AUDITORIA',
-                                                            par_filtro:'prm.id_parametro'
+                                                        baseParams: {
+                                                            tipo_parametro: 'OBJETO_AUDITORIA',
+                                                            par_filtro: 'prm.id_parametro'
                                                         }
                                                     }),
                                                     valueField: 'id_parametro',
@@ -738,7 +756,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     name: 'fecha_prev_inicio',
                                                     disabled: false,
                                                     anchor: '100%',
-                                                    id: this.idContenedor+'_fecha_prev_inicio',
+                                                    id: this.idContenedor + '_fecha_prev_inicio',
                                                     style: 'background-image: none;',
                                                     readOnly: true,
                                                 },
@@ -748,7 +766,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     name: 'fecha_prev_fin',
                                                     disabled: false,
                                                     anchor: '100%',
-                                                    id: this.idContenedor+'_fecha_prev_fin',
+                                                    id: this.idContenedor + '_fecha_prev_fin',
                                                     style: 'background-image: none;',
                                                     readOnly: true,
                                                 },
@@ -758,7 +776,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     name: 'fecha_prog_inicio',
                                                     disabled: false,
                                                     anchor: '100%',
-                                                    id: this.idContenedor+'_fecha_prog_inicio',
+                                                    id: this.idContenedor + '_fecha_prog_inicio',
                                                     style: 'background-image: none;',
                                                     readOnly: true,
                                                 },
@@ -768,7 +786,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     name: 'fecha_prog_fin',
                                                     disabled: false,
                                                     anchor: '100%',
-                                                    id: this.idContenedor+'_fecha_prog_fin',
+                                                    id: this.idContenedor + '_fecha_prog_fin',
                                                     style: 'background-image: none;',
                                                     readOnly: true,
                                                 },
@@ -786,7 +804,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 items: [
                                     new Ext.grid.GridPanel({
                                         layout: 'fit',
-                                        store:  this.storeProceso,
+                                        store: this.storeProceso,
                                         region: 'center',
                                         trackMouseOver: false,
                                         split: true,
@@ -802,14 +820,18 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 dataIndex: 'id_proceso',
                                                 width: 300,
                                                 sortable: false,
-                                                renderer:function(value, p, record){return String.format('{0}', record.data['proceso']);},
+                                                renderer: function (value, p, record) {
+                                                    return String.format('{0}', record.data['proceso']);
+                                                },
                                             },
                                             {
                                                 header: 'Responsable',
                                                 dataIndex: 'desc_funcionario',
                                                 width: 300,
                                                 sortable: false,
-                                                renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario']);},
+                                                renderer: function (value, p, record) {
+                                                    return String.format('{0}', record.data['desc_funcionario']);
+                                                },
                                             },
                                             {
                                                 header: 'Estado Reg.',
@@ -836,11 +858,11 @@ header("content-type: text/javascript; charset=UTF-8");
                             {
                                 title: 'Responsables',
                                 layout: 'fit',
-                                region:'center',
+                                region: 'center',
                                 items: [
                                     new Ext.grid.GridPanel({
                                         layout: 'fit',
-                                        store:  this.storeEquipo,
+                                        store: this.storeEquipo,
                                         region: 'center',
                                         split: true,
                                         border: false,
@@ -855,14 +877,18 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 dataIndex: 'id_parametro',
                                                 width: 100,
                                                 sortable: false,
-                                                renderer:function(value, p, record){return String.format('{0}', record.data['valor_parametro'])},
+                                                renderer: function (value, p, record) {
+                                                    return String.format('{0}', record.data['valor_parametro'])
+                                                },
                                             },
                                             {
                                                 header: 'Funcionario',
                                                 dataIndex: 'id_funcionario',
                                                 width: 200,
                                                 sortable: false,
-                                                renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario1'])},
+                                                renderer: function (value, p, record) {
+                                                    return String.format('{0}', record.data['desc_funcionario1'])
+                                                },
                                             },
                                             {
                                                 header: 'Interno',
@@ -901,12 +927,12 @@ header("content-type: text/javascript; charset=UTF-8");
                             {
                                 title: 'Punto de Norma',
                                 layout: 'fit',
-                                region:'center',
+                                region: 'center',
                                 items: [
                                     new Ext.grid.GridPanel({
                                         layout: 'fit',
-                                        store:  this.storePuntoNorma,
-                                        region:  'center',
+                                        store: this.storePuntoNorma,
+                                        region: 'center',
                                         margins: '3 3 3 0',
                                         trackMouseOver: false,
                                         columns: [
@@ -916,11 +942,11 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 dataIndex: 'id_norma',
                                                 width: 150,
                                                 sortable: false,
-                                                renderer:function(value, p, record){
+                                                renderer: function (value, p, record) {
                                                     let resultao = '';
-                                                    if(this.sigla !== record.data['sigla_norma']){
+                                                    if (this.sigla !== record.data['sigla_norma']) {
                                                         resultao = String.format('<b>{0}</b>', record.data['sigla_norma']);
-                                                        this.sigla =  record.data['sigla_norma']
+                                                        this.sigla = record.data['sigla_norma']
                                                     }
                                                     return resultao
                                                 }
@@ -930,7 +956,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 dataIndex: 'codigo_pn',
                                                 width: 100,
                                                 sortable: false,
-                                                renderer:function(value, p, record){
+                                                renderer: function (value, p, record) {
                                                     return String.format('<span>{0}</span>', record.data['codigo_pn'])
                                                 },
 
@@ -940,7 +966,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 dataIndex: 'id_pn',
                                                 width: 350,
                                                 sortable: false,
-                                                renderer:function(value, p, record){
+                                                renderer: function (value, p, record) {
                                                     return String.format('<span>{0}</span>', record.data['nombre_pn'])
                                                 },
                                             },
@@ -969,12 +995,12 @@ header("content-type: text/javascript; charset=UTF-8");
                             {
                                 title: 'Lista de Verificación',
                                 layout: 'fit',
-                                region:'center',
+                                region: 'center',
                                 items: [
                                     new Ext.grid.GridPanel({
                                         layout: 'fit',
-                                        store:  this.storePregunta,
-                                        region:  'center',
+                                        store: this.storePregunta,
+                                        region: 'center',
                                         margins: '3 3 3 0',
                                         trackMouseOver: false,
                                         columns: [
@@ -984,21 +1010,27 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 dataIndex: 'id_norma',
                                                 width: 150,
                                                 sortable: false,
-                                                renderer:function(value, p, record){return String.format('{0}', record.data['sigla_norma'])},
+                                                renderer: function (value, p, record) {
+                                                    return String.format('{0}', record.data['sigla_norma'])
+                                                },
                                             },
                                             {
                                                 header: 'Punto de Norma',
                                                 dataIndex: 'id_pn',
                                                 width: 300,
                                                 sortable: false,
-                                                renderer:function(value, p, record){return String.format('{0}', record.data['nombre_pn'])},
+                                                renderer: function (value, p, record) {
+                                                    return String.format('{0}', record.data['nombre_pn'])
+                                                },
                                             },
                                             {
                                                 header: 'Pregunta',
                                                 dataIndex: 'id_pregunta',
                                                 width: 300,
                                                 sortable: false,
-                                                renderer:function(value, p, record){return String.format('{0}', record.data['descrip_pregunta'])},
+                                                renderer: function (value, p, record) {
+                                                    return String.format('{0}', record.data['descrip_pregunta'])
+                                                },
                                             },
                                             {
                                                 header: 'Estado Reg.',
@@ -1025,7 +1057,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             {
                                 title: 'Cronograma',
                                 layout: 'fit',
-                                region:'center',
+                                region: 'center',
                                 items: [
                                     crorograma
                                 ]
@@ -1067,15 +1099,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 items: [this.form_auditoria]
             });
         },
-        formularioNoConformidad:function(data){
+        formularioNoConformidad: function (data) {
             const maestro = this.sm.getSelected().data;
             const me = this;
 
             console.log(this.maestro)
             let evento = 'NEW';
             let id_modificacion = null;
-            if(data){
-                evento  = 'EDIT';
+            if (data) {
+                evento = 'EDIT';
                 id_modificacion = data.id_nc
             }
 
@@ -1084,39 +1116,39 @@ header("content-type: text/javascript; charset=UTF-8");
                 id: 'id_pnnc',
                 root: 'datos',
                 totalProperty: 'total',
-                fields: ['id_pnnc','id_nc','id_pn','id_norma','nombre_pn','desc_norma','nombre_pn','sigla_norma','codigo_pn','nombre_descrip'],
+                fields: ['id_pnnc', 'id_nc', 'id_pn', 'id_norma', 'nombre_pn', 'desc_norma', 'nombre_pn', 'sigla_norma', 'codigo_pn', 'nombre_descrip'],
                 remoteSort: true,
-                baseParams: {dir:'ASC',sort:'id_pnnc',limit:'100',start:'0'}
+                baseParams: {dir: 'ASC', sort: 'id_pnnc', limit: '100', start: '0'}
             });
-            if(data){
-                this.punto.baseParams.id_nc = data?data.id_nc:this.id_no_conformidad;
+            if (data) {
+                this.punto.baseParams.id_nc = data ? data.id_nc : this.id_no_conformidad;
                 this.punto.load();
             }
-            this.documentos  = new Ext.data.JsonStore({
+            this.documentos = new Ext.data.JsonStore({
                 url: '../../sis_workflow/control/DocumentoWf/listarDocumentoWf',
                 id: 'id_documento_wf',
                 root: 'datos',
                 totalProperty: 'total',
                 fields: [
-                    {name:'id_documento_wf', type: 'numeric'},
-                    {name:'url', type: 'string'},
-                    {name:'num_tramite', type: 'string'},
-                    {name:'id_tipo_documento', type: 'numeric'},
-                    {name:'obs', type: 'string'},
-                    {name:'id_proceso_wf', type: 'numeric'},
-                    {name:'extension', type: 'string'},
-                    {name:'chequeado', type: 'string'},
-                    {name:'estado_reg', type: 'string'},
-                    {name:'nombre_tipo_doc', type: 'string'},
-                    {name:'nombre_doc', type: 'string'},
-                    {name:'momento', type: 'string'},
-                    {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
-                    {name:'id_usuario_reg', type: 'numeric'},
-                    {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
-                    {name:'id_usuario_mod', type: 'numeric'},
-                    {name:'priorizacion', type: 'numeric'},
-                    {name:'usr_reg', type: 'string'},
-                    {name:'usr_mod', type: 'string'},
+                    {name: 'id_documento_wf', type: 'numeric'},
+                    {name: 'url', type: 'string'},
+                    {name: 'num_tramite', type: 'string'},
+                    {name: 'id_tipo_documento', type: 'numeric'},
+                    {name: 'obs', type: 'string'},
+                    {name: 'id_proceso_wf', type: 'numeric'},
+                    {name: 'extension', type: 'string'},
+                    {name: 'chequeado', type: 'string'},
+                    {name: 'estado_reg', type: 'string'},
+                    {name: 'nombre_tipo_doc', type: 'string'},
+                    {name: 'nombre_doc', type: 'string'},
+                    {name: 'momento', type: 'string'},
+                    {name: 'fecha_reg', type: 'date', dateFormat: 'Y-m-d H:i:s.u'},
+                    {name: 'id_usuario_reg', type: 'numeric'},
+                    {name: 'fecha_mod', type: 'date', dateFormat: 'Y-m-d H:i:s.u'},
+                    {name: 'id_usuario_mod', type: 'numeric'},
+                    {name: 'priorizacion', type: 'numeric'},
+                    {name: 'usr_reg', type: 'string'},
+                    {name: 'usr_mod', type: 'string'},
                     'codigo_tipo_proceso',
                     'codigo_tipo_documento',
                     'nombre_tipo_documento',
@@ -1128,25 +1160,29 @@ header("content-type: text/javascript; charset=UTF-8");
                     'chequeado_fisico',
                     'usr_upload',
                     'tipo_documento',
-                    'action','solo_lectura','id_documento_wf_ori','id_proceso_wf_ori','nro_tramite_ori',
-                    {name:'fecha_upload', type: 'date',dateFormat:'Y-m-d H:i:s.u'},'modificar','insertar','eliminar','demanda',
-                    'nombre_vista','esquema_vista','nombre_archivo_plantilla'
+                    'action', 'solo_lectura', 'id_documento_wf_ori', 'id_proceso_wf_ori', 'nro_tramite_ori',
+                    {
+                        name: 'fecha_upload',
+                        type: 'date',
+                        dateFormat: 'Y-m-d H:i:s.u'
+                    }, 'modificar', 'insertar', 'eliminar', 'demanda',
+                    'nombre_vista', 'esquema_vista', 'nombre_archivo_plantilla'
                 ],
                 remoteSort: true,
-                baseParams: {dir:'ASC',sort:'id_documento_wf',limit:'100',start:'0'}
+                baseParams: {dir: 'ASC', sort: 'id_documento_wf', limit: '100', start: '0'}
             });
-            if(data){
+            if (data) {
                 this.documentos.baseParams.modoConsulta = 'no';
                 this.documentos.baseParams.todos_documentos = 'no';
                 this.documentos.baseParams.anulados = 'no';
                 this.documentos.baseParams.id_proceso_wf = data.id_proceso_wf;
-                this.documentos.load({params:{start: 0, limit: 50 }});
+                this.documentos.load({params: {start: 0, limit: 50}});
             }
             const table = new Ext.grid.GridPanel({
                 store: this.punto,
                 height: 200,
                 layout: 'fit',
-                region:'center',
+                region: 'center',
                 anchor: '100%',
                 split: true,
                 border: true,
@@ -1160,7 +1196,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         dataIndex: 'id_norma',
                         width: 180,
                         sortable: false,
-                        renderer:function(value, p, record){return String.format('{0}', record.data['sigla_norma'])},
+                        renderer: function (value, p, record) {
+                            return String.format('{0}', record.data['sigla_norma'])
+                        },
                     },
                     {
                         header: 'Codigo',
@@ -1173,7 +1211,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         dataIndex: 'id_pn',
                         width: 270,
                         sortable: false,
-                        renderer:function(value, p, record){return String.format('{0}', record.data['nombre_pn'])},
+                        renderer: function (value, p, record) {
+                            return String.format('{0}', record.data['nombre_pn'])
+                        },
                     },
                 ]/*,
                 tbar: [{
@@ -1191,9 +1231,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
                 ]*/
             });
-            const grilla =  new Ext.grid.GridPanel({
+            const grilla = new Ext.grid.GridPanel({
                 layout: 'fit',
-                store:  this.documentos,
+                store: this.documentos,
                 region: 'center',
                 trackMouseOver: false,
                 split: true,
@@ -1206,7 +1246,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     text: '<button class="btn">&nbsp;&nbsp;<b>Nuevo</b></button>',
                     scope: this,
                     width: '100',
-                    handler: function() {
+                    handler: function () {
                         this.onFormularioDocumento(data);
                     }
                 },
@@ -1214,18 +1254,18 @@ header("content-type: text/javascript; charset=UTF-8");
                         text: '<button class="btn">&nbsp;&nbsp;<b>Eliminar</b></button>',
                         scope: this,
                         width: '100',
-                        handler: function() {
+                        handler: function () {
                             const record = grilla.getSelectionModel().getSelections();
                             Phx.CP.loadingShow();
                             Ext.Ajax.request({
                                 url: '../../sis_workflow/control/DocumentoWf/eliminarDocumentoWf',
                                 params: {
-                                    id_documento_wf : record[0].data.id_documento_wf
+                                    id_documento_wf: record[0].data.id_documento_wf
                                 },
                                 isUpload: false,
-                                success: function(a,b,c){
+                                success: function (a, b, c) {
                                     Phx.CP.loadingHide();
-                                    this.documentos.load({params:{ start: 0, limit: 50 }});
+                                    this.documentos.load({params: {start: 0, limit: 50}});
                                 },
                                 argument: this.argumentSave,
                                 failure: this.conexionFailure,
@@ -1242,17 +1282,16 @@ header("content-type: text/javascript; charset=UTF-8");
                         dataIndex: 'chequeado',
                         width: 100,
                         sortable: false,
-                        renderer:function (value, p, record, rowIndex, colIndex){
+                        renderer: function (value, p, record, rowIndex, colIndex) {
 
-                            if(record.data['chequeado'] == 'si') {
+                            if (record.data['chequeado'] == 'si') {
                                 return "<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Abrir Documento' src = '../../../lib/imagenes/icono_awesome/awe_print_good.png' align='center' width='30' height='30'></div>";
-                            } else if(record.data.nombre_vista) {
+                            } else if (record.data.nombre_vista) {
                                 return "<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Generar Plantilla' src = '../../../lib/imagenes/icono_awesome/awe_template.png' align='center' width='30' height='30'></div>";
-                            }
-                            else if (record.data['action'] != '') {
+                            } else if (record.data['action'] != '') {
                                 return "<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Vista Previa Documento Generado' src = '../../../lib/imagenes/icono_awesome/awe_print_good.png' align='center' width='30' height='30'></div>";
-                            } else{
-                                return  String.format('{0}',"<div style='text-align:center'><img title='Documento No Escaneado' src = '../../../lib/imagenes/icono_awesome/awe_wrong.png' align='center' width='30' height='30'/></div>");
+                            } else {
+                                return String.format('{0}', "<div style='text-align:center'><img title='Documento No Escaneado' src = '../../../lib/imagenes/icono_awesome/awe_wrong.png' align='center' width='30' height='30'/></div>");
                             }
                         },
                     },
@@ -1261,12 +1300,12 @@ header("content-type: text/javascript; charset=UTF-8");
                         dataIndex: 'upload',
                         width: 100,
                         sortable: false,
-                        renderer:function (value, p, record){
+                        renderer: function (value, p, record) {
                             if (record.data['solo_lectura'] == 'no' && !record.data['id_proceso_wf_ori']) {
-                                if(record.data['extension'].length!=0) {
-                                    return  String.format('{0}',"<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Reemplazar Archivo' src = '../../../lib/imagenes/icono_awesome/awe_upload.png' align='center' width='30' height='30'></div>");
+                                if (record.data['extension'].length != 0) {
+                                    return String.format('{0}', "<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Reemplazar Archivo' src = '../../../lib/imagenes/icono_awesome/awe_upload.png' align='center' width='30' height='30'></div>");
                                 } else {
-                                    return  String.format('{0}',"<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Subir Archivo' src = '../../../lib/imagenes/icono_awesome/awe_upload.png' align='center' width='30' height='30'></div>");
+                                    return String.format('{0}', "<div style='text-align:center'><img border='0' style='-webkit-user-select:auto;cursor:pointer;' title='Subir Archivo' src = '../../../lib/imagenes/icono_awesome/awe_upload.png' align='center' width='30' height='30'></div>");
                                 }
                             }
                         }
@@ -1276,24 +1315,23 @@ header("content-type: text/javascript; charset=UTF-8");
                         dataIndex: 'nombre_tipo_documento',
                         width: 100,
                         sortable: false,
-                        renderer:function(value,p,record){
-                            if( record.data.priorizacion==0||record.data.priorizacion==9){
+                        renderer: function (value, p, record) {
+                            if (record.data.priorizacion == 0 || record.data.priorizacion == 9) {
                                 return String.format('<b><font color="red">{0}***</font></b>', value);
-                            }
-                            else{
+                            } else {
                                 return String.format('{0}', value);
-                            }}
+                            }
+                        }
                     },
                     {
                         header: 'Descripcion Proceso',
                         dataIndex: 'descripcion_proceso_wf',
                         width: 200,
                         sortable: false,
-                        renderer:function(value,p,record){
-                            if( record.data.demanda == 'si'){
+                        renderer: function (value, p, record) {
+                            if (record.data.demanda == 'si') {
                                 return String.format('<b><font color="green">{0}</font></b>', value);
-                            }
-                            else{
+                            } else {
                                 return String.format('{0}', value);
                             }
                         }
@@ -1307,7 +1345,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 ]
             });
-            this.isForm= new Ext.form.FormPanel({
+            this.isForm = new Ext.form.FormPanel({
                 items: [{
                     region: 'center',
                     layout: 'column',
@@ -1331,7 +1369,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             items: [
                                 new Ext.form.FieldSet({
                                     collapsible: false,
-                                    border:false,
+                                    border: false,
                                     items: [
                                         {
                                             xtype: 'field',
@@ -1339,7 +1377,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                             name: 'nro_tramite_wf',
                                             anchor: '100%',
                                             value: this.maestro.nro_tramite_wf,
-                                            readOnly :true,
+                                            readOnly: true,
                                             style: 'background-image: none; background: #eeeeee;'
                                         },
                                         {
@@ -1348,7 +1386,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                             name: 'nombre_aom1',
                                             anchor: '100%',
                                             value: maestro.nombre_aom1,
-                                            readOnly :true,
+                                            readOnly: true,
                                             style: 'background-image: none; background: #eeeeee;'
                                         },
                                         {
@@ -1356,7 +1394,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                             name: 'id_uo',
                                             fieldLabel: 'Area',
                                             allowBlank: false,
-                                            resizable:true,
+                                            resizable: true,
                                             emptyText: 'Elija una opción...',
                                             store: new Ext.data.JsonStore({
                                                 url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListUO',
@@ -1367,7 +1405,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                     direction: 'ASC'
                                                 },
                                                 totalProperty: 'total',
-                                                fields: ['id_uo', 'nombre_unidad','codigo','nivel_organizacional'],
+                                                fields: ['id_uo', 'nombre_unidad', 'codigo', 'nivel_organizacional'],
                                                 remoteSort: true,
                                                 baseParams: {par_filtro: 'nombre_unidad'}
                                             }),
@@ -1381,14 +1419,14 @@ header("content-type: text/javascript; charset=UTF-8");
                                             pageSize: 15,
                                             minChars: 2,
                                             anchor: '100%',
-                                            readOnly :true,
+                                            readOnly: true,
                                         },
                                         {
                                             xtype: 'field',
                                             fieldLabel: 'Resp. Area de NC',
                                             name: 'id_funcionario',
                                             anchor: '100%',
-                                            readOnly :true,
+                                            readOnly: true,
                                             style: 'background-image: none; background: #eeeeee;'
                                         },
                                         {
@@ -1408,7 +1446,10 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 totalProperty: 'total',
                                                 fields: ['id_parametro', 'valor_parametro', 'id_tipo_parametro'],
                                                 remoteSort: true,
-                                                baseParams: {par_filtro: 'prm.id_parametro#prm.valor_parametro',tipo_no:'TIPO_NO_CONFORMIDAD'}
+                                                baseParams: {
+                                                    par_filtro: 'prm.id_parametro#prm.valor_parametro',
+                                                    tipo_no: 'TIPO_NO_CONFORMIDAD'
+                                                }
                                             }),
                                             valueField: 'id_parametro',
                                             displayField: 'valor_parametro',
@@ -1420,12 +1461,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                             pageSize: 15,
                                             minChars: 2,
                                             anchor: '100%',
-                                            readOnly :true,
+                                            readOnly: true,
                                         },
                                         new Ext.form.FieldSet({
                                             collapsible: false,
-                                            layout:"column",
-                                            border : false,
+                                            layout: "column",
+                                            border: false,
                                             defaults: {
                                                 flex: 1
                                             },
@@ -1436,12 +1477,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 }),
                                                 {
                                                     xtype: 'checkbox',
-                                                    name : 'calidad',
-                                                    fieldLabel : 'Calidad',
-                                                    renderer : function(value, p, record) {
+                                                    name: 'calidad',
+                                                    fieldLabel: 'Calidad',
+                                                    renderer: function (value, p, record) {
                                                         return record.data['calidad'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50
+                                                    gwidth: 50
                                                 }, //
                                                 new Ext.form.Label({
                                                     text: 'Medio Ambiente  :',
@@ -1449,12 +1490,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 }),
                                                 {
                                                     xtype: 'checkbox',
-                                                    name : 'medio_ambiente',
-                                                    fieldLabel : 'Medio Ambiente',
-                                                    renderer : function(value, p, record) {
+                                                    name: 'medio_ambiente',
+                                                    fieldLabel: 'Medio Ambiente',
+                                                    renderer: function (value, p, record) {
                                                         return record.data['medio_ambiente'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50
+                                                    gwidth: 50
                                                 },
                                                 new Ext.form.Label({
                                                     text: 'Seguridad :',
@@ -1462,12 +1503,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 }),
                                                 {
                                                     xtype: 'checkbox',
-                                                    name : 'seguridad',
-                                                    fieldLabel : 'Seguridad',
-                                                    renderer : function(value, p, record) {
+                                                    name: 'seguridad',
+                                                    fieldLabel: 'Seguridad',
+                                                    renderer: function (value, p, record) {
                                                         return record.data['seguridad'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50
+                                                    gwidth: 50
                                                 }, //
                                                 new Ext.form.Label({
                                                     text: 'Responsabilidad Social :',
@@ -1475,12 +1516,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 }),
                                                 {
                                                     xtype: 'checkbox',
-                                                    name : 'responsabilidad_social',
-                                                    fieldLabel : 'Responsabilidad Social',
-                                                    renderer : function(value, p, record) {
+                                                    name: 'responsabilidad_social',
+                                                    fieldLabel: 'Responsabilidad Social',
+                                                    renderer: function (value, p, record) {
                                                         return record.data['responsabilidad_social'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50
+                                                    gwidth: 50
                                                 },
                                                 new Ext.form.Label({
                                                     text: 'Sistemas Integrados :',
@@ -1488,12 +1529,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 }),
                                                 {
                                                     xtype: 'checkbox',
-                                                    name : 'sistemas_integrados',
-                                                    fieldLabel : 'Sistemas Integrados',
-                                                    renderer : function(value, p, record) {
+                                                    name: 'sistemas_integrados',
+                                                    fieldLabel: 'Sistemas Integrados',
+                                                    renderer: function (value, p, record) {
                                                         return record.data['sistemas_integrados'] === 'true' ? 'si' : 'no';
                                                     },
-                                                    gwidth : 50
+                                                    gwidth: 50
                                                 }
                                             ]
                                         }),
@@ -1504,7 +1545,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                             allowBlank: false,
                                             anchor: '100%',
                                             gwidth: 280,
-                                            readOnly :true,
+                                            readOnly: true,
                                         },
                                         {
                                             xtype: 'textarea',
@@ -1513,7 +1554,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                             allowBlank: true,
                                             anchor: '100%',
                                             gwidth: 280,
-                                            readOnly :true,
+                                            readOnly: true,
                                         },
                                         {
                                             xtype: 'textarea',
@@ -1548,11 +1589,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 autoScroll: true,
                 region: 'center'
             });
-            grilla.addListener('cellclick', this.oncellclicks,this);
-            if(data){
-               this.isForm.getForm().findField('descrip_nc').setValue(data.descrip_nc);
-               this.isForm.getForm().findField('evidencia').setValue(data.evidencia);
-               this.isForm.getForm().findField('obs_consultor').setValue(data.obs_consultor);
+            grilla.addListener('cellclick', this.oncellclicks, this);
+            if (data) {
+                this.isForm.getForm().findField('descrip_nc').setValue(data.descrip_nc);
+                this.isForm.getForm().findField('evidencia').setValue(data.evidencia);
+                this.isForm.getForm().findField('obs_consultor').setValue(data.obs_consultor);
                 setTimeout(() => {
                     this.isForm.getForm().findField('id_parametro').setValue(data.id_parametro);
                     this.isForm.getForm().findField('id_parametro').setRawValue(data.valor_parametro);
@@ -1565,9 +1606,9 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             let id_funcionario = null;
             Ext.Ajax.request({
-                url:'../../sis_auditoria/control/NoConformidad/getUo',
-                params:{ id_uo: maestro.id_uo },
-                success:function(resp){
+                url: '../../sis_auditoria/control/NoConformidad/getUo',
+                params: {id_uo: maestro.id_uo},
+                success: function (resp) {
                     const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                     this.isForm.getForm().findField('id_uo').setValue(reg.ROOT.datos.id_uo);
                     this.isForm.getForm().findField('id_uo').setRawValue(reg.ROOT.datos.nombre_unidad);
@@ -1575,25 +1616,25 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_funcionario = reg.ROOT.datos.id_funcionario;
                 },
                 failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
+                timeout: this.timeout,
+                scope: this
             });
 
-            this.isForm.getForm().findField('id_uo').on('select', function(combo, record, index){
+            this.isForm.getForm().findField('id_uo').on('select', function (combo, record, index) {
                 Ext.Ajax.request({
-                    url:'../../sis_auditoria/control/NoConformidad/getUo',
-                    params:{ id_uo: record.data.id_uo },
-                    success:function(resp) {
+                    url: '../../sis_auditoria/control/NoConformidad/getUo',
+                    params: {id_uo: record.data.id_uo},
+                    success: function (resp) {
                         isForm.getForm().findField('id_funcionario').reset();
                         const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                         isForm.getForm().findField('id_funcionario').setValue(reg.ROOT.datos.desc_funcionario1);
                         id_funcionario = reg.ROOT.datos.id_funcionario;
                     },
                     failure: this.conexionFailure,
-                    timeout:this.timeout,
-                    scope:this
+                    timeout: this.timeout,
+                    scope: this
                 });
-            },this);
+            }, this);
 
             this.ventanaNoConformidad = new Ext.Window({
                 width: 650,
@@ -1609,17 +1650,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 items: [this.isForm]
             });
         },
-        successNoConformidad: function(resp){
+        successNoConformidad: function (resp) {
             Phx.CP.loadingHide();
             const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            this.cargaFormulario(reg.datos[0],this.isForm);
+            this.cargaFormulario(reg.datos[0], this.isForm);
         },
-        successRevision: function(resp){
+        successRevision: function (resp) {
             Phx.CP.loadingHide();
             const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            this.cargaFormulario(reg.datos[0],this.form_auditoria);
+            this.cargaFormulario(reg.datos[0], this.form_auditoria);
         },
-        oncellclicks : function(grid, rowIndex, columnIndex, e) {
+        oncellclicks: function (grid, rowIndex, columnIndex, e) {
 
             var record = this.documentos.getAt(rowIndex),
                 fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
@@ -1629,54 +1670,53 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.loadCheckDocumentosSolWf(record);
             } else if (fieldName == 'upload') {
 
-                if (record.data.solo_lectura == 'no' &&  !record.data.id_proceso_wf_ori) {
+                if (record.data.solo_lectura == 'no' && !record.data.id_proceso_wf_ori) {
                     this.SubirArchivo(record);
                     // this.onSubirDocumento(record.data);
                 }
-            } else if(fieldName == 'modificar') {
-                if(record.data['modificar'] == 'si'){
+            } else if (fieldName == 'modificar') {
+                if (record.data['modificar'] == 'si') {
 
                     this.cambiarMomentoClick(record);
 
                 }
-            }
-            else if (fieldName == 'chequeado') {
-                if(record.data['extension'].length!=0) {
+            } else if (fieldName == 'chequeado') {
+                if (record.data['extension'].length != 0) {
                     //Escaneados
                     var data = "id=" + record.data['id_documento_wf'];
                     data += "&extension=" + record.data['extension'];
                     data += "&sistema=sis_workflow";
                     data += "&clase=DocumentoWf";
-                    data += "&url="+record.data['url'];
+                    data += "&url=" + record.data['url'];
                     window.open('../../../lib/lib_control/CTOpenFile.php?' + data);
-                } else if(record.data.nombre_vista){
+                } else if (record.data.nombre_vista) {
                     //Plantillas
                     Phx.CP.loadingShow();
                     Ext.Ajax.request({
-                        url : '../../sis_workflow/control/TipoDocumento/generarDocumento',
-                        params : {
-                            id_proceso_wf    		: record.data.id_proceso_wf,
-                            id_tipo_documento		: record.data.id_tipo_documento,
-                            nombre_vista	 		: record.data.nombre_vista,
-                            esquema_vista    		: record.data.esquema_vista,
+                        url: '../../sis_workflow/control/TipoDocumento/generarDocumento',
+                        params: {
+                            id_proceso_wf: record.data.id_proceso_wf,
+                            id_tipo_documento: record.data.id_tipo_documento,
+                            nombre_vista: record.data.nombre_vista,
+                            esquema_vista: record.data.esquema_vista,
                             nombre_archivo_plantilla: record.data.nombre_archivo_plantilla
                         },
-                        success : this.successExport,
-                        failure : this.conexionFailure,
-                        timeout : this.timeout,
-                        scope : this
+                        success: this.successExport,
+                        failure: this.conexionFailure,
+                        timeout: this.timeout,
+                        scope: this
                     });
 
 
                 } else if (record.data['tipo_documento'] == 'generado') {
                     Phx.CP.loadingShow();
                     Ext.Ajax.request({
-                        url:'../../'+record.data.action,
-                        params:{'id_proceso_wf':record.data.id_proceso_wf, 'action':record.data.action},
+                        url: '../../' + record.data.action,
+                        params: {'id_proceso_wf': record.data.id_proceso_wf, 'action': record.data.action},
                         success: this.successExport,
                         failure: this.conexionFailure,
-                        timeout:this.timeout,
-                        scope:this
+                        timeout: this.timeout,
+                        scope: this
                     });
                 } else {
                     alert('No se ha subido ningun archivo para este documento');
@@ -1684,28 +1724,34 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
         },
-        cargaFormulario: function(data, formulario){
-            var obj,key;
-            Ext.each(formulario.getForm().items.keys, function(element, index){
+        cargaFormulario: function (data, formulario) {
+            var obj, key;
+            Ext.each(formulario.getForm().items.keys, function (element, index) {
                 obj = Ext.getCmp(element);
-                if(obj&&obj.items){
-                    Ext.each(obj.items.items, function(elm, b, c){
-                        if(elm.getXType()=='combo'&&elm.mode=='remote'&&elm.store!=undefined){
+                if (obj && obj.items) {
+                    Ext.each(obj.items.items, function (elm, b, c) {
+                        if (elm.getXType() == 'combo' && elm.mode == 'remote' && elm.store != undefined) {
                             if (!elm.store.getById(data[elm.name])) {
-                                rec = new Ext.data.Record({[elm.displayField]: data[elm.gdisplayField], [elm.valueField]: data[elm.name] },data[elm.name]);
+                                rec = new Ext.data.Record({
+                                    [elm.displayField]: data[elm.gdisplayField],
+                                    [elm.valueField]: data[elm.name]
+                                }, data[elm.name]);
                                 elm.store.add(rec);
                                 elm.store.commitChanges();
                                 elm.modificado = true;
                             }
                         }
                         elm.setValue(data[elm.name]);
-                    },this);
+                    }, this);
                 } else {
-                    key = element.replace(this.idContenedor+'_','');
-                    if(obj){
-                        if((obj.getXType()=='combo'&&obj.mode=='remote'&&obj.store!=undefined)||key=='id_centro_costo'){
+                    key = element.replace(this.idContenedor + '_', '');
+                    if (obj) {
+                        if ((obj.getXType() == 'combo' && obj.mode == 'remote' && obj.store != undefined) || key == 'id_centro_costo') {
                             if (!obj.store.getById(data[key])) {
-                                rec = new Ext.data.Record({[obj.displayField]: data[obj.gdisplayField], [obj.valueField]: data[key] },data[key]);
+                                rec = new Ext.data.Record({
+                                    [obj.displayField]: data[obj.gdisplayField],
+                                    [obj.valueField]: data[key]
+                                }, data[key]);
                                 obj.store.add(rec);
                                 obj.store.commitChanges();
                                 obj.modificado = true;
@@ -1714,25 +1760,25 @@ header("content-type: text/javascript; charset=UTF-8");
                         obj.setValue(data[key]);
                     }
                 }
-            },this);
+            }, this);
         },
-        onBool:function(valor){
+        onBool: function (valor) {
             return valor === 't';
         },
-        onFormularioTodo: function(){
-           const me = this;
-           Phx.CP.loadingShow();
-           const informe =  {
+        onFormularioTodo: function () {
+            const me = this;
+            Phx.CP.loadingShow();
+            const informe = {
                 fieldLabel: 'Informe',
                 xtype: 'box',
                 autoEl: {
                     tag: 'a',
-                    html: this.maestro.nombre_aom1+' '+this.maestro.nro_tramite_wf,
+                    html: this.maestro.nombre_aom1 + ' ' + this.maestro.nro_tramite_wf,
                 },
                 style: 'cursor:pointer;',
                 listeners: {
-                    render: function(component) {
-                        component.getEl().on('click', function(e) {
+                    render: function (component) {
+                        component.getEl().on('click', function (e) {
 
 
                         });
@@ -1744,51 +1790,51 @@ header("content-type: text/javascript; charset=UTF-8");
                 msgTarget: 'title',
                 fieldLabel: 'Area',
                 allowBlank: true,
-                readOnly :true,
+                readOnly: true,
                 anchor: '100%',
                 style: 'background-image: none;',
                 value: this.maestro.nombre_unidad,
-                maxLength:50
+                maxLength: 50
             });
             const responsable_area = new Ext.form.TextField({
                 name: 'responsable_area',
                 msgTarget: 'title',
                 fieldLabel: 'Responsable area',
                 allowBlank: true,
-                readOnly :true,
+                readOnly: true,
                 anchor: '100%',
                 style: 'background-image: none;',
                 // value: this.maestro.desc_funcionario_destinatario,
-                maxLength:50
+                maxLength: 50
             });
             const storeCombo = new Ext.data.JsonStore({
                 url: '../../sis_auditoria/control/NoConformidad/listarFuncionariosUO',
                 id: 'id_funcionario',
                 root: 'datos',
-                sortInfo:{
+                sortInfo: {
                     field: 'desc_funcionario',
                     direction: 'ASC'
                 },
                 totalProperty: 'total',
-                fields: ['id_funcionario','desc_funcionario','desc_funcionario_cargo'],
+                fields: ['id_funcionario', 'desc_funcionario', 'desc_funcionario_cargo'],
                 remoteSort: true,
                 baseParams: {par_filtro: 'vfc.desc_funcionario1 '}
             });
 
             const combo = new Ext.form.ComboBox({
-                name:'id_funcionario_nc',
-                fieldLabel:'Responsable de No Conformidad',
-                allowBlank : false,
+                name: 'id_funcionario_nc',
+                fieldLabel: 'Responsable de No Conformidad',
+                allowBlank: false,
                 typeAhead: true,
                 store: storeCombo,
                 mode: 'remote',
                 pageSize: 15,
                 triggerAction: 'all',
-                valueField : 'id_funcionario',
-                displayField : 'desc_funcionario',
+                valueField: 'id_funcionario',
+                displayField: 'desc_funcionario',
                 forceSelection: true,
                 anchor: '100%',
-                resizable : true,
+                resizable: true,
                 enableMultiSelect: false
             });
 
@@ -1799,20 +1845,21 @@ header("content-type: text/javascript; charset=UTF-8");
                 autoHeight: true,
                 autoScroll: true,
                 region: 'center',
-                defaults: { height: 450},
+                defaults: {height: 450},
                 items: [
                     new Ext.form.FieldSet({
-                            collapsible: false,
-                            title:'Datos Generales',
-                            border: true,
-                            layout: 'form',
-                                items: [
-                                        informe,
-                                        area,
-                                        responsable_area,
-                                        combo
-                                ]})
-                    ]
+                        collapsible: false,
+                        title: 'Datos Generales',
+                        border: true,
+                        layout: 'form',
+                        items: [
+                            informe,
+                            area,
+                            responsable_area,
+                            combo
+                        ]
+                    })
+                ]
             });
 
             this.ventanaTodoAcep = new Ext.Window({
@@ -1822,16 +1869,19 @@ header("content-type: text/javascript; charset=UTF-8");
                 closeAction: 'hide',
                 labelAlign: 'bottom',
                 items: this.formTodoAceptar,
-                modal:true,
+                modal: true,
                 bodyStyle: 'padding:5px',
                 layout: 'form',
                 buttons: [{
                     text: 'Guardar',
                     handler: this.saveResponsableTodo,
-                    scope: this},
+                    scope: this
+                },
                     {
                         text: 'Cancelar',
-                        handler: function(){ this.ventanaTodoAcep.hide() },
+                        handler: function () {
+                            this.ventanaTodoAcep.hide()
+                        },
                         scope: this
                     }]
             });
@@ -1841,7 +1891,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 params: {
                     id_uo: this.maestro.id_uo
                 },
-                success: function(resp){
+                success: function (resp) {
                     const reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                     this.formTodoAceptar.getForm().findField('responsable_area').setValue(reg.ROOT.datos.desc_funcionario);
                     Phx.CP.loadingHide();
@@ -1850,15 +1900,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 timeout: this.timeout,
                 scope: this
             });
-             this.cmpResponsable = this.formTodoAceptar.getForm().findField('id_funcionario_nc');
+            this.cmpResponsable = this.formTodoAceptar.getForm().findField('id_funcionario_nc');
         },
-        saveResponsableTodo: function(){
+        saveResponsableTodo: function () {
             Phx.CP.loadingShow();
             Ext.Ajax.request({
-                url:'../../sis_auditoria/control/NoConformidad/siTodoNoConformidad',
-                params:{
+                url: '../../sis_auditoria/control/NoConformidad/siTodoNoConformidad',
+                params: {
                     id_aom: this.maestro.id_aom,
-                    id_funcionario_nc : this.cmpResponsable.getValue()
+                    id_funcionario_nc: this.cmpResponsable.getValue()
                 },
                 success: this.successWizard,
                 failure: this.conexionFailure,

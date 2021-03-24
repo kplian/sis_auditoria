@@ -1,11 +1,7 @@
-CREATE OR REPLACE FUNCTION ssom.ft_no_conformidad_sel (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS varchar AS
-$body$
+create or replace function ssom.ft_no_conformidad_sel(p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying) returns character varying
+    language plpgsql
+as
+$$
 /**************************************************************************
  SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
  FUNCION: 		ssom.ft_no_conformidad_sel
@@ -22,37 +18,34 @@ $body$
 
 DECLARE
 
-	v_consulta    		varchar;
-	v_parametros  		record;
-	v_nombre_funcion   	text;
-	v_resp				varchar;
-    v_id_parametro 		integer;
-    v_filtro			varchar;
-    v_id_uo				integer;
+    v_consulta    		varchar;
+    v_parametros  		record;
+    v_nombre_funcion   	text;
+    v_resp				varchar;
     v_id_aom			integer;
 
 BEGIN
 
-	v_nombre_funcion = 'ssom.ft_no_conformidad_sel';
+    v_nombre_funcion = 'ssom.ft_no_conformidad_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************
- 	#TRANSACCION:  'SSOM_NOCONF_SEL'
- 	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		szambrana
- 	#FECHA:		04-07-2019 19:53:16
-	***********************************/
+    /*********************************
+     #TRANSACCION:  'SSOM_NOCONF_SEL'
+     #DESCRIPCION:	Consulta de datos
+     #AUTOR:		szambrana
+     #FECHA:		04-07-2019 19:53:16
+    ***********************************/
 
-	if(p_transaccion='SSOM_NOCONF_SEL')then
+    if(p_transaccion='SSOM_NOCONF_SEL')then
 
-    	begin
-
-
-
-    		--Sentencia de la consulta
+        begin
 
 
-			v_consulta:='select   noconf.id_nc,
+
+            --Sentencia de la consulta
+
+
+            v_consulta:='select   noconf.id_nc,
                                   noconf.obs_consultor,
                                   noconf.estado_reg,
                                   noconf.evidencia,
@@ -106,28 +99,28 @@ BEGIN
                                   left join orga.vfuncionario rfun on rfun.id_funcionario = noconf.id_funcionario_nc
 				       			  where  ';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			raise notice '%',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            raise notice '%',v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
-	/*********************************
- 	#TRANSACCION:  'SSOM_NOCONF_CONT'
- 	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		szambrana
- 	#FECHA:		04-07-2019 19:53:16
-	***********************************/
+        /*********************************
+         #TRANSACCION:  'SSOM_NOCONF_CONT'
+         #DESCRIPCION:	Conteo de registros
+         #AUTOR:		szambrana
+         #FECHA:		04-07-2019 19:53:16
+        ***********************************/
 
-	elsif(p_transaccion='SSOM_NOCONF_CONT')then
+    elsif(p_transaccion='SSOM_NOCONF_CONT')then
 
-		begin
-			--Sentencia de la consulta de conteo de registros
+        begin
+            --Sentencia de la consulta de conteo de registros
 
-			v_consulta:='select count(id_nc)
+            v_consulta:='select count(id_nc)
                         from ssom.tno_conformidad noconf
                         inner join segu.tusuario usu1 on usu1.id_usuario = noconf.id_usuario_reg
                         inner join ssom.tparametro param on param.id_parametro = noconf.id_parametro
@@ -142,27 +135,27 @@ BEGIN
                         left join orga.vfuncionario rfun on rfun.id_funcionario = noconf.id_funcionario_nc
 					    where ';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
 
 
-    /*********************************
- 	#TRANSACCION:  'SSOM_USU_SEL'
- 	#DESCRIPCION:	sel de registros
- 	#AUTOR:		szambrana
- 	#FECHA:		04-07-2019 19:53:16
-	***********************************/
+        /*********************************
+         #TRANSACCION:  'SSOM_USU_SEL'
+         #DESCRIPCION:	sel de registros
+         #AUTOR:		szambrana
+         #FECHA:		04-07-2019 19:53:16
+        ***********************************/
     elsif(p_transaccion='SSOM_USU_SEL')then
 
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='SELECT
+        begin
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='SELECT
                           ofunc.id_uo_funcionario,
                           ofunc.id_funcionario,
                           ofunc.desc_funcionario1,
@@ -184,53 +177,53 @@ BEGIN
                           FROM orga.vfuncionario_cargo ofunc
 					      WHERE ';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
-	/*********************************
- 	#TRANSACCION:  'SSOM_USU_CONT'
- 	#DESCRIPCION:	sel de registros
- 	#AUTOR:		szambrana
- 	#FECHA:		04-07-2019 19:53:16
-	***********************************/
+        end;
+        /*********************************
+         #TRANSACCION:  'SSOM_USU_CONT'
+         #DESCRIPCION:	sel de registros
+         #AUTOR:		szambrana
+         #FECHA:		04-07-2019 19:53:16
+        ***********************************/
     elsif(p_transaccion='SSOM_USU_CONT')then
 
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='SELECT
+        begin
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='SELECT
             				count(ofunc.id_funcionario)
                          FROM orga.vfuncionario_cargo ofunc
 					      where ';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
 
-	/*********************************
- 	#TRANSACCION:  'SSOM_RPT_NOCONF'
- 	#DESCRIPCION:	reporte de registros
- 	#AUTOR:		szambrana
- 	#FECHA:		27-09-2019 19:53:16
-	***********************************/
+        /*********************************
+         #TRANSACCION:  'SSOM_RPT_NOCONF'
+         #DESCRIPCION:	reporte de registros
+         #AUTOR:		szambrana
+         #FECHA:		27-09-2019 19:53:16
+        ***********************************/
     elsif(p_transaccion='SSOM_RPT_NOCONF')then
 
-		begin
-          -- raise exception '%',v_parametros.id_proceso_wf;
+        begin
+            -- raise exception '%',v_parametros.id_proceso_wf;
 
 
-          select aom.id_aom into v_id_aom
-          from ssom.tauditoria_oportunidad_mejora aom
-          where aom.id_proceso_wf = v_parametros.id_proceso_wf;
+            select aom.id_aom into v_id_aom
+            from ssom.tauditoria_oportunidad_mejora aom
+            where aom.id_proceso_wf = v_parametros.id_proceso_wf;
 
             v_consulta:= 'select   au.id_aom,
                                    au.id_proceso_wf,
@@ -250,36 +243,36 @@ BEGIN
                             inner join ssom.tparametro  pa on pa.id_parametro = nc.id_parametro
                             where nc.id_aom ='||v_id_aom;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
 
-    /*********************************
- 	#TRANSACCION:  'SSOM_FUO_SEL'
- 	#DESCRIPCION:	sel de registros
- 	#AUTOR:		szambrana
- 	#FECHA:		04-12-2019 19:53:16
-	***********************************/
+        /*********************************
+         #TRANSACCION:  'SSOM_FUO_SEL'
+         #DESCRIPCION:	sel de registros
+         #AUTOR:		szambrana
+         #FECHA:		04-12-2019 19:53:16
+        ***********************************/
     elsif(p_transaccion='SSOM_FUO_SEL')then
 
-		begin
+        begin
 
-        	--listado de funcionarios de una UO
-			v_consulta:=' SELECT  vfc.id_funcionario,
+            --listado de funcionarios de una UO
+            v_consulta:=' SELECT  vfc.id_funcionario,
                                   vfc.desc_funcionario1 as desc_funcionario
                           FROM orga.vfuncionario_cargo vfc
                           WHERE( vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date)
                               and ';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			--Devuelve la respuesta
-			return v_consulta;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
         /*********************************
         #TRANSACCION:  'SSOM_FUO_CONT'
         #DESCRIPCION:	sel de registros
@@ -289,33 +282,33 @@ BEGIN
 
     elsif(p_transaccion='SSOM_FUO_CONT')then
 
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='SELECT  count(vfc.id_funcionario)
+        begin
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='SELECT  count(vfc.id_funcionario)
                         FROM orga.vfuncionario_cargo vfc
                         WHERE( vfc.fecha_finalizacion is null or vfc.fecha_finalizacion >= now()::date)
                         and ';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			--Devuelve la respuesta
-			return v_consulta;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
 
-    /*********************************
- 	#TRANSACCION:  'SSOM_NOCF_SEL'
- 	#DESCRIPCION:	sel de registros
- 	#AUTOR:		MMV
- 	#FECHA:		2-10-2020
-	***********************************/
+        /*********************************
+         #TRANSACCION:  'SSOM_NOCF_SEL'
+         #DESCRIPCION:	sel de registros
+         #AUTOR:		MMV
+         #FECHA:		2-10-2020
+        ***********************************/
     elsif(p_transaccion='SSOM_NOCF_SEL')then
 
-		begin
+        begin
 
-        	--listado de funcionarios de una UO
-			v_consulta:='select	nof.id_nc,
+            --listado de funcionarios de una UO
+            v_consulta:='select	nof.id_nc,
                                 nof.obs_consultor,
                                 nof.estado_reg,
                                 nof.evidencia,
@@ -364,14 +357,14 @@ BEGIN
                                 left join orga.vfuncionario funo on funo.id_funcionario = nof.id_funcionario_nc
                                 where';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			--Devuelve la respuesta
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            --Devuelve la respuesta
             raise notice '%',v_consulta;
-			return v_consulta;
+            return v_consulta;
 
-		end;
+        end;
         /*********************************
         #TRANSACCION:  'SSOM_NOCF_CONT'
         #DESCRIPCION:	sel de registros
@@ -381,9 +374,9 @@ BEGIN
 
     elsif(p_transaccion='SSOM_NOCF_CONT')then
 
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count (nof.id_nc)
+        begin
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='select count (nof.id_nc)
                           from ssom.tno_conformidad nof
                           inner join segu.tusuario usu1 on usu1.id_usuario = nof.id_usuario_reg
                           inner join ssom.tauditoria_oportunidad_mejora aom on aom.id_aom = nof.id_aom
@@ -395,34 +388,27 @@ BEGIN
                           left join orga.vfuncionario funo on funo.id_funcionario = nof.id_funcionario_nc
                           where ';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			--Devuelve la respuesta
-			return v_consulta;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
-	else
+        end;
+    else
 
-		raise exception 'Transaccion inexistente';
+        raise exception 'Transaccion inexistente';
 
-	end if;
+    end if;
 
 EXCEPTION
 
-	WHEN OTHERS THEN
-			v_resp='';
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-			raise exception '%',v_resp;
+    WHEN OTHERS THEN
+        v_resp='';
+        v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+        v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+        v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+        raise exception '%',v_resp;
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-PARALLEL UNSAFE
-COST 100;
+$$;
 
-ALTER FUNCTION ssom.ft_no_conformidad_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;
+

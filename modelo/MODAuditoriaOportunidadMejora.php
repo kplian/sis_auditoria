@@ -618,6 +618,7 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 
         //Define los parametros para la funcion
         $this->setParametro('id_tipo_auditoria','id_tipo_auditoria','int4');
+        $this->setParametro('codigo','codigo','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();

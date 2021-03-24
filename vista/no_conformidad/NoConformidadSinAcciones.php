@@ -31,12 +31,12 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.store.baseParams.interfaz = this.nombreVista;
             this.init();
-            this.addButton('atras',{argument: { estado: 'anterior'},
-                text:'Anterior',
-                iconCls: 'batras',
-                disabled:true,
-                handler:this.onButtonAtras,
-                tooltip: '<b>Pasar al anterior Estado</b>'});
+            // this.addButton('atras',{argument: { estado: 'anterior'},
+            //     text:'Anterior',
+            //     iconCls: 'batras',
+            //     disabled:true,
+            //     handler:this.onButtonAtras,
+            //     tooltip: '<b>Pasar al anterior Estado</b>'});
             this.store.baseParams.interfaz = 'NoConformidadSinAcciones';
             this.load({params:{start:0, limit:this.tam_pag}});
 
@@ -73,14 +73,14 @@ header("content-type: text/javascript; charset=UTF-8");
             const tb =this.tbar;
             Phx.vista.NoConformidadSinAcciones.superclass.preparaMenu.call(this,n);
             // this.getBoton('notifcar_respo').enable();
-            this.getBoton('atras').enable();
+          //  this.getBoton('atras').enable();
             return tb
         },
         liberaMenu:function(){
             const tb = Phx.vista.NoConformidadSinAcciones.superclass.liberaMenu.call(this);
             if(tb){
                // this.getBoton('notifcar_respo').disable();
-                this.getBoton('atras').disable();
+            //    this.getBoton('atras').disable();
             }
             return tb
         },
