@@ -2476,7 +2476,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 },
                                 valueField: 'id_equipo_responsable',
                                 displayField: 'desc_funcionario1',
-                                },
+                            },
                                 {
                                     width: 300,
                                     height: 150,
