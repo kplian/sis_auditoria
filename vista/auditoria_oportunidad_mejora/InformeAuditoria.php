@@ -1461,7 +1461,13 @@ header("content-type: text/javascript; charset=UTF-8");
                         me.tienda.load();
                     },
                     scope: this
-                }]
+                }],
+                listeners: {
+                    close: function () {
+                        this.tienda.load();
+                    },
+                    scope: this
+                }
             });
         },
         onBool: function (valor) {
