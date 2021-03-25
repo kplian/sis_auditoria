@@ -69,6 +69,7 @@ class ACTPuntoNorma extends ACTbase
 		}
 
         if ($this->objParam->getParametro('id_norma') != '') {
+            /// var_dump($this->objParam->getParametro('id_norma') );exit;
             $this->objParam->addFiltro("ptonor.id_norma = " . $this->objParam->getParametro('id_norma'));
         }
 

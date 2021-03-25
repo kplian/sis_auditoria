@@ -115,7 +115,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         xtype: 'box',
                         autoEl: {
                             tag: 'a',
-                            html: 'Crear nueva NO Conformidad'
+                            html: 'Crear nueva No Conformidad'
                         },
                         style: 'cursor:pointer; font-size: 13px; margin: 10px;',
                         listeners: {
@@ -149,12 +149,32 @@ header("content-type: text/javascript; charset=UTF-8");
                         }
                     },
                     {
-                        header: 'Eliminar',
-                        dataIndex: 'eliminar',
+                        xtype: 'actioncolumn',
                         width: 50,
-                        renderer: function (value, p, record) {
-                            return String.format('<a style="display: flex; justify-content: center; align-items: center"><i class="fa fa-trash fa-lg" style="cursor:pointer;"></i></a>', record.data['lista_funcionario']);
+                        items: [{
+                            icon: '../../../pxp/lib/ux/images/delete.gif',  // ../../../pxp/lib/ux/images/
+                            tooltip: 'Sell stock',
+                            handler: function (grid, rowIndex, colIndex) {
+                                const rec = me.tienda.getAt(rowIndex);
+                                Phx.CP.loadingShow();
+                                Ext.Ajax.request({
+                                    url: '../../sis_auditoria/control/NoConformidad/eliminarNoConformidad',
+                                    params: {
+                                        id_nc: rec.get('id_nc')
+                                    },
+                                    isUpload: false,
+                                    success: function (a, b, c) {
+                                        Phx.CP.loadingHide();
+                                        me.tienda.load();
+                                    },
+                                    argument: this.argumentSave,
+                                    failure: this.conexionFailure,
+                                    timeout: this.timeout,
+                                    scope: this
+                                });
+                            }
                         }
+                        ]
                     },
                     {
                         header: 'Estado',
@@ -440,18 +460,36 @@ header("content-type: text/javascript; charset=UTF-8");
                                                             start: '0'
                                                         }
                                                     }),
-                                                    tbar: [{
-                                                        text: 'Todo',
-                                                        handler: function () {
-                                                            const toStore = isForm.getForm().findField('id_proceso').multiselects[0].store;
-                                                            const fromStore = isForm.getForm().findField('id_proceso').multiselects[1].store;
-                                                            for (var i = toStore.getCount() - 1; i >= 0; i--) {
-                                                                const record = toStore.getAt(i);
-                                                                toStore.remove(record);
-                                                                fromStore.add(record);
+                                                    tbar: {
+                                                        xtype: 'toolbar',
+                                                        flex: 1,
+                                                        dock: 'top',
+                                                        items: [
+                                                            'Filtro:',
+                                                            {
+                                                                xtype: 'textfield',
+                                                                fieldStyle: 'text-align: left;',
+                                                                enableKeyEvents: true,
+                                                                listeners: {
+                                                                    scope: this,
+                                                                    specialkey: function (field, e) {
+                                                                        if (e.getKey() === e.ENTER) {
+                                                                            if (String(field).trim() !== '') {
+                                                                                this.form.getForm().findField('id_destinatarios').multiselects[0].store.baseParams = {
+                                                                                    desc_funcionario1: field.getValue(),
+                                                                                    dir: 'ASC',
+                                                                                    sort: 'id_funcionario',
+                                                                                    limit: '100',
+                                                                                    start: '0'
+                                                                                };
+                                                                                this.form.getForm().findField('id_destinatarios').multiselects[0].store.load();
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
                                                             }
-                                                        }
-                                                    }],
+                                                        ]
+                                                    },
                                                     displayField: 'desc_funcionario1',
                                                     valueField: 'id_funcionario',
                                                 },
@@ -474,12 +512,25 @@ header("content-type: text/javascript; charset=UTF-8");
                                                                 id_aom: maestro.id_aom,
                                                             }
                                                         }),
-                                                        tbar: [{
-                                                            text: 'Limpiar',
-                                                            handler: function () {
-                                                                isForm.getForm().findField('id_proceso').reset();
-                                                            }
-                                                        }],
+                                                        tbar: [
+                                                            {
+                                                                text: 'Todo',
+                                                                handler: function () {
+                                                                    const toStore = isForm.getForm().findField('id_proceso').multiselects[0].store;
+                                                                    const fromStore = isForm.getForm().findField('id_proceso').multiselects[1].store;
+                                                                    for (var i = toStore.getCount() - 1; i >= 0; i--) {
+                                                                        const record = toStore.getAt(i);
+                                                                        toStore.remove(record);
+                                                                        fromStore.add(record);
+                                                                    }
+                                                                }
+                                                            },
+                                                            {
+                                                                text: 'Limpiar',
+                                                                handler: function () {
+                                                                    isForm.getForm().findField('id_proceso').reset();
+                                                                }
+                                                            }],
                                                         displayField: 'desc_funcionario1',
                                                         valueField: 'id_funcionario',
                                                     }]
@@ -564,9 +615,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 title: 'Informe Auditoria',
                 bodyStyle: 'padding:5px',
                 layout: 'border',
-                items: [
-                    this.form
-                ],
+                items: this.form,
                 buttons: [{
                     text: 'Guardar',
                     handler: this.onSubmit,
@@ -1379,16 +1428,13 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.ventanaNoConformidad = new Ext.Window({
                 width: 650,
-                height: 700,
+                height: 720,
                 modal: true,
-                minimizable: true,
-                maximizable: true,
-                closeAction: 'hide',
-                labelAlign: 'bottom',
-                title: 'Formulario',
+                title: 'Formulario No Conformidad',
                 bodyStyle: 'padding:5px',
-                layout: 'border',
-                items: [isForm],
+                layout: 'fit',
+                items: isForm,
+                lain: true,
                 buttons: [{
                     text: 'Guardar',
                     handler: function () {
@@ -1464,7 +1510,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 }],
                 listeners: {
                     close: function () {
-                        this.tienda.load();
+                        console.log(1)
+                        me.tienda.load();
                     },
                     scope: this
                 }
@@ -1503,8 +1550,9 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         formularioPuntoNorma: function (data) {
             const maestro = this.sm.getSelected().data;
-            console.log(maestro);
             const me = this;
+            let id_norma_aux = null;
+
             const isForm = new Ext.form.FormPanel({
                 labelAlign: 'top',
                 frame: true,
@@ -1595,26 +1643,43 @@ header("content-type: text/javascript; charset=UTF-8");
                                     url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNormaMulti',
                                     id: 'id_pn',
                                     root: 'datos',
-                                    sortInfo: {
-                                        field: 'nombre_descrip',
-                                        direction: 'ASC'
-                                    },
                                     totalProperty: 'total',
                                     fields: ['id_pn', 'nombre_pn', 'nombre_descrip'],
                                     remoteSort: true,
                                     baseParams: {dir: 'ASC', sort: 'id_pn', limit: '100', start: '0'}
-                                }), tbar: [{
-                                    text: 'Todo',
-                                    handler: function () {
-                                        const toStore = isForm.getForm().findField('id_pn').multiselects[0].store;
-                                        const fromStore = isForm.getForm().findField('id_pn').multiselects[1].store;
-                                        for (var i = toStore.getCount() - 1; i >= 0; i--) {
-                                            const record = toStore.getAt(i);
-                                            toStore.remove(record);
-                                            fromStore.add(record);
+                                }),
+                                tbar: {
+                                    xtype: 'toolbar',
+                                    flex: 1,
+                                    dock: 'top',
+                                    items: [
+                                        'Filtro:',
+                                        {
+                                            xtype: 'textfield',
+                                            fieldStyle: 'text-align: left;',
+                                            enableKeyEvents: true,
+                                            listeners: {
+                                                scope: this,
+                                                specialkey: function (field, e) {
+                                                    if (e.getKey() === e.ENTER) {
+                                                        if (String(field).trim() !== '') {
+                                                            isForm.getForm().findField('id_pn').multiselects[0].store.baseParams = {
+                                                                nombre_descrip: field.getValue(),
+                                                                dir: "ASC",
+                                                                sort: "id_pn",
+                                                                limit: "100",
+                                                                start: "0",
+                                                                id_norma: id_norma_aux,
+                                                                item: maestro.id_aom
+                                                            };
+                                                            isForm.getForm().findField('id_pn').multiselects[0].store.load();
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }
-                                }],
+                                    ]
+                                },
                                 displayField: 'nombre_descrip',
                                 valueField: 'id_pn',
                             }, {
@@ -1635,12 +1700,25 @@ header("content-type: text/javascript; charset=UTF-8");
                                         id_nc: data ? data.id_nc : this.id_no_conformidad
                                     }
                                 }),
-                                tbar: [{
-                                    text: 'Limpiar',
-                                    handler: function () {
-                                        isForm.getForm().findField('id_pn').reset();
-                                    }
-                                }],
+                                tbar: [
+                                    {
+                                        text: 'Todo',
+                                        handler: function () {
+                                            const toStore = isForm.getForm().findField('id_pn').multiselects[0].store;
+                                            const fromStore = isForm.getForm().findField('id_pn').multiselects[1].store;
+                                            for (var i = toStore.getCount() - 1; i >= 0; i--) {
+                                                const record = toStore.getAt(i);
+                                                toStore.remove(record);
+                                                fromStore.add(record);
+                                            }
+                                        }
+                                    },
+                                    {
+                                        text: 'Limpiar',
+                                        handler: function () {
+                                            isForm.getForm().findField('id_pn').reset();
+                                        }
+                                    }],
                                 displayField: 'nombre_descrip',
                                 valueField: 'id_pn',
                             }]
@@ -1648,26 +1726,27 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 ]
             });
-            console.log(isForm.getForm().findField('id_norma').getValue())
-
-
             isForm.getForm().findField('id_norma').on('select', function (combo, record, index) {
                 isForm.getForm().findField('id_pn').multiselects[0].store.baseParams = {
                     dir: "ASC",
-                    sort: "id_aom",
+                    sort: "id_pn",
                     limit: "100",
                     start: "0",
                     id_norma: record.data.id_norma,
                     itemNc: data ? data.id_nc : this.id_no_conformidad,
                 };
+
                 isForm.getForm().findField('id_pn').multiselects[1].store.baseParams = {
                     dir: "ASC",
-                    sort: "id_aom",
+                    sort: "id_pn",
                     limit: "100",
                     start: "0",
                     id_nc: data ? data.id_nc : this.id_no_conformidad,
                     id_norma: record.data.id_norma
                 };
+
+                id_norma_aux = record.data.id_norma;
+                isForm.getForm().findField('id_pn').multiselects[0].store.load();
                 isForm.getForm().findField('id_pn').multiselects[1].store.load();
                 isForm.getForm().findField('id_pn').modificado = true;
                 isForm.getForm().findField('id_pn').reset();
@@ -1678,10 +1757,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 isForm.getForm().findField('id_norma').modificado = true;
                 isForm.getForm().findField('id_pn').modificado = true;
                 isForm.getForm().findField('id_pn').reset();
-
+                // let norma = null
                 if (check.getRawValue() === 'norma') {
+
+                    console.log('Entra')
+                    isForm.getForm().findField('id_pn').multiselects[0].store.removeAll();
+                    isForm.getForm().findField('id_pn').multiselects[1].store.removeAll();
+
                     isForm.getForm().findField('id_norma').store.baseParams = {par_filtro: 'nor.sigla_norma'};
                     isForm.getForm().findField('id_norma').on('select', function (combo, record, index) {
+                        console.log(record.data.id_norma)
                         isForm.getForm().findField('id_pn').multiselects[0].store.baseParams = {
                             dir: "ASC",
                             sort: "id_pn",
@@ -1698,12 +1783,17 @@ header("content-type: text/javascript; charset=UTF-8");
                             id_aom: maestro.id_aom,
                             id_norma: record.data.id_norma
                         };
+                        id_norma_aux = record.data.id_norma;
+                        isForm.getForm().findField('id_pn').multiselects[0].store.load();
                         isForm.getForm().findField('id_pn').multiselects[1].store.load();
                         isForm.getForm().findField('id_pn').modificado = true;
                         isForm.getForm().findField('id_pn').reset();
                     }, this);
 
                 } else {
+                    isForm.getForm().findField('id_pn').multiselects[0].store.removeAll();
+                    isForm.getForm().findField('id_pn').multiselects[1].store.removeAll();
+
                     isForm.getForm().findField('id_norma').store.baseParams = {
                         par_filtro: 'nor.sigla_norma',
                         id_nc_aom: maestro.id_aom
@@ -1725,12 +1815,15 @@ header("content-type: text/javascript; charset=UTF-8");
                             id_nc: data ? data.id_nc : this.id_no_conformidad,
                             id_norma: record.data.id_norma
                         };
-                        console.log('entra')
+                        id_norma_aux = record.data.id_norma;
+                        isForm.getForm().findField('id_pn').multiselects[0].store.load();
                         isForm.getForm().findField('id_pn').multiselects[1].store.load();
                         isForm.getForm().findField('id_pn').modificado = true;
                         isForm.getForm().findField('id_pn').reset();
                     }, this);
                 }
+
+
             }, this);
 
             this.ventanaPuntoNorma = new Ext.Window({
