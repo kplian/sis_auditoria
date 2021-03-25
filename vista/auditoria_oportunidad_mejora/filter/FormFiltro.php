@@ -6,24 +6,23 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 
 <script>
-Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
+    Phx.vista.FormFiltro = Ext.extend(Phx.frmInterfaz, {
 
-  constructor:function(config){
-  	this.panelResumen = new Ext.Panel({html:''});
-  	this.Grupos =
-  	[
-          {
-              xtype: 'fieldset',
-              border: true,
-              autoScroll: true,
-              layout: 'form',
-              items:
-              [
-              ],
-              id_grupo: 0
-          },
-          this.panelResumen
-    ];
+        constructor: function (config) {
+            this.panelResumen = new Ext.Panel({html: ''});
+            this.Grupos =
+                [
+                    {
+                        xtype: 'fieldset',
+                        border: true,
+                        autoScroll: true,
+                        layout: 'form',
+                        items:
+                            [],
+                        id_grupo: 0
+                    },
+                    this.panelResumen
+                ];
 
             Phx.vista.FormFiltro.superclass.constructor.call(this, config);
             this.init();
@@ -39,66 +38,66 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
             }, this);
             this.onEvento();
 
-      if(config.detalle){
-      			//cargar los valores para el FormFiltro
-      			this.loadForm({data: config.detalle});
-      			var me = this;
-      			setTimeout(function(){
-      				me.onSubmit()
-      			}, 1500);
-		  }
-    },
-    //
-    Atributos:[
-        {
-           config:{
-             name : 'tipo_filtro',
-             fieldLabel : 'Filtros',
-             items: [
-                     {boxLabel: 'Gestión', name: 'tipo_filtro', inputValue: 'gestion', checked: true},
-                     {boxLabel: 'Solo fechas', name: 'tipo_filtro', inputValue: 'fechas'}
-                 ],
-
-
-           },
-           type : 'RadioGroupField',
-           id_grupo : 0,
-           form : true
+            if (config.detalle) {
+                //cargar los valores para el FormFiltro
+                this.loadForm({data: config.detalle});
+                var me = this;
+                setTimeout(function () {
+                    me.onSubmit()
+                }, 1500);
+            }
         },
-        {
-            config:{
-                name : 'id_gestion',
-                origen : 'GESTION',
-                fieldLabel : 'Gestion',
-                gdisplayField: 'desc_gestion',
-                allowBlank : false,
-                anchor: '100%',
+        //
+        Atributos: [
+            {
+                config: {
+                    name: 'tipo_filtro',
+                    fieldLabel: 'Filtros',
+                    items: [
+                        {boxLabel: 'Gestión', name: 'tipo_filtro', inputValue: 'gestion', checked: true},
+                        {boxLabel: 'Solo fechas', name: 'tipo_filtro', inputValue: 'fechas'}
+                    ],
 
+
+                },
+                type: 'RadioGroupField',
+                id_grupo: 0,
+                form: true
             },
-            type : 'ComboRec',
-            id_grupo : 0,
-            form : true
-        },
-        {
-            config:{
-                name: 'desde',
-                fieldLabel: 'Fecha (Desde)',
-                allowBlank: true,
-                format: 'd/m/Y',
-                anchor: '100%',
+            {
+                config: {
+                    name: 'id_gestion',
+                    origen: 'GESTION',
+                    fieldLabel: 'Gestion',
+                    gdisplayField: 'desc_gestion',
+                    allowBlank: false,
+                    anchor: '100%',
 
+                },
+                type: 'ComboRec',
+                id_grupo: 0,
+                form: true
             },
-            type: 'DateField',
-            id_grupo: 0,
-            form: true
-        },
-        {
-            config:{
-                name: 'hasta',
-                fieldLabel: 'Fecha (Hasta)',
-                allowBlank: true,
-                format: 'd/m/Y',
-                anchor: '100%',
+            {
+                config: {
+                    name: 'desde',
+                    fieldLabel: 'Fecha (Desde)',
+                    allowBlank: true,
+                    format: 'd/m/Y',
+                    anchor: '100%',
+
+                },
+                type: 'DateField',
+                id_grupo: 0,
+                form: true
+            },
+            {
+                config: {
+                    name: 'hasta',
+                    fieldLabel: 'Fecha (Hasta)',
+                    allowBlank: true,
+                    format: 'd/m/Y',
+                    anchor: '100%',
 
                 },
                 type: 'DateField',
@@ -180,13 +179,13 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
                 desde: this.Cmp.desde.getValue(),
                 hasta: this.Cmp.hasta.getValue(),
             };
-	  },
-    loadValoresIniciales: function(){
-    	Phx.vista.FormFiltro.superclass.loadValoresIniciales.call(this);
-    },
-    onReloadPage:function(){
+        },
+        loadValoresIniciales: function () {
+            Phx.vista.FormFiltro.superclass.loadValoresIniciales.call(this);
+        },
+        onReloadPage: function () {
 
-    }
+        }
 
-})
+    })
 </script>
