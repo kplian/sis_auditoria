@@ -568,6 +568,22 @@ ALTER TABLE ssom.taom_riesgo_oportunidad
     OWNER TO postgres;
 /***********************************F-SCP-MMV-SSOM-11-24/3/2021*****************************************/
 
+/***********************************I-SCP-MMV-SSOM-11-25/3/2021*****************************************/
+CREATE TABLE ssom.tdestinatario (
+                                    id_destinatario_aom SERIAL,
+                                    id_parametro INTEGER,
+                                    id_aom INTEGER NOT NULL,
+                                    id_funcionario INTEGER,
+                                    exp_tec_externo VARCHAR(150),
+                                    obs_destinatario VARCHAR(300),
+                                    incluir_informe VARCHAR(5) DEFAULT 'no'::character varying NOT NULL,
+                                    CONSTRAINT tdestinatario_pkey PRIMARY KEY(id_destinatario_aom)
+) INHERITS (pxp.tbase)
+  WITH (oids = false);
+
+ALTER TABLE ssom.tdestinatario
+    OWNER TO postgres;
+/***********************************F-SCP-MMV-SSOM-11-25/3/2021*****************************************/
 
 
 
