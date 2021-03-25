@@ -109,6 +109,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 plain: true,
                 stripeRows: true,
                 trackMouseOver: false,
+                loadMask: true,
                 tbar: [
                     {
                         xtype: 'box',
@@ -1667,10 +1668,10 @@ header("content-type: text/javascript; charset=UTF-8");
             }, this);
 
             isForm.getForm().findField('filtro').on('change', function (cmp, check) {
-                   isForm.getForm().findField('id_norma').reset();
-                   isForm.getForm().findField('id_norma').modificado = true;
-                   isForm.getForm().findField('id_pn').modificado = true;
-                   isForm.getForm().findField('id_pn').reset();
+                isForm.getForm().findField('id_norma').reset();
+                isForm.getForm().findField('id_norma').modificado = true;
+                isForm.getForm().findField('id_pn').modificado = true;
+                isForm.getForm().findField('id_pn').reset();
 
                 if (check.getRawValue() === 'norma') {
                     isForm.getForm().findField('id_norma').store.baseParams = {par_filtro: 'nor.sigla_norma'};
