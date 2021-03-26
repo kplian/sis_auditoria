@@ -36,15 +36,6 @@ header("content-type: text/javascript; charset=UTF-8");
             });
 
             this.addBotonesGantt();
-          /*  this.addButton('btnChequeoDocumentosWf',
-                {	text: 'Documentos',
-                    grupo:[0,1],
-                    iconCls: 'bchecklist',
-                    disabled: true,
-                    handler: this.loadCheckDocumentosRecWf,
-                    tooltip: '<b>Documentos de la No conformidad</b><br/>Subir los documentos de evidencia.'
-                });*/
-
             this.load({params:{start:0, limit:this.tam_pag}})
         },
         addBotonesGantt: function() {
@@ -1167,16 +1158,6 @@ header("content-type: text/javascript; charset=UTF-8");
                     {
                         header: 'Fecha Inicio',
                         dataIndex: 'fecha_ini_activ',
-                        align: 'center',
-                        width: 100,
-                        renderer:function (value,p,record){
-                            const fecha = value.split("-");
-                            return  fecha[2]+'/'+fecha[1]+'/'+fecha[0];
-                        }
-                    },
-                    {
-                        header: 'Fecha Fin',
-                        dataIndex: 'fecha_fin_activ',
                         align: 'center',
                         width: 100,
                         renderer:function (value,p,record){
@@ -2548,5 +2529,12 @@ header("content-type: text/javascript; charset=UTF-8");
             this.documentos.load({params:{ start: 0, limit: 50 }});
             this.ventanaDocumento.hide();
         },
+        west: {
+            url: '../../../sis_auditoria/vista/auditoria_oportunidad_mejora/filter/FormFiltro.php',
+            width: '25%',
+            title: 'Filtrar Datos',
+            collapsed: false,
+            cls: 'FormFiltro'
+        }
     })
 </script>

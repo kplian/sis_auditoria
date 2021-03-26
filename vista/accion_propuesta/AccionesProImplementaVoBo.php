@@ -24,6 +24,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.idContenedor = config.idContenedor;
             this.maestro = config;
             Phx.vista.AccionesProImplementaVoBo.superclass.constructor.call(this,config);
+            this.store.baseParams.interfaz = this.nombreVista;
+
             this.load({params:{start:0, limit:this.tam_pag}});
         }
     };

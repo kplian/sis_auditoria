@@ -569,10 +569,10 @@ header("content-type: text/javascript; charset=UTF-8");
                         dataIndex: 'fecha_fin_activ',
                         align: 'center',
                         width: 100,
-                        renderer: function (value, p, record) {
-                            const fecha = value.split("-");
-                            return fecha[2] + '/' + fecha[1] + '/' + fecha[0];
-                        }
+                        // renderer: function (value, p, record) {
+                        //     const fecha = value.split("-");
+                        //     return fecha[2] + '/' + fecha[1] + '/' + fecha[0];
+                        // }
                     },
                     {
                         header: 'Hora Inicio',
@@ -1915,7 +1915,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 timeout: this.timeout,
                 scope: this
             });
-        }
-
+        },
     };
 </script>

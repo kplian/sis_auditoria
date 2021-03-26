@@ -383,7 +383,7 @@ header("content-type: text/javascript; charset=UTF-8");
             const rec = this.sm.getSelected();
             const id_estado_wf = rec.data.id_estado_wf;
             const id_proceso_wf = rec.data.id_proceso_wf;
-            if(confirm('¿Acción Aprobada por Responsable?')){
+            if(confirm('¿Acción para Implementar?')){
                 Ext.Ajax.request({
                     url:'../../sis_auditoria/control/AccionPropuesta/aprobarEstado',
                     params:{
