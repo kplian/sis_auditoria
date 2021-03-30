@@ -556,6 +556,20 @@ Phx.vista.NoConformidad=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
+        {
+            config:{
+                name: 'auditoria',
+                fieldLabel: 'Auditoria',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:10
+            },
+            type:'TextField',
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
 		{
 			config:{
 				name: 'fecha_reg',

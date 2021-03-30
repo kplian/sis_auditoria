@@ -163,7 +163,8 @@ class ACTNoConformidad extends ACTbase{
         $this->objParam->defecto('dir_ordenacion','asc');
 
         if ($this->objParam->getParametro('tipo_interfaz')  == 'NoConformidadSuper'){
-              $this->objParam->addFiltro("nof.estado_wf in (''aceptada_resp'',''rechazado_resp'')");
+              $this->objParam->addFiltro("nof.estado_wf in (''aceptada_resp'')");
+              // $this->objParam->addFiltro("nof.estado_wf in (''aceptada_resp'',''rechazado_resp'')");
         }
         if($this->objParam->getParametro('id_nc')!=''){
             $this->objParam->addFiltro("nof.id_nc = ".$this->objParam->getParametro('id_nc'));

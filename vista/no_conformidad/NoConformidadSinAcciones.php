@@ -19,6 +19,12 @@ header("content-type: text/javascript; charset=UTF-8");
         bnew:false,
         bdel:false,
         dblclickEdit: true,
+        tipoStore: 'GroupingStore',//GroupingStore o JsonStore #
+        remoteGroup: true,
+        groupField: 'auditoria',
+        viewGrid: new Ext.grid.GroupingView({
+            forceFit: false,
+        }),
         constructor: function(config){
             this.idContenedor = config.idContenedor;
             this.maestro = config;
@@ -31,12 +37,6 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.store.baseParams.interfaz = this.nombreVista;
             this.init();
-            // this.addButton('atras',{argument: { estado: 'anterior'},
-            //     text:'Anterior',
-            //     iconCls: 'batras',
-            //     disabled:true,
-            //     handler:this.onButtonAtras,
-            //     tooltip: '<b>Pasar al anterior Estado</b>'});
             this.store.baseParams.interfaz = 'NoConformidadSinAcciones';
             this.load({params:{start:0, limit:this.tam_pag}});
 
