@@ -948,7 +948,7 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             successWizard: function (resp) {
                 Phx.CP.loadingHide();
-                resp.argument.wizard.panel.destroy();
+                //resp.argument.wizard.panel.destroy();
                 this.reload();
             },
             loadCheckDocumentosRecWf: function () {

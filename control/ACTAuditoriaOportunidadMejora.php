@@ -49,7 +49,9 @@ class ACTAuditoriaOportunidadMejora extends ACTbase
         }
 
         if ($this->objParam->getParametro('interfaz') == 'OportunidadMejora') {
-            $this->objParam->addFiltro("aom.estado_wf in (''programada'',''aprobado_responsable'') and aom.codigo_aom != ''AETR''");
+            //  $this->objParam->addFiltro("aom.estado_wf in (''programada'',''aprobado_responsable'') and aom.codigo_aom != ''AETR''");
+            $this->objParam->addFiltro("aom.codigo_aom != ''AETR''");
+
         }
         if ($this->objParam->getParametro('interfaz') == 'InformesAuditoriaNotificados') {
             $this->objParam->addFiltro("aom.estado_wf in (''notificar_responsable'',''notificar'')");

@@ -1307,7 +1307,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             totalProperty: 'total',
                             fields: ['id_norma', 'id_tipo_norma', 'nombre_norma', 'sigla_norma', 'descrip_norma'],
                             remoteSort: true,
-                            baseParams: {par_filtro: 'nor.sigla_norma', id_nc_aom: maestro.id_aom}
+                            baseParams: {par_filtro: 'nor.sigla_norma'}
                         }),
                         valueField: 'id_norma',
                         displayField: 'sigla_norma',
@@ -1395,26 +1395,31 @@ header("content-type: text/javascript; charset=UTF-8");
             });
 
             isForm.getForm().findField('id_norma').on('select', function (combo, record, index) {
+                console.log(record.data.id_norma)
                 isForm.getForm().findField('id_pn').multiselects[0].store.baseParams = {
                     dir: "ASC",
-                    sort: "id_aom",
+                    sort: "id_pn",
                     limit: "100",
                     start: "0",
                     id_norma: record.data.id_norma,
-                    itemNc: data ? data.id_nc : this.id_no_conformidad,
+                    item: maestro.id_aom
                 };
                 isForm.getForm().findField('id_pn').multiselects[1].store.baseParams = {
                     dir: "ASC",
-                    sort: "id_aom",
+                    sort: "id_pn",
                     limit: "100",
                     start: "0",
-                    id_nc: data ? data.id_nc : this.id_no_conformidad,
+                    id_aom: maestro.id_aom,
                     id_norma: record.data.id_norma
                 };
+                id_norma_aux = record.data.id_norma;
+                isForm.getForm().findField('id_pn').multiselects[0].store.load();
                 isForm.getForm().findField('id_pn').multiselects[1].store.load();
                 isForm.getForm().findField('id_pn').modificado = true;
                 isForm.getForm().findField('id_pn').reset();
             }, this);
+
+
 
             this.ventanaPuntoNorma = new Ext.Window({
                 width: 610,
@@ -1719,6 +1724,56 @@ header("content-type: text/javascript; charset=UTF-8");
             title: 'Filtrar Datos',
             collapsed: false,
             cls: 'FormFiltroInfo'
+        },
+        preparaMenu: function (n) {
+            const tb = this.tbar;
+            const data = this.sm.getSelected().data;
+
+            Phx.vista.OportunidadMejoraInforme.superclass.preparaMenu.call(this, n);
+            this.getBoton('diagrama_gantt').enable();
+            // this.getBoton('ant_estado').disable();
+            if (data['estado_wf'] === 'ejecutada') {
+                this.getBoton('ant_estado').enable();
+                this.getBoton('sig_estado').enable();
+            }
+            return tb
+        },
+        liberaMenu: function () {
+            const tb = Phx.vista.OportunidadMejoraInforme.superclass.liberaMenu.call(this);
+            if (tb) {
+                this.getBoton('diagrama_gantt').disable();
+                this.getBoton('ant_estado').disable();
+                this.getBoton('sig_estado').enable();
+            }
+            return tb
+        },
+        sigEstado: function () {
+            Phx.CP.loadingShow();
+            const rec = this.sm.getSelected();
+            const id_estado_wf = rec.data.id_estado_wf;
+            const id_proceso_wf = rec.data.id_proceso_wf;
+            if (confirm('¿Desea NOTIFICAR este informe de auditoria a los destinatarios especificados?\n No podras retornar al estado actual')) {
+                if (confirm('El informe de auditoria ser NOTIFICADO al responsable del Area Auditadas y a los destinatarios adicionales \n ¿Desea continuar?')) {
+                    Ext.Ajax.request({
+                        url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/aprobarEstado',
+                        params: {
+                            id_proceso_wf: id_proceso_wf,
+                            id_estado_wf: id_estado_wf
+                        },
+                        success: this.successWizard,
+                        failure: this.conexionFailure,
+                        timeout: this.timeout,
+                        scope: this
+                    });
+                }
+            } else {
+                Phx.CP.loadingHide();
+            }
+        },
+        successWizard: function () {
+            Phx.CP.loadingHide();
+            alert('El informe ha sido notificado al Responsable de Area Auditada y a los  destinatarios adicionales');
+            this.reload();
         },
     };
 </script>

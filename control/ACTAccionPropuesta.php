@@ -31,7 +31,7 @@ class ACTAccionPropuesta extends ACTbase
             $this->objParam->addFiltro("accpro.estado_wf in (''aceptado_resp'') ");
         }
         if ($this->objParam->getParametro('interfaz') == 'AccionesProImplementaVoBo') {
-            $this->objParam->addFiltro("accpro.estado_wf in (''aceptado_resp'') ");
+            $this->objParam->addFiltro("accpro.estado_wf in (''aceptado_resp'', ''rechazado_auditor'') ");
         }
         if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
             $this->objReporte = new Reporte($this->objParam, $this);
