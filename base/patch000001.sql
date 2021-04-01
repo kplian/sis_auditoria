@@ -1,4 +1,22 @@
 /***********************************I-SCP-MCCH-SSOM-0-01/04/2021*****************************************/
+
+CREATE TABLE ssom.taom_riesgo_oportunidad (
+                                              id_aom_ro SERIAL,
+                                              id_aom INTEGER NOT NULL,
+                                              id_tipo_ro INTEGER NOT NULL,
+                                              id_ro INTEGER NOT NULL,
+                                              otro_nombre_ro VARCHAR(300),
+                                              id_probabilidad INTEGER NOT NULL,
+                                              id_impacto INTEGER NOT NULL,
+                                              criticidad VARCHAR(20) NOT NULL,
+                                              CONSTRAINT taom_riesgo_oportunidad_pkey PRIMARY KEY(id_aom_ro)
+) INHERITS (pxp.tbase)
+  WITH (oids = false);
+
+ALTER TABLE ssom.taom_riesgo_oportunidad
+    OWNER TO postgres;
+
+
 CREATE TABLE ssom.taccion_propuesta (
                                         id_ap SERIAL,
                                         id_nc INTEGER,
@@ -59,21 +77,6 @@ CREATE TABLE ssom.tactividad (
 ALTER TABLE ssom.tactividad
     OWNER TO postgres;
 
-CREATE TABLE ssom.taom_riesgo_oportunidad (
-                                              id_aom_ro SERIAL,
-                                              id_aom INTEGER NOT NULL,
-                                              id_tipo_ro INTEGER NOT NULL,
-                                              id_ro INTEGER NOT NULL,
-                                              otro_nombre_ro VARCHAR(300),
-                                              id_probabilidad INTEGER NOT NULL,
-                                              id_impacto INTEGER NOT NULL,
-                                              criticidad VARCHAR(20) NOT NULL,
-                                              CONSTRAINT taom_riesgo_oportunidad_pkey PRIMARY KEY(id_aom_ro)
-) INHERITS (pxp.tbase)
-  WITH (oids = false);
-
-ALTER TABLE ssom.taom_riesgo_oportunidad
-    OWNER TO postgres;
 
 CREATE TABLE ssom.tauditoria_npn (
                                      id_anpn SERIAL,
