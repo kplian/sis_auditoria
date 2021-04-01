@@ -11,6 +11,11 @@ class ACTParametro extends ACTbase{
 	function listarParametro(){
 		$this->objParam->defecto('ordenacion','id_parametro');
 		$this->objParam->defecto('dir_ordenacion','asc');
+
+        if($this->objParam->getParametro('id_tipo_parametro') != '') {
+            $this->objParam->addFiltro("prm.id_tipo_parametro = " .$this->objParam->getParametro('id_tipo_parametro'));
+        }
+
         if($this->objParam->getParametro('tipo_norma') != '') {
             $this->objParam->addFiltro("tpp.tipo_parametro =  ''" .$this->objParam->getParametro('tipo_norma')."'' ");
         }

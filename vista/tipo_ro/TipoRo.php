@@ -41,8 +41,7 @@ Phx.vista.TipoRo=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Tipo Riesgo-Oportunidad',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:60
+				gwidth: 250,
 			},
 				type:'TextField',
 				filters:{pfiltro:'tro.tipo_ro',type:'string'},
@@ -56,8 +55,7 @@ Phx.vista.TipoRo=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Desc. Tipo Riesgo-Oport.',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 100,
-                maxLength:1000
+                gwidth: 250,
             },
             type:'TextField',
             filters:{pfiltro:'tro.desc_tipo_ro',type:'string'},

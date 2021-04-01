@@ -37,8 +37,7 @@ Phx.vista.TipoParametro=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Tipo Parametro',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:200
+				gwidth: 200,
 			},
 				type:'TextField',
 				filters:{pfiltro:'tpr.tipo_parametro',type:'string'},
@@ -52,8 +51,7 @@ Phx.vista.TipoParametro=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Descripcion',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 100,
-                //maxLength:200
+                gwidth: 200,
             },
             type:'TextArea',
             filters:{pfiltro:'tpr.tipo_parametro',type:'string'},
@@ -68,7 +66,6 @@ Phx.vista.TipoParametro=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:10
 			},
 				type:'TextField',
 				filters:{pfiltro:'tpr.estado_reg',type:'string'},

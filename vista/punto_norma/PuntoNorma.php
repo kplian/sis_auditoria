@@ -218,7 +218,7 @@ Phx.vista.PuntoNorma=Ext.extend(Phx.gridInterfaz,{
 		
 	],
 	sortInfo:{
-		field: 'id_pn',
+		field: 'codigo_pn',
 		direction: 'ASC'
 	},
 	bdel:true,
