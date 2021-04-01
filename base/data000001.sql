@@ -1,3 +1,14 @@
+/********************************************I-DAT-MCCH-SSOM-3-01/04/2021********************************************/
+/* Data for the 'segu.tsubsistema' table  (Records 1 - 37) */
+
+INSERT INTO segu.tsubsistema ("codigo", "nombre", "fecha_reg", "prefijo", "estado_reg", "nombre_carpeta", "id_subsis_orig", "codigo_git", "organizacion_git", "sw_importacion")
+VALUES
+(E'SSOM', E'Seguimiento de Oportunidades de Mejora', E'2020-04-13', E'SSOM', E'activo', E'auditoria', NULL, NULL, NULL, E'no');
+
+/********************************************F-DAT-MCCH-SSOM-3-01/04/2021********************************************/
+
+
+
 /********************************************I-DAT-MCCH-SSOM-0-30/12/2019********************************************/
 ------------------------------------------------------------------------
 -- Creamos Tipos de Auditoria
