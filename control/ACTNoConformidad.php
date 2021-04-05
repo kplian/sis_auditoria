@@ -1,18 +1,18 @@
 <?php
 /**
-*@package pXP
-*@file gen-ACTNoConformidad.php
-*@author  (szambrana)
-*@date 04-07-2019 19:53:16
-*@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
-*/
+ *@package pXP
+ *@file gen-ACTNoConformidad.php
+ *@author  (szambrana)
+ *@date 04-07-2019 19:53:16
+ *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ */
 require_once(dirname(__FILE__).'/../reportes/RNoConformidades.php');
 
-class ACTNoConformidad extends ACTbase{    
-			
-	function listarNoConformidad(){
-		$this->objParam->defecto('ordenacion','id_nc');
-		$this->objParam->defecto('dir_ordenacion','asc');
+class ACTNoConformidad extends ACTbase{
+
+    function listarNoConformidad(){
+        $this->objParam->defecto('ordenacion','id_nc');
+        $this->objParam->defecto('dir_ordenacion','asc');
 
 
         if($this->objParam->getParametro('id_aom')!=''){
@@ -23,44 +23,44 @@ class ACTNoConformidad extends ACTbase{
         }
 
         if($this->objParam->getParametro('interfaz') == 'NoConformidadSinAcciones'){
-           $this->objParam->addFiltro("noconf.estado_wf in (''consultor'')");
+            $this->objParam->addFiltro("noconf.estado_wf in (''acciones'')");
         }
         if($this->objParam->getParametro('interfaz') == 'NoConformidadAccion'){
-         /*   $this->objParam->addFiltro("noconf.estado_wf in (''correccion'') and (select count(a.id_ap)
-                                                                                    from ssom.taccion_propuesta a
-                                                                                        where a.id_nc = noconf.id_nc) > 0 ");*/
+            /*   $this->objParam->addFiltro("noconf.estado_wf in (''correccion'') and (select count(a.id_ap)
+                                                                                       from ssom.taccion_propuesta a
+                                                                                           where a.id_nc = noconf.id_nc) > 0 ");*/
         }
- 
 
 
-		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
-			$this->objReporte = new Reporte($this->objParam,$this);
-			$this->res = $this->objReporte->generarReporteListado('MODNoConformidad','listarNoConformidad');
-		} else{
-			$this->objFunc=$this->create('MODNoConformidad');
-			
-			$this->res=$this->objFunc->listarNoConformidad($this->objParam);
-		}
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
-	function insertarNoConformidad(){
-		$this->objFunc=$this->create('MODNoConformidad');	
-		if($this->objParam->insertar('id_nc')){
-			$this->res=$this->objFunc->insertarNoConformidad($this->objParam);			
-		} else{			
-			$this->res=$this->objFunc->modificarNoConformidad($this->objParam);
-		}
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
-	function eliminarNoConformidad(){
-	    $this->objFunc=$this->create('MODNoConformidad');
-		$this->res=$this->objFunc->eliminarNoConformidad($this->objParam);
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
+
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODNoConformidad','listarNoConformidad');
+        } else{
+            $this->objFunc=$this->create('MODNoConformidad');
+
+            $this->res=$this->objFunc->listarNoConformidad($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function insertarNoConformidad(){
+        $this->objFunc=$this->create('MODNoConformidad');
+        if($this->objParam->insertar('id_nc')){
+            $this->res=$this->objFunc->insertarNoConformidad($this->objParam);
+        } else{
+            $this->res=$this->objFunc->modificarNoConformidad($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function eliminarNoConformidad(){
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->eliminarNoConformidad($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
     function listarRespAreaGerente(){
-		$this->objFunc=$this->create('MODNoConformidad');	
-		$this->res=$this->objFunc->listarRespAreaGerente($this->objParam);
-		$this->res->imprimirRespuesta($this->res->generarJson());
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->listarRespAreaGerente($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
     }
     function listarSomUsuario(){
         $this->objParam->defecto('ordenacion','id_funcionario');
@@ -109,20 +109,20 @@ class ACTNoConformidad extends ACTbase{
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 
     }
-	function listarFuncionariosUO(){
-		$this->objParam->defecto('ordenacion','id_nc');
+    function listarFuncionariosUO(){
+        $this->objParam->defecto('ordenacion','id_nc');
 
-		$this->objParam->defecto('dir_ordenacion','asc');
-            /// var_dump($this->objParam->getParametro('id_uo'));exit;
-		$this->objFunc=$this->create('MODNoConformidad');
-		$this->res=$this->objFunc->listarFuncionariosUO($this->objParam);
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
-	function asignarFuncRespNC(){
-		$this->objFunc=$this->create('MODNoConformidad');	
-		$this->res=$this->objFunc->asignarFuncRespNC($this->objParam);
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
+        $this->objParam->defecto('dir_ordenacion','asc');
+        /// var_dump($this->objParam->getParametro('id_uo'));exit;
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->listarFuncionariosUO($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function asignarFuncRespNC(){
+        $this->objFunc=$this->create('MODNoConformidad');
+        $this->res=$this->objFunc->asignarFuncRespNC($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
     function sigueienteGrupo(){
         $this->objFunc=$this->create('MODNoConformidad');
         $this->res=$this->objFunc->sigueienteGrupo($this->objParam);
@@ -163,8 +163,8 @@ class ACTNoConformidad extends ACTbase{
         $this->objParam->defecto('dir_ordenacion','asc');
 
         if ($this->objParam->getParametro('tipo_interfaz')  == 'NoConformidadSuper'){
-              $this->objParam->addFiltro("nof.estado_wf in (''aceptada_resp'')");
-              // $this->objParam->addFiltro("nof.estado_wf in (''aceptada_resp'',''rechazado_resp'')");
+            $this->objParam->addFiltro("nof.estado_wf in (''aceptada_resp'')");
+            // $this->objParam->addFiltro("nof.estado_wf in (''aceptada_resp'',''rechazado_resp'')");
         }
         if($this->objParam->getParametro('id_nc')!=''){
             $this->objParam->addFiltro("nof.id_nc = ".$this->objParam->getParametro('id_nc'));

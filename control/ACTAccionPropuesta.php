@@ -25,10 +25,10 @@ class ACTAccionPropuesta extends ACTbase
             $this->objParam->addFiltro("accpro.estado_wf in (''NoConformidadSinAcciones'') ");
         }
         if ($this->objParam->getParametro('interfaz') == 'AccionesPropuestaAuditor') {
-            $this->objParam->addFiltro("accpro.estado_wf in (''implementadas'',''implementado_aceptado_resp'',''verificadas'') ");
+            $this->objParam->addFiltro("accpro.estado_wf in (''rechazado'',''implementado_aceptado_resp'',''verificadas'') ");
         }
         if ($this->objParam->getParametro('interfaz') == 'AccionesPropuestaImplementadas') {
-            $this->objParam->addFiltro("accpro.estado_wf in (''aceptado_resp'') ");
+            $this->objParam->addFiltro("accpro.estado_wf in (''implementadas'') ");
         }
         if ($this->objParam->getParametro('interfaz') == 'AccionesProImplementaVoBo') {
             $this->objParam->addFiltro("accpro.estado_wf in (''aceptado_resp'', ''rechazado_auditor'') ");

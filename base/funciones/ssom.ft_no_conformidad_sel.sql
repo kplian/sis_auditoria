@@ -90,7 +90,7 @@ BEGIN
                                   inner join ssom.tparametro param on param.id_parametro = noconf.id_parametro
                                   inner join orga.tuo unorg1 on unorg1.id_uo = noconf.id_uo
                                   inner join ssom.tauditoria_oportunidad_mejora aom on aom.id_aom  = noconf.id_aom
-                                  inner join orga.vfuncionario mafun on mafun.id_funcionario = aom.id_funcionario
+                                  left join orga.vfuncionario mafun on mafun.id_funcionario = aom.id_funcionario
                                   inner join orga.tuo aomuo on aomuo.id_uo = aom.id_uo
                                   inner join wf.testado_wf es on es.id_estado_wf = noconf.id_estado_wf
         						  inner join wf.ttipo_estado ts on ts.id_tipo_estado = es.id_tipo_estado

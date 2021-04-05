@@ -132,3 +132,42 @@ FROM ssom.tparametro par
 WHERE tpa.tipo_parametro::text = 'OBJETO_AUDITORIA'::text
 ORDER BY par.id_parametro;
 /********************************************F-DEP-MMV-SSOM-3-01/04/2021********************************************/
+
+/********************************************I-DEP-MMV-SSOM-1-05/04/2021********************************************/
+select pxp.f_insert_tgui_rol ('SSOM', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('SISTEMA', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('PRL', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('APA', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('ICS', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('AIP', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('NCA', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('NCP', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('ION', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('ODM', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('OMP', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('ODMS', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('RPTAUD', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('PAY', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('AUD', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('INFEA', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('PAUDI', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('PAUD', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('config', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('ROP', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('PROB', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('TRO', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('RIOP', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('ARO', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('IMP', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('cnor', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('nor', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('CFADM', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('ATV', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('TAU', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('PCS', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('GCT', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('PDAU', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('ER', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('TPR', 'SSOM - Admin');
+select pxp.f_insert_tgui_rol ('PRM', 'SSOM - Admin');
+/********************************************F-DEP-MMV-SSOM-1-05/04/2021********************************************/

@@ -77,22 +77,43 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config: {
                         name: 'id_responsable',
-                        hiddenName: 'desc_funcionario1',
-                        origen: 'FUNCIONARIOCAR',
                         fieldLabel: 'Funcionario',
-                        allowBlank: false,
-                        gwidth: 200,
+                        allowBlank: true,
+                        emptyText: 'Elija una opción...',
+                        store: new Ext.data.JsonStore({
+                            url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/listarFuncionarioVigentes',
+                            id: 'id_funcionario',
+                            root: 'datos',
+                            sortInfo: {
+                                field: 'desc_funcionario1',
+                                direction: 'ASC'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_funcionario', 'desc_funcionario1', 'codigo'],
+                            remoteSort: true,
+                            baseParams: {par_filtro: 'fc.desc_funcionario1#fc.codigo'}
+                        }),
                         valueField: 'id_funcionario',
+                        displayField: 'desc_funcionario1',
                         gdisplayField: 'desc_funcionario1',
-                        baseParams: {es_combo_solicitud: 'si'},
+                        hiddenName: 'id_funcionario',
+                        forceSelection: true,
+                        typeAhead: false,
+                        triggerAction: 'all',
+                        lazyRender: true,
+                        mode: 'remote',
+                        pageSize: 15,
+                        queryDelay: 1000,
+                        anchor: '100%',
+                        gwidth: 300,
+                        minChars: 2,
                         renderer: function (value, p, record) {
                             return String.format('{0}', record.data['desc_funcionario1']);
                         }
                     },
-                    type: 'ComboRec',
+                    type: 'ComboBox',
                     id_grupo: 0,
                     filters: {pfiltro: 'fun.desc_funcionario1', type: 'string'},
-                    bottom_filter: true,
                     grid: true,
                     form: true
                 },
