@@ -45,6 +45,7 @@ class MODAomRiesgoOportunidad extends MODbase{
 		$this->captura('desc_tipo_ro','varchar');
 		$this->captura('nombre_prob','varchar');
 		$this->captura('nombre_imp','varchar');
+		$this->captura('acciones_ro','text');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -69,6 +70,7 @@ class MODAomRiesgoOportunidad extends MODbase{
         $this->setParametro('otro_nombre_ro','otro_nombre_ro','varchar');
 		$this->setParametro('id_aom','id_aom','int4');
 		$this->setParametro('criticidad','criticidad','varchar');
+		$this->setParametro('acciones_ro','acciones_ro','text');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -94,6 +96,7 @@ class MODAomRiesgoOportunidad extends MODbase{
         $this->setParametro('otro_nombre_ro','otro_nombre_ro','varchar');
 		$this->setParametro('id_aom','id_aom','int4');
 		$this->setParametro('criticidad','criticidad','varchar');
+        $this->setParametro('acciones_ro','acciones_ro','text');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

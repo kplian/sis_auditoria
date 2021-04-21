@@ -793,3 +793,6 @@ select pxp.f_insert_tprocedimiento ('SSOM_RESAP_SEL', 'Consulta de datos', 'si',
 select pxp.f_insert_tprocedimiento ('SSOM_RESAP_CONT', 'Conteo de registros', 'si', '', '', 'ssom.ft_resp_acciones_prop_sel');
 select pxp.f_insert_trol ('', 'SSOM - Admin', 'SSOM');
 /********************************************F-DAT-MMV-SSOM-1-05/04/2021********************************************/
+/********************************************I-DAT-MMV-SSOM-2-21/04/2021********************************************/
+select pxp.f_insert_tgui ('Riesgo Oportunidad', 'Riesgo Oportunidad', 'RIOP', 'si', 2, 'sis_auditoria/vista/riesgo_oportunidad/RiesgoOportunidadPrin.php', 3, '', 'RiesgoOportunidadPrin', 'SSOM');
+/********************************************F-DAT-MMV-SSOM-2-21/04/2021********************************************/

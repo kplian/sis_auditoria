@@ -171,7 +171,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 totalProperty: 'total',
                 fields: ['id_aom_ro', 'id_impacto', 'id_probabilidad', 'id_tipo_ro', 'id_ro',
                     'otro_nombre_ro', 'id_aom', 'criticidad', 'nombre_ro', 'desc_tipo_ro',
-                    'nombre_prob', 'nombre_imp', 'estado_reg', 'usr_reg', 'fecha_reg'], remoteSort: true,
+                    'nombre_prob', 'nombre_imp', 'estado_reg', 'usr_reg', 'fecha_reg','acciones_ro'], remoteSort: true,
                 baseParams: {dir: 'ASC', sort: 'id_aom_ro', limit: '100', start: '0'}
             });
 
@@ -650,6 +650,11 @@ header("content-type: text/javascript; charset=UTF-8");
                         header: 'Criticidad',
                         dataIndex: 'criticidad',
                         width: 50
+                    },
+                    {
+                        header: 'Acción',
+                        dataIndex: 'acciones_ro',
+                        width: 200
                     },
                     {
                         header: 'Eliminar',
@@ -2637,6 +2642,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         formularioRiego: function (record) {
             const maestro = this.sm.getSelected().data;
+            var id_tipo_ro_aux ;
             const isForm = new Ext.form.FormPanel({
                 items: [
                     new Ext.form.FieldSet({
@@ -2648,7 +2654,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 xtype: 'combo',
                                 name: 'id_tipo_ro',
                                 fieldLabel: 'Tipo RO',
-                                allowBlank: false,
+                                allowBlank: true,
                                 emptyText: 'Elija una opción...',
                                 store: new Ext.data.JsonStore({
                                     url: '../../sis_auditoria/control/TipoRo/listarTipoRo',
@@ -2702,7 +2708,162 @@ header("content-type: text/javascript; charset=UTF-8");
                                 triggerAction: 'all',
                                 lazyRender: true,
                                 pageSize: 15,
-                                minChars: 2
+                                minChars: 2,
+                                trigger1Class: 'x-form-clear-trigger',
+                                trigger2Class: 'x-form-arrow-trigger',
+                                trigger3Class: 'x-form-search-trigger',
+                                modificado: true,
+                                turl: '../../../sis_auditoria/vista/riesgo_oportunidad/RiesgoOportunidad.php', ///
+                                tasignacion: false,//si la signacion es verdadera la ventana destno habilita un boton para asignar su resultado
+                                ttitle: 'Riesgo Oportunidad', //
+                                tconfig: {width: 900, height: 400},
+                                tdata: { },
+                                tcls: 'RiesgoOportunidad', //
+                                pid: this.idContenedor, //
+                                tinit: true,//inicia trigguer adicional
+                                initComponent: function () {
+                                    Ext.form.TrigguerCombo.superclass.initComponent.call(this);
+                                    this.triggerConfig = {tag: 'span', cls: 'x-form-twin-triggers', cn: []};
+                                    this.triggerConfig.cn.push({
+                                        tag: 'img',
+                                        src: Ext.BLANK_IMAGE_URL,
+                                        alt: '',
+                                        cls: 'x-form-trigger ' + this.trigger1Class
+                                    });
+                                    this.triggerConfig.cn.push({
+                                        tag: "img",
+                                        src: Ext.BLANK_IMAGE_URL,
+                                        alt: "",
+                                        cls: "x-form-trigger " + this.trigger2Class
+                                    });
+                                    if (this.tinit) {
+                                        this.triggerConfig.cn.push({
+                                            tag: "img",
+                                            src: Ext.BLANK_IMAGE_URL,
+                                            alt: "",
+                                            cls: "x-form-trigger " + this.trigger3Class
+                                        });
+                                    }
+                                    this.addEvents(
+                                        /**
+                                         * @event clear
+                                         * RAC 01112011
+                                         * se dipsra al limpiar los datos del combo
+                                         * @param {Ext.ux.AwesomeCombo} combo This combo box
+                                         */
+                                        'clearcmb');
+
+                                },
+                                getTrigger: function (index) {
+                                    return this.triggers[index];
+                                },
+                                afterRender: function () {
+                                    Ext.form.TrigguerCombo.superclass.afterRender.call(this);
+                                    var triggers = this.triggers,
+                                        i = 0,
+                                        len = triggers.length;
+
+                                    for (; i < len; ++i) {
+                                        if (this['hideTrigger' + (i + 1)]) {
+                                            triggers[i].hide();
+                                        }
+
+                                    }
+                                },
+                                initTrigger: function () {
+                                    var ts = this.trigger.select('.x-form-trigger', true),
+                                        triggerField = this;
+
+                                    ts.each(function (t, all, index) {
+                                        var triggerIndex = 'Trigger' + (index + 1);
+                                        t.hide = function () {
+                                            var w = triggerField.wrap.getWidth();
+                                            this.dom.style.display = 'none';
+                                            triggerField.el.setWidth(w - triggerField.trigger.getWidth());
+                                            triggerField['hidden' + triggerIndex] = true;
+                                        };
+                                        t.show = function () {
+                                            var w = triggerField.wrap.getWidth();
+                                            this.dom.style.display = '';
+                                            triggerField.el.setWidth(w - triggerField.trigger.getWidth());
+                                            triggerField['hidden' + triggerIndex] = false;
+                                        };
+                                        this.mon(t, 'click', this['on' + triggerIndex + 'Click'], this, {preventDefault: true});
+                                        t.addClassOnOver('x-form-trigger-over');
+                                        t.addClassOnClick('x-form-trigger-click');
+                                    }, this);
+                                    this.triggers = ts.elements;
+                                },
+                                getTriggerWidth: function () {
+                                    var tw = 0;
+                                    Ext.each(this.triggers, function (t, index) {
+                                        var triggerIndex = 'Trigger' + (index + 1),
+                                            w = t.getWidth();
+                                        if (w === 0 && !this['hidden' + triggerIndex]) {
+                                            tw += this.defaultTriggerWidth;
+                                        } else {
+                                            tw += w;
+                                        }
+                                    }, this);
+                                    return tw;
+                                },
+                                /*
+                                 rac 22022012
+                                 setea valor apartir de un record
+                                 * */
+                                setValueRec: function (data) {
+                                    var _id = this.valueField;
+                                    var _id_name = this.name;
+                                    var _df = this.displayField;
+                                    if (this.tname) {
+                                        _id_name = this.tname;
+                                    }
+                                    if (this.tdisplayField) {
+                                        _df = this.tdisplayField;
+                                    }
+                                    //nombre del atributo del combo que recibe el valor
+                                    var _dis = this.displayField;
+                                    if (!this.store.getById(data[_id_name])) {
+                                        const recTem = [];
+                                        recTem[_id] = data[_id_name];
+                                        recTem[_dis] = data[_df];
+                                        this.store.add(new Ext.data.Record(recTem, data[_id_name]));
+                                        this.store.commitChanges();
+                                    }
+                                    this.setValue(data[_id_name])
+                                    //Disparo de evento para ser más fácilmente manipulable en las interfaxces
+
+                                    this.fireEvent('select', this, {data: data});
+
+                                },
+                                onDestroy: function () {
+                                    Ext.destroy(this.triggers);
+                                    Ext.form.TwinTriggerField.superclass.onDestroy.call(this);
+                                },
+                                onTrigger2Click: function () {
+                                    Ext.form.TrigguerCombo.superclass.onTriggerClick.call(this)
+                                },
+                                onTrigger3Click: function () {
+                                    //manda el combo como parametro para que desde la vista destino
+                                    //asignar un valor directamente
+                                    if (this.tasignacion) {
+                                        Ext.apply(this.tdata, {comboTriguer: this});
+                                    }
+
+                                    Phx.CP.loadWindows(this.turl, this.ttitle, this.tconfig, {data:{id_tipo_ro: id_tipo_ro_aux,id_ro: isForm.getForm().findField('id_ro')}
+                                    }, this.pid, this.tcls);
+                                },
+                                // private
+                                onTrigger1Click: function () {
+                                    if (this.readOnly || this.disabled) {
+                                        return;
+                                    }
+                                    this.reset();
+                                    this.validate();
+                                    //RAC 01/11/11
+                                    //aumenta el evento para cuando se limpia el contenido
+                                    this.fireEvent('clearcmb', this);
+                                },
                             },
                             {
                                 xtype: 'combo',
@@ -2770,6 +2931,14 @@ header("content-type: text/javascript; charset=UTF-8");
                                 name: 'criticidad',
                                 anchor: '100%',
                             },
+                            {
+                                xtype: 'textarea',
+                                name: 'acciones_ro',
+                                fieldLabel: 'Acción',
+                                allowBlank: true,
+                                anchor: '100%',
+                                gwidth: 280
+                            },
                         ]
                     })
                 ],
@@ -2781,6 +2950,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 autoScroll: true,
                 region: 'center'
             });
+
+            isForm.getForm().findField('id_tipo_ro').on('select', function (combo, record, index) {
+                id_tipo_ro_aux = record.data.id_tipo_ro;
+                isForm.getForm().findField('id_ro').store.baseParams = {
+                    par_filtro: 'prob.nombre_prob',
+                    id_tipo_ro: record.data.id_tipo_ro
+                }
+                isForm.getForm().findField('id_ro').modificado = true;
+                isForm.getForm().findField('id_ro').reset();
+            }, this);
+
             if (record) {
                 Phx.CP.loadingShow();
                 setTimeout(() => {
@@ -2796,6 +2976,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     isForm.getForm().findField('id_impacto').setValue(record.id_impacto);
                     isForm.getForm().findField('id_impacto').setRawValue(record.nombre_imp);
                     isForm.getForm().findField('criticidad').setValue(record.criticidad);
+                    isForm.getForm().findField('acciones_ro').setValue(record.acciones_ro);
 
                     Phx.CP.loadingHide();
 
@@ -2803,7 +2984,7 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             this.ventanaRiesgo = new Ext.Window({
                 width: 500,
-                height: 300,
+                height:400,
                 modal: true,
                 autoScroll: true,
                 closeAction: 'hide',
@@ -2811,9 +2992,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 title: 'RIESGO OPORTUNIDAD',
                 bodyStyle: 'padding:5px',
                 layout: 'border',
-                items: [
-                    isForm,
-                ],
+                items: isForm,
                 buttons: [
                     {
                         text: 'Guardar',
@@ -2843,7 +3022,8 @@ header("content-type: text/javascript; charset=UTF-8");
                                         id_ro: submit.id_ro,
                                         otro_nombre_ro: null,
                                         id_aom: maestro.id_aom,
-                                        criticidad: submit.criticidad
+                                        criticidad: submit.criticidad,
+                                        acciones_ro: submit.acciones_ro
                                     },
                                     isUpload: false,
                                     success: function (a, b, c) {
@@ -2868,7 +3048,9 @@ header("content-type: text/javascript; charset=UTF-8");
                                         id_ro: submit.id_ro,
                                         otro_nombre_ro: null,
                                         id_aom: maestro.id_aom,
-                                        criticidad: submit.criticidad
+                                        criticidad: submit.criticidad,
+                                        acciones_ro: submit.acciones_ro
+
                                     },
                                     isUpload: false,
                                     success: function (a, b, c) {
