@@ -18,8 +18,8 @@ header("content-type: text/javascript; charset=UTF-8");
             id_ro: null,
             constructor: function (config) {
                 this.maestro = config.maestro;
-                this.id_tipo_ro_maestro = config.data.id_tipo_ro;
-                this.id_ro = config.data.id_ro;
+                this.id_tipo_ro_maestro = config.data?.id_tipo_ro;
+                this.id_ro = config.data?.id_ro;
                 Phx.vista.RiesgoOportunidad.superclass.constructor.call(this, config);
                 this.init()
                 this.store.baseParams.id_tipo_ro = this.id_tipo_ro_maestro;

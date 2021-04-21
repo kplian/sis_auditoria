@@ -26,6 +26,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.store.removeAll();
                 this.capturaFiltros();
             }, this);
+            // this.load({params: {start: 0, limit: this.tam_pag}});
         },
         onButtonNew: function () {
             if (!this.validarFiltros()) {
