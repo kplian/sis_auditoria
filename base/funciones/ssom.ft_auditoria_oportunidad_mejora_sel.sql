@@ -108,7 +108,6 @@ BEGIN
             --Definicion de la respuesta
             v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
             return v_consulta;
 
         end;
@@ -243,7 +242,7 @@ BEGIN
                 if (v_parametros.codigo = 'RESP')then
                     v_filtro = ' pa.valor_parametro = ''Responsable'' and ';
                 else
-                    v_filtro = ' pa.valor_parametro = ''Equipo Auditor'' and';
+                    v_filtro = ' pa.valor_parametro in (''Equipo Auditor'',''Responsable'') and';
                 end if;
 
                 v_consulta:='select  eus.id_funcionario,
@@ -712,4 +711,3 @@ EXCEPTION
         raise exception '%',v_resp;
 END;
 $$;
-
