@@ -1051,6 +1051,22 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         formularioProceso: function () {
             const maestro = this.sm.getSelected().data;
+            let storeOne = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/Proceso/listarProceso',
+                id: 'id_proceso',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_proceso', 'proceso'],
+                remoteSort: true,
+                autoLoad: true,
+                baseParams: {
+                    dir: 'ASC',
+                    sort: 'id_proceso',
+                    limit: '100',
+                    start: '0',
+                    item: maestro.id_aom
+                }
+            });
             const isForm = new Ext.form.FormPanel({
                 labelAlign: 'top',
                 frame: true,
@@ -1103,22 +1119,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             multiselects: [{
                                 width: 300,
                                 height: 200,
-                                store: new Ext.data.JsonStore({
-                                    url: '../../sis_auditoria/control/Proceso/listarProceso',
-                                    id: 'id_proceso',
-                                    root: 'datos',
-                                    totalProperty: 'total',
-                                    fields: ['id_proceso', 'proceso'],
-                                    remoteSort: true,
-                                    autoLoad: true,
-                                    baseParams: {
-                                        dir: 'ASC',
-                                        sort: 'id_proceso',
-                                        limit: '100',
-                                        start: '0',
-                                        item: maestro.id_aom
-                                    }
-                                }),
+                                store: storeOne ,
                                 tbar: {
                                     xtype: 'toolbar',
                                     flex: 1,
@@ -1133,17 +1134,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 scope: this,
                                                 specialkey: function (field, e) {
                                                     if (e.getKey() === e.ENTER) {
-                                                        if (String(field).trim() !== '') {
-                                                            isForm.getForm().findField('id_proceso').multiselects[0].store.baseParams = {
-                                                                proceso: field.getValue(),
-                                                                dir: 'ASC',
-                                                                sort: 'id_proceso',
-                                                                limit: '100',
-                                                                start: '0',
-                                                                item: maestro.id_aom
-                                                            };
-                                                            isForm.getForm().findField('id_proceso').multiselects[0].store.load();
-                                                        }
+                                                        storeOne.filter('proceso', field.getValue());
                                                     }
                                                 }
                                             }
@@ -1265,7 +1256,7 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.CP.loadingShow();
             const maestro = this.sm.getSelected().data;
             const me = this;
-            const tienda = new Ext.data.JsonStore({
+            let tienda = new Ext.data.JsonStore({
                 url: '../../sis_auditoria/control/AuditoriaOportunidadMejora/getListAuditores',
                 id: 'id_funcionario',
                 root: 'datos',
@@ -1380,18 +1371,19 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 scope: this,
                                                 specialkey: function (field, e) {
                                                     if (e.getKey() === e.ENTER) {
-                                                        if (String(field).trim() !== '') {
-                                                            isForm.getForm().findField('id_equipo_auditor').multiselects[0].store.baseParams = {
-                                                                desc_funcionario1: field.getValue(),
-                                                                dir: 'ASC',
-                                                                sort: 'id_funcionario',
-                                                                limit: '100',
-                                                                start: '0',
-                                                                codigo: 'MEQ',
-                                                                item: maestro.id_aom
-                                                            };
-                                                            isForm.getForm().findField('id_equipo_auditor').multiselects[0].store.load();
-                                                        }
+                                                        tienda.filter('desc_funcionario1', field.getValue());
+                                                        // if (String(field).trim() !== '') {
+                                                        //     isForm.getForm().findField('id_equipo_auditor').multiselects[0].store.baseParams = {
+                                                        //         desc_funcionario1: field.getValue(),
+                                                        //         dir: 'ASC',
+                                                        //         sort: 'id_funcionario',
+                                                        //         limit: '100',
+                                                        //         start: '0',
+                                                        //         codigo: 'MEQ',
+                                                        //         item: maestro.id_aom
+                                                        //     };
+                                                        //     isForm.getForm().findField('id_equipo_auditor').multiselects[0].store.load();
+                                                        // }
                                                     }
                                                 }
                                             }
@@ -1613,6 +1605,15 @@ header("content-type: text/javascript; charset=UTF-8");
             const maestro = this.sm.getSelected().data;
             const me = this;
             let id_norma_aux = null;
+            let storeOne = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNormaMulti',
+                id: 'id_pn',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_pn', 'nombre_pn', 'nombre_descrip'],
+                remoteSort: true,
+                baseParams: {dir: 'ASC', sort: 'id_pn', limit: '100', start: '0'}
+            });
             const isForm = new Ext.form.FormPanel({
                 labelAlign: 'top',
                 frame: true,
@@ -1689,15 +1690,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             multiselects: [{
                                 width: 300,
                                 height: 250,
-                                store: new Ext.data.JsonStore({
-                                    url: '../../sis_auditoria/control/PuntoNorma/listarPuntoNormaMulti',
-                                    id: 'id_pn',
-                                    root: 'datos',
-                                    totalProperty: 'total',
-                                    fields: ['id_pn', 'nombre_pn', 'nombre_descrip'],
-                                    remoteSort: true,
-                                    baseParams: {dir: 'ASC', sort: 'id_pn', limit: '100', start: '0'}
-                                }),
+                                store: storeOne,
                                 tbar: {
                                     xtype: 'toolbar',
                                     flex: 1,
@@ -1712,18 +1705,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 scope: this,
                                                 specialkey: function (field, e) {
                                                     if (e.getKey() === e.ENTER) {
-                                                        if (String(field).trim() !== '') {
-                                                            isForm.getForm().findField('id_pn').multiselects[0].store.baseParams = {
-                                                                nombre_pn: field.getValue(),
-                                                                dir: "ASC",
-                                                                sort: "id_pn",
-                                                                limit: "100",
-                                                                start: "0",
-                                                                id_norma: id_norma_aux,
-                                                                item: maestro.id_aom
-                                                            };
-                                                            isForm.getForm().findField('id_pn').multiselects[0].store.load();
-                                                        }
+                                                        storeOne.filter('nombre_pn', field.getValue());
                                                     }
                                                 }
                                             }
@@ -1899,6 +1881,16 @@ header("content-type: text/javascript; charset=UTF-8");
             pnNorma = '';
             const me = this;
             let id_pn_aux = null;
+            let storeOne = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/Pregunta/listarPregunta',
+                id: 'id_pregunta',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_pregunta', 'nro_pregunta', 'descrip_pregunta'],
+                remoteSort: true,
+                baseParams: {dir: 'ASC', sort: 'id_pregunta', limit: '100', start: '0'}
+            });
+
             this.isFormp = new Ext.form.FormPanel({
                 labelAlign: 'top',
                 frame: true,
@@ -2010,15 +2002,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             multiselects: [{
                                 width: 300,
                                 height: 250,
-                                store: new Ext.data.JsonStore({
-                                    url: '../../sis_auditoria/control/Pregunta/listarPregunta',
-                                    id: 'id_pregunta',
-                                    root: 'datos',
-                                    totalProperty: 'total',
-                                    fields: ['id_pregunta', 'nro_pregunta', 'descrip_pregunta'],
-                                    remoteSort: true,
-                                    baseParams: {dir: 'ASC', sort: 'id_pregunta', limit: '100', start: '0'}
-                                }),
+                                store: storeOne,
                                 tbar: {
                                     xtype: 'toolbar',
                                     flex: 1,
@@ -2033,18 +2017,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 scope: this,
                                                 specialkey: function (field, e) {
                                                     if (e.getKey() === e.ENTER) {
-                                                        if (String(field).trim() !== '') {
-                                                            me.isFormp.getForm().findField('id_pregunta').multiselects[0].store.baseParams = {
-                                                                descrip_pregunta: field.getValue(),
-                                                                dir: "ASC",
-                                                                sort: "id_pregunta",
-                                                                limit: "100",
-                                                                start: "0",
-                                                                id_pn: id_pn_aux,
-                                                                item: maestro.id_aom
-                                                            };
-                                                            me.isFormp.getForm().findField('id_pregunta').multiselects[0].store.load();
-                                                        }
+                                                        storeOne.filter('descrip_pregunta', field.getValue());
                                                     }
                                                 }
                                             }
@@ -2328,7 +2301,22 @@ header("content-type: text/javascript; charset=UTF-8");
             });
             const desde = this.formatoFecha(maestro.fecha_prev_inicio);
             const hasta = this.formatoFecha(maestro.fecha_prev_fin);
-
+            let storeOne = new Ext.data.JsonStore({
+                url: '../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
+                id: 'id_funcionario',
+                root: 'datos',
+                totalProperty: 'total',
+                fields: ['id_funcionario', 'desc_funcionario1', 'id_equipo_responsable'],
+                remoteSort: true,
+                autoLoad: true,
+                baseParams: {
+                    dir: 'ASC',
+                    sort: 'id_aom',
+                    limit: '100',
+                    start: '0',
+                    id_aom: maestro.id_aom
+                }
+            });
             const isForm = new Ext.form.FormPanel({
                 labelAlign: 'top',
                 frame: true,
@@ -2432,22 +2420,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             multiselects: [{
                                 width: 300,
                                 height: 150,
-                                store: new Ext.data.JsonStore({
-                                    url: '../../sis_auditoria/control/EquipoResponsable/listarEquipoResponsable',
-                                    id: 'id_funcionario',
-                                    root: 'datos',
-                                    totalProperty: 'total',
-                                    fields: ['id_funcionario', 'desc_funcionario1', 'id_equipo_responsable'],
-                                    remoteSort: true,
-                                    autoLoad: true,
-                                    baseParams: {
-                                        dir: 'ASC',
-                                        sort: 'id_aom',
-                                        limit: '100',
-                                        start: '0',
-                                        id_aom: maestro.id_aom
-                                    }
-                                }),
+                                store: storeOne ,
                                 tbar: {
                                     xtype: 'toolbar',
                                     flex: 1,
@@ -2462,17 +2435,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 scope: this,
                                                 specialkey: function (field, e) {
                                                     if (e.getKey() === e.ENTER) {
-                                                        if (String(field).trim() !== '') {
-                                                            isForm.getForm().findField('itemselector').multiselects[0].store.baseParams = {
-                                                                desc_funcionario1: field.getValue(),
-                                                                dir: 'ASC',
-                                                                sort: 'id_aom',
-                                                                limit: '100',
-                                                                start: '0',
-                                                                id_aom: maestro.id_aom
-                                                            };
-                                                            isForm.getForm().findField('itemselector').multiselects[0].store.load();
-                                                        }
+                                                        storeOne.filter('desc_funcionario1', field.getValue());
                                                     }
                                                 }
                                             }
