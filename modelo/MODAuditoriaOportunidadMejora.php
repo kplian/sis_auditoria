@@ -69,6 +69,7 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 		$this->captura('resumen','text');
         $this->captura('id_gestion','int4');
         $this->captura('nro_tramite','varchar');
+        $this->captura('metodo_auditoria','varchar');
 
         //Ejecuta la instruccion
 		$this->armarConsulta();
@@ -108,6 +109,7 @@ class MODAuditoriaOportunidadMejora extends MODbase{
         $this->setParametro('formulario_ingreso','formulario_ingreso','text');
         $this->setParametro('estado_form_ingreso','estado_form_ingreso','int4');
 		$this->setParametro('fecha_eje_fin','fecha_eje_fin','date');
+        $this->setParametro('metodo_auditoria','metodo_auditoria','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -145,6 +147,7 @@ class MODAuditoriaOportunidadMejora extends MODbase{
 		$this->setParametro('lugar','lugar','varchar');
 		$this->setParametro('id_tipo_om','id_tipo_om','int4');
 		$this->setParametro('fecha_eje_fin','fecha_eje_fin','date');
+        $this->setParametro('metodo_auditoria','metodo_auditoria','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

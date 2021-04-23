@@ -1,7 +1,11 @@
-create or replace function ssom.ft_auditoria_oportunidad_mejora_sel(p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying) returns character varying
-    language plpgsql
-as
-$$
+CREATE OR REPLACE FUNCTION ssom.ft_auditoria_oportunidad_mejora_sel (
+    p_administrador integer,
+    p_id_usuario integer,
+    p_tabla varchar,
+    p_transaccion varchar
+)
+    RETURNS varchar AS
+$body$
 /**************************************************************************
    SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
    FUNCION: 		ssom.ft_auditoria_oportunidad_mejora_sel
@@ -89,7 +93,8 @@ BEGIN
                             df.desc_funcionario1 as desc_funcionario_destinatario,
                             aom.resumen,
                             aom.id_gestion,
-                            aom.nro_tramite
+                            aom.nro_tramite,
+                            aom.metodo_auditoria
                             from ssom.tauditoria_oportunidad_mejora aom
                             inner join segu.tusuario usu1 on usu1.id_usuario = aom.id_usuario_reg
                             inner join ssom.ttipo_auditoria as tau on aom.id_tipo_auditoria=tau.id_tipo_auditoria
@@ -102,7 +107,7 @@ BEGIN
                             left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
                             left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
                             left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-                            left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario
+                            left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario 
                             where ';
 
             --Definicion de la respuesta
@@ -136,7 +141,7 @@ BEGIN
                             left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
                             left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
                             left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-            				left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario
+            				left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario 
 					        where ';
 
             --Definicion de la respuesta
@@ -163,7 +168,7 @@ BEGIN
                                som.nombre_aom1,
                                som.descrip_aom1,
                                som.nro_tramite_wf,
-                               fun.desc_funcionario1
+                               fun.desc_funcionario1	
                         from ssom.tauditoria_oportunidad_mejora som
                         inner join ssom.tequipo_responsable equ on equ.id_aom = som.id_aom
                         inner join orga.vfuncionario fun on fun.id_funcionario = equ.id_funcionario
@@ -192,7 +197,7 @@ BEGIN
                           inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
                           inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
                           inner join orga.tuo ger ON ger.id_uo = orga.f_get_uo_gerencia(fun.id_uo, NULL::integer, NULL::date)
-                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date) 
                           and pa.valor_parametro = ''Responsable'' and ';
 
             --Definicion de la respuesta
@@ -217,7 +222,7 @@ BEGIN
                           inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
                           inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
                           inner join orga.tuo ger ON ger.id_uo = orga.f_get_uo_gerencia(fun.id_uo, NULL::integer, NULL::date)
-                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date) 
                           and pa.valor_parametro = ''Responsable'' and';
 
             --Definicion de la respuesta
@@ -252,7 +257,7 @@ BEGIN
                         from ssom.tequipo_auditores eus
                         inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
                         inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
-                        where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                        where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date) 
                         and '||v_filtro;
 
             else
@@ -266,7 +271,7 @@ BEGIN
                                                      select e.id_uo_hijo,
                                                             e.id_uo_padre
                                                      from orga.testructura_uo e
-                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
+                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre 
                                                      and e.estado_reg = ''activo''
                                                   )select fu.id_funcionario,
                                                           fun.desc_funcionario1,
@@ -309,7 +314,7 @@ BEGIN
                             from ssom.tequipo_auditores eus
                             inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
                             inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
-                            where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                            where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date) 
                             and '||v_filtro;
 
             else
@@ -323,7 +328,7 @@ BEGIN
                                                      select e.id_uo_hijo,
                                                             e.id_uo_padre
                                                      from orga.testructura_uo e
-                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
+                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre 
                                                      and e.estado_reg = ''activo''
                                                   )select count(fu.id_funcionario)
                                                    from uo_mas_subordinados suo
@@ -640,7 +645,7 @@ BEGIN
                                 ''afk''::varchar as funcionario_implementado,
                                 ''IMP''::varchar as imp,
                                 ''V''::varchar as v,
-                                uo.nombre_unidad
+                                uo.nombre_unidad 
                                 from ssom.tauditoria_oportunidad_mejora som
                                 inner join orga.vfuncionario fu on fu.id_funcionario = som.id_funcionario
                                 inner join ssom.tno_conformidad mo on mo.id_aom = som.id_aom
@@ -710,4 +715,10 @@ EXCEPTION
         v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
         raise exception '%',v_resp;
 END;
-$$;
+$body$
+    LANGUAGE 'plpgsql'
+    VOLATILE
+    CALLED ON NULL INPUT
+    SECURITY INVOKER
+    PARALLEL UNSAFE
+    COST 100;

@@ -694,7 +694,20 @@ header("content-type: text/javascript; charset=UTF-8");
                     grid: true,
                     form: true
                 },
-
+                {
+                    config: {
+                        name: 'metodo_auditoria',
+                        fieldLabel: 'Método de auditoría',
+                        allowBlank: false,
+                        anchor: '80%',
+                        gwidth: 200
+                    },
+                    type: 'TextField',
+                    filters: {pfiltro: 'aom.metodo_auditoria', type: 'string'},
+                    id_grupo: 1,
+                    grid: true,
+                    form: true
+                },
                 {
                     config: {
                         name: 'fecha_eje_inicio',
@@ -884,7 +897,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 {name: 'id_destinatario', type: 'numeric'},
                 {name: 'desc_funcionario_destinatario', type: 'string'},
                 {name: 'resumen', type: 'string'},
-                {name: 'nro_tramite', type: 'string'}
+                {name: 'nro_tramite', type: 'string'},
+                {name: 'metodo_auditoria', type: 'string'}
             ],
             sortInfo: {
                 field: 'id_aom',

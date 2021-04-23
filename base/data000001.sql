@@ -796,3 +796,9 @@ select pxp.f_insert_trol ('', 'SSOM - Admin', 'SSOM');
 /********************************************I-DAT-MMV-SSOM-2-21/04/2021********************************************/
 select pxp.f_insert_tgui ('Riesgo Oportunidad', 'Riesgo Oportunidad', 'RIOP', 'si', 2, 'sis_auditoria/vista/riesgo_oportunidad/RiesgoOportunidadPrin.php', 3, '', 'RiesgoOportunidadPrin', 'SSOM');
 /********************************************F-DAT-MMV-SSOM-2-21/04/2021********************************************/
+
+/**********************************I-DAT-MMV-SSOM-ETR-3750-23/04/2021****************************************/
+select param.f_import_tcatalogo_tipo ('insert','tauditoria_oportunidad_mejora','SSOM','tauditoria_oportunidad_mejora');
+select param.f_import_tcatalogo ('insert','SSOM','presencial','presencial','tauditoria_oportunidad_mejora');
+select param.f_import_tcatalogo ('insert','SSOM','remota','remota','tauditoria_oportunidad_mejora');
+/**********************************F-DAT-MMV-SSOM-ETR-3750-23/04/2021****************************************/

@@ -608,3 +608,7 @@ alter table ssom.taom_riesgo_oportunidad
     add acciones_ro text;
 /**********************************F-DEP-MZM-SSOM-16-21/04/2021****************************************/
 
+/**********************************I-DEP-MMV-SSOM-ETR-3750-23/04/2021****************************************/
+ALTER TABLE ssom.tauditoria_oportunidad_mejora
+    ADD COLUMN metodo_auditoria VARCHAR(100);
+/**********************************F-DEP-MMV-SSOM-ETR-3750-23/04/2021****************************************/

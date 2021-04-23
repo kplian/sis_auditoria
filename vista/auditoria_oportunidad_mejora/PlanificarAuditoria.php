@@ -701,7 +701,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         xtype: 'tabpanel',
                         plain: true,
                         activeTab: 0,
-                        height: 500,
+                        height: 540,
                         width: 700,
 
                         enableTabScroll: true,
@@ -840,6 +840,36 @@ header("content-type: text/javascript; charset=UTF-8");
                                                 minChars: 2,
                                                 anchor: '98%'
                                             },
+                                            {
+                                                xtype: 'combo',
+                                                fieldLabel: '*Método de auditoría',
+                                                name: 'metodo_auditoria',
+                                                allowBlank: false,
+                                                id: this.idContenedor + '_metodo_auditoria',
+                                                emptyText: 'Elija una opción...',
+                                                store: new Ext.data.JsonStore({
+                                                    url: '../../sis_parametros/control/Catalogo/listarCatalogoCombo',
+                                                    id: 'id_catalogo',
+                                                    root: 'datos',
+                                                    sortInfo:{
+                                                        field: 'descripcion',
+                                                        direction: 'ASC'
+                                                    },
+                                                    totalProperty: 'total',
+                                                    fields: ['id_catalogo','codigo','descripcion'],
+                                                    remoteSort: true,
+                                                    baseParams: {par_filtro: 'descripcion', cod_subsistema : 'SSOM',catalogo_tipo :'tauditoria_oportunidad_mejora'}
+                                                }),
+                                                valueField : 'descripcion',
+                                                displayField : 'descripcion',
+                                                // gdisplayField: 'desc_tipo_objeto',
+                                                mode: 'remote',
+                                                triggerAction: 'all',
+                                                lazyRender: true,
+                                                pageSize: 15,
+                                                minChars: 2,
+                                                anchor: '98%'
+                                            },
                                         ]
                                     },
                                     {
@@ -954,16 +984,16 @@ header("content-type: text/javascript; charset=UTF-8");
             });
             this.formularioVentana = new Ext.Window({
                 width: 735,
-                height: 590,
+                height: 630,
                 minWidth: 735,
-                minHeight: 590,
+                minHeight: 630,
                 modal: true,
                 autoScroll: true,
                 closeAction: 'hide',
                 labelAlign: 'top',
                 title: 'AUDITORIA PLANIFICADA',
                 bodyStyle: 'padding:5px',
-                resizable: false,
+                resizable: true,
                 // layout: 'border',
                 layout: 'fit',
                 plain: true,

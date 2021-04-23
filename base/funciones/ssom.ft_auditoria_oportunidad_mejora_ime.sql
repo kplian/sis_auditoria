@@ -1,7 +1,11 @@
-create or replace function ssom.ft_auditoria_oportunidad_mejora_ime(p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying) returns character varying
-    language plpgsql
-as
-$$
+CREATE OR REPLACE FUNCTION ssom.ft_auditoria_oportunidad_mejora_ime (
+    p_administrador integer,
+    p_id_usuario integer,
+    p_tabla varchar,
+    p_transaccion varchar
+)
+    RETURNS varchar AS
+$body$
 /**************************************************************************
      SISTEMA:		Sistema de Seguimiento a Oportunidades de Mejora
      FUNCION: 		ssom.ft_auditoria_oportunidad_mejora_ime
@@ -75,6 +79,7 @@ DECLARE
     v_auditria                record;
     v_correlativo_del         record;
     v_funcionario             integer;
+    v_metodo_auditoria		  varchar;
 BEGIN
 
     v_nombre_funcion = 'ssom.ft_auditoria_oportunidad_mejora_ime';
@@ -182,7 +187,8 @@ BEGIN
                                                            id_gconsultivo,
                                                            fecha_prev_inicio,
                                                            fecha_prev_fin,
-                                                           nro_tramite)
+                                                           nro_tramite,
+                                                           metodo_auditoria)
             values (v_id_proceso_wf,
                     v_num_tramite,
                     v_funcionario,
@@ -208,7 +214,8 @@ BEGIN
                     v_parametros.fecha_prev_inicio,
                     v_parametros.fecha_prev_fin,
                     ssom.f_generar_correlativo(v_codigo_aud,
-                                               EXTRACT(YEAR FROM current_date)::integer, true))
+                                               EXTRACT(YEAR FROM current_date)::integer, true),
+                    v_parametros.metodo_auditoria)
             RETURNING id_aom into v_id_aom;
 
 
@@ -282,7 +289,8 @@ BEGIN
                 id_usuario_mod    = p_id_usuario,
                 fecha_mod         = now(),
                 id_usuario_ai     = v_parametros._id_usuario_ai,
-                usuario_ai        = v_parametros._nombre_usuario_ai
+                usuario_ai        = v_parametros._nombre_usuario_ai,
+                metodo_auditoria  = v_parametros.metodo_auditoria
             where id_aom = v_parametros.id_aom;
 
             --Definicion de la respuesta
@@ -812,15 +820,14 @@ BEGIN
                 for v_json_formulario_record in (select json_array_elements(v_json_formularion))
                     loop
 
-                        v_fecha_prog_inicio =
-                                    v_json_formulario_record.json_array_elements::json ->> 'fecha_prog_inicio';
-                        v_fecha_prev_inicio =
-                                    v_json_formulario_record.json_array_elements::json ->> 'fecha_prev_inicio';
+                        v_fecha_prog_inicio = v_json_formulario_record.json_array_elements::json ->> 'fecha_prog_inicio';
+                        v_fecha_prev_inicio = v_json_formulario_record.json_array_elements::json ->> 'fecha_prev_inicio';
                         v_fecha_prev_fin = v_json_formulario_record.json_array_elements::json ->> 'fecha_prev_fin';
                         v_fecha_prog_fin = v_json_formulario_record.json_array_elements::json ->> 'fecha_prog_fin';
                         v_id_tobjeto = v_json_formulario_record.json_array_elements::json ->> 'id_tobjeto';
                         v_id_tnorma = v_json_formulario_record.json_array_elements::json ->> 'id_tnorma';
                         v_lugar = v_json_formulario_record.json_array_elements::json ->> 'lugar';
+                        v_metodo_auditoria = v_json_formulario_record.json_array_elements::json ->> 'metodo_auditoria';
 
                         v_id_destinatario = null;
                         v_resumen = null;
@@ -829,8 +836,7 @@ BEGIN
 
                         if v_parametros.informe = 'si' then
 
-                            v_id_destinatario =
-                                        v_json_formulario_record.json_array_elements::json ->> 'id_destinatario';
+                            v_id_destinatario = v_json_formulario_record.json_array_elements::json ->> 'id_destinatario';
                             v_recomendacion = v_json_formulario_record.json_array_elements::json ->> 'recomendacion';
                             v_id_destinatarios = v_json_formulario_record.json_array_elements::json ->>
                                                  'id_destinatarios';
@@ -841,7 +847,8 @@ BEGIN
                                 resumen         = v_parametros.resumen,
                                 recomendacion   = v_parametros.recomendacion,
                                 id_usuario_mod  = p_id_usuario,
-                                fecha_mod       = now()
+                                fecha_mod       = now(),
+                                metodo_auditoria  = v_metodo_auditoria
                             where id_aom = v_parametros.id_aom;
 
                             delete
@@ -882,6 +889,7 @@ BEGIN
                                 id_tnorma         = v_id_tnorma,
                                 lugar             = v_lugar,
                                 id_usuario_mod    = p_id_usuario,
+                                metodo_auditoria  = v_metodo_auditoria,
                                 fecha_mod         = now()
                             where id_aom = v_parametros.id_aom;
                         end if;
@@ -989,4 +997,10 @@ EXCEPTION
         raise exception '%',v_resp;
 
 END;
-$$;
+$body$
+    LANGUAGE 'plpgsql'
+    VOLATILE
+    CALLED ON NULL INPUT
+    SECURITY INVOKER
+    PARALLEL UNSAFE
+    COST 100;
