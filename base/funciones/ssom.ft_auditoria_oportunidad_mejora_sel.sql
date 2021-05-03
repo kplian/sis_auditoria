@@ -107,7 +107,7 @@ BEGIN
                             left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
                             left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
                             left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-                            left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario 
+                            left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario
                             where ';
 
             --Definicion de la respuesta
@@ -141,7 +141,7 @@ BEGIN
                             left join ssom.vparametro_tnorma vptn on aom.id_tnorma::integer = vptn.id_parametro_tn
                             left join ssom.vparametro_tobjeto vpto on aom.id_tobjeto::integer = vpto.id_parametro_to
                             left join ssom.vparametro_tipo_om vptom on aom.id_tipo_om = vptom.id_parametro_tom
-            				left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario 
+            				left join orga.vfuncionario df on df.id_funcionario = aom.id_destinatario
 					        where ';
 
             --Definicion de la respuesta
@@ -168,7 +168,7 @@ BEGIN
                                som.nombre_aom1,
                                som.descrip_aom1,
                                som.nro_tramite_wf,
-                               fun.desc_funcionario1	
+                               fun.desc_funcionario1
                         from ssom.tauditoria_oportunidad_mejora som
                         inner join ssom.tequipo_responsable equ on equ.id_aom = som.id_aom
                         inner join orga.vfuncionario fun on fun.id_funcionario = equ.id_funcionario
@@ -197,8 +197,8 @@ BEGIN
                           inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
                           inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
                           inner join orga.tuo ger ON ger.id_uo = orga.f_get_uo_gerencia(fun.id_uo, NULL::integer, NULL::date)
-                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date) 
-                          and pa.valor_parametro = ''Responsable'' and ';
+                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                          and pa.valor_parametro in (''Equipo Auditor'',''Responsable'') and ';
 
             --Definicion de la respuesta
             v_consulta:=v_consulta||v_parametros.filtro;
@@ -222,8 +222,8 @@ BEGIN
                           inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
                           inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
                           inner join orga.tuo ger ON ger.id_uo = orga.f_get_uo_gerencia(fun.id_uo, NULL::integer, NULL::date)
-                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date) 
-                          and pa.valor_parametro = ''Responsable'' and';
+                          where fun.fecha_asignacion <= now()::date and (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
+                          and pa.valor_parametro in (''Equipo Auditor'',''Responsable'') and';
 
             --Definicion de la respuesta
             v_consulta:=v_consulta||v_parametros.filtro;
@@ -245,7 +245,7 @@ BEGIN
             if(v_parametros.codigo = 'RESP' or v_parametros.codigo = 'MEQ' )then
 
                 if (v_parametros.codigo = 'RESP')then
-                    v_filtro = ' pa.valor_parametro = ''Responsable'' and ';
+                    v_filtro = ' pa.valor_parametro in (''Equipo Auditor'',''Responsable'') and ';
                 else
                     v_filtro = ' pa.valor_parametro in (''Equipo Auditor'',''Responsable'') and';
                 end if;
@@ -257,7 +257,7 @@ BEGIN
                         from ssom.tequipo_auditores eus
                         inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
                         inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
-                        where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date) 
+                        where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
                         and '||v_filtro;
 
             else
@@ -271,7 +271,7 @@ BEGIN
                                                      select e.id_uo_hijo,
                                                             e.id_uo_padre
                                                      from orga.testructura_uo e
-                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre 
+                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
                                                      and e.estado_reg = ''activo''
                                                   )select fu.id_funcionario,
                                                           fun.desc_funcionario1,
@@ -304,9 +304,9 @@ BEGIN
             if(v_parametros.codigo = 'RESP' or v_parametros.codigo = 'MEQ' )then
 
                 if (v_parametros.codigo = 'RESP')then
-                    v_filtro = ' pa.valor_parametro = ''Responsable'' and ';
+                    v_filtro = ' pa.valor_parametro in (''Equipo Auditor'',''Responsable'') and ';
                 else
-                    v_filtro = ' pa.valor_parametro = ''Equipo Auditor'' and';
+                    v_filtro = ' pa.valor_parametro in (''Equipo Auditor'',''Responsable'') and';
                 end if;
 
 
@@ -314,7 +314,7 @@ BEGIN
                             from ssom.tequipo_auditores eus
                             inner join orga.vfuncionario_cargo fun on fun.id_funcionario = eus.id_funcionario
                             inner join ssom.tparametro  pa on  pa.id_parametro = eus.id_tipo_participacion
-                            where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date) 
+                            where (fun.fecha_finalizacion is null or fun.fecha_finalizacion >= now()::date)
                             and '||v_filtro;
 
             else
@@ -328,7 +328,7 @@ BEGIN
                                                      select e.id_uo_hijo,
                                                             e.id_uo_padre
                                                      from orga.testructura_uo e
-                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre 
+                                                     inner join uo_mas_subordinados s on s.id_uo_hijo = e.id_uo_padre
                                                      and e.estado_reg = ''activo''
                                                   )select count(fu.id_funcionario)
                                                    from uo_mas_subordinados suo
@@ -645,7 +645,7 @@ BEGIN
                                 ''afk''::varchar as funcionario_implementado,
                                 ''IMP''::varchar as imp,
                                 ''V''::varchar as v,
-                                uo.nombre_unidad 
+                                uo.nombre_unidad
                                 from ssom.tauditoria_oportunidad_mejora som
                                 inner join orga.vfuncionario fu on fu.id_funcionario = som.id_funcionario
                                 inner join ssom.tno_conformidad mo on mo.id_aom = som.id_aom
